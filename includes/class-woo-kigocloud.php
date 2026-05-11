@@ -41,7 +41,7 @@ class Woo_KigoCloud {
      *
      * @since 1.0.0
      */
-    const PLUGIN_VERSION = '2.1.4';
+    const PLUGIN_VERSION = '2.1.5';
 
 	/**
 	 * The loader that's responsible for maintaining and registering all hooks that power
@@ -224,15 +224,15 @@ class Woo_KigoCloud {
             }
 
             // Block checkout (WC 8.6+) via Additional Checkout Fields API.
-            // Registration is kept minimal; sanitize / validate live on
-            // separate WC filters so the registration itself can never
-            // be rejected for callback type mismatches.
-            if (Woo_KigoCloud_R1::block_supported()) {
-                $this->loader->add_action('woocommerce_init', $plugin_r1, 'register_block_fields', 20);
-                $this->loader->add_filter('woocommerce_sanitize_additional_field', $plugin_r1, 'sanitize_block_additional_field', 10, 2);
-                $this->loader->add_filter('woocommerce_validate_additional_field', $plugin_r1, 'validate_block_additional_field', 10, 3);
-                $this->loader->add_action('woocommerce_store_api_checkout_update_order_from_request', $plugin_r1, 'sync_block_meta_to_legacy', 10, 2);
-            }
+            // The hook is registered UNCONDITIONALLY because plugins are
+            // loaded alphabetically and `kigocloud-` < `woocommerce-`,
+            // which means WC_VERSION is not yet defined at this point.
+            // The handler itself does the function_exists / mode check
+            // at fire time when WC is guaranteed to be loaded.
+            $this->loader->add_action('woocommerce_init', $plugin_r1, 'register_block_fields', 20);
+            $this->loader->add_filter('woocommerce_sanitize_additional_field', $plugin_r1, 'sanitize_block_additional_field', 10, 2);
+            $this->loader->add_filter('woocommerce_validate_additional_field', $plugin_r1, 'validate_block_additional_field', 10, 3);
+            $this->loader->add_action('woocommerce_store_api_checkout_update_order_from_request', $plugin_r1, 'sync_block_meta_to_legacy', 10, 2);
 
             // Optional: force the standard billing.company field to be
             // required on both classic and block checkouts.

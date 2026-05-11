@@ -5,7 +5,7 @@ Tags: woocommerce, hrvatska fiskalizacija, croatian fiscalization, fiscalization
 Requires at least: 5.5
 Requires PHP: 7.2
 Tested up to: 6.9
-Stable tag: 2.1.4
+Stable tag: 2.1.5
 WC requires at least: 5.0
 WC tested up to: 9.4
 License: GPLv2 or later
@@ -45,6 +45,9 @@ This plugin is not hosted on the WordPress.org repository. Updates are delivered
 4. WooCommerce -> Settings -> KigoCloud, fill in your API credentials
 
 == Changelog ==
+
+= 2.1.5 =
+* Fix: R1 fields are now actually registered on the block checkout. Root cause: the woocommerce_init hook was wrapped in a Woo_KigoCloud_R1::block_supported() check that tested WC_VERSION. Plugins load alphabetically and "kigocloud-" < "woocommerce-", so at hook-registration time WC_VERSION was not yet defined and the check returned false, silently preventing the hook from being added. The hook is now registered unconditionally; the handler itself validates WC availability when it fires.
 
 = 2.1.4 =
 * Admin: every tab is now pre-rendered in the DOM. Switching tabs is an instant show/hide (no fetch, no reload). One Save All button at the bottom posts the entire admin in a single options.php request, persisting every option across every tab in one go.
