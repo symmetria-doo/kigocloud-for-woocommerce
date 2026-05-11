@@ -120,6 +120,31 @@ class Woo_KigoCloud_R1
         ));
     }
 
+    /**
+     * Marks the standard WooCommerce billing.company field as required.
+     * Hook: woocommerce_default_address_fields (covers block checkout
+     * and Customer Account address forms).
+     */
+    public function force_company_required($fields)
+    {
+        if (isset($fields['company'])) {
+            $fields['company']['required'] = true;
+        }
+        return $fields;
+    }
+
+    /**
+     * Same as above but on the classic checkout filter (which uses
+     * billing_* prefixed keys instead of the default address fields).
+     */
+    public function force_classic_billing_company_required($fields)
+    {
+        if (isset($fields['billing_company'])) {
+            $fields['billing_company']['required'] = true;
+        }
+        return $fields;
+    }
+
 
     /**
      * When the Store API creates the order, copy the additional checkout

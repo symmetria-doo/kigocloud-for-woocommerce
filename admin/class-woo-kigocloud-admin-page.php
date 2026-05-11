@@ -114,10 +114,62 @@ class Woo_KigoCloud_Admin_Page
                 padding: 2px 8px; border-radius: 10px; font-size: 11px;
                 font-weight: 600; vertical-align: middle; margin-left: 6px;
             }
+            .kigocloud-admin .kc-preview {
+                border: 1px solid #dcdcde; border-radius: 6px;
+                background: #f6f7f7; padding: 18px 20px; margin-top: 8px;
+                max-width: 520px;
+            }
+            .kigocloud-admin .kc-preview-label {
+                font-size: 11px; text-transform: uppercase;
+                color: #8c8f94; font-weight: 600; letter-spacing: .04em;
+                margin-bottom: 8px;
+            }
+            .kigocloud-admin .kc-preview-field {
+                background: #fff; border: 1px solid #c3c4c7;
+                border-radius: 4px; padding: 8px 10px;
+                margin-bottom: 10px; font-size: 13px;
+                display: flex; flex-direction: column;
+            }
+            .kigocloud-admin .kc-preview-field strong {
+                font-size: 11px; color: #50575e;
+                font-weight: 500; margin-bottom: 2px;
+            }
+            .kigocloud-admin .kc-preview-field .kc-placeholder {
+                color: #a7aaad; font-style: italic;
+            }
+            .kigocloud-admin .kc-preview-field.kc-req strong::after {
+                content: " *"; color: #d63638;
+            }
+            .kigocloud-admin .kc-preview-toggle {
+                background: #fff; border: 1px solid #c3c4c7;
+                border-radius: 4px; padding: 10px;
+                margin-bottom: 10px; font-size: 13px;
+                display: flex; align-items: center; gap: 8px;
+            }
+            .kigocloud-admin .kc-preview-toggle::before {
+                content: ""; width: 16px; height: 16px;
+                border: 1px solid #8c8f94; border-radius: 3px;
+                display: inline-block; background: #fff;
+            }
+            .kigocloud-admin .kc-test-result {
+                margin-top: 10px; padding: 8px 12px; border-radius: 4px;
+                font-size: 13px; max-width: 520px;
+            }
+            .kigocloud-admin .kc-test-running { background: #f0f6fc; color: #2271b1; border: 1px solid #2271b1; }
+            .kigocloud-admin .kc-test-ok      { background: #edfaef; color: #00a32a; border: 1px solid #00a32a; }
+            .kigocloud-admin .kc-test-bad     { background: #fcf0f1; color: #d63638; border: 1px solid #d63638; }
         ';
         wp_register_style('kigocloud-admin', false, array(), Woo_KigoCloud::PLUGIN_VERSION);
         wp_enqueue_style('kigocloud-admin');
         wp_add_inline_style('kigocloud-admin', $inline);
+
+        wp_enqueue_script(
+            'kigocloud-admin',
+            WOO_KIGOCLOUD_PLUGIN_URL . 'admin/js/kigocloud-admin.js',
+            array(),
+            Woo_KigoCloud::PLUGIN_VERSION,
+            true
+        );
     }
 
     public function render_page()
@@ -190,6 +242,7 @@ class Woo_KigoCloud_Admin_Page
             ),
             'kigocloud_r1' => array(
                 'kigocloud_vat_invoices',
+                'kigocloud_require_billing_company',
             ),
             'kigocloud_email' => array(
                 'kigocloud_email_from_name',
@@ -447,6 +500,7 @@ class Woo_KigoCloud_Admin_Page
     private function render_tab_r1()
     {
         $wc_supports_block_r1 = defined('WC_VERSION') && version_compare(WC_VERSION, '8.6.0', '>=');
+        $mode = (int) get_option('kigocloud_vat_invoices', 0);
         ?>
         <div class="kc-card">
             <h2><?php esc_html_e('R1 customer fields', 'kigocloud-for-woocommerce'); ?></h2>
@@ -469,11 +523,188 @@ class Woo_KigoCloud_Admin_Page
                     '1' => __('Show OIB / VAT field only', 'kigocloud-for-woocommerce'),
                     '2' => __('Show full R1 block (company, address, city, postcode, OIB)', 'kigocloud-for-woocommerce'),
                 ), array('default' => '0'));
+
+                $this->select_field('kigocloud_require_billing_company', __('Force billing company required', 'kigocloud-for-woocommerce'), array(
+                    '0' => __('No (use WooCommerce default)', 'kigocloud-for-woocommerce'),
+                    '1' => __('Yes (make billing.company a required field)', 'kigocloud-for-woocommerce'),
+                ), array(
+                    'default'     => '0',
+                    'description' => __('When R1 mode 2 is on, customers must enter a company name. Enabling this option marks the standard WooCommerce billing.company field as required so the block checkout enforces it everywhere.', 'kigocloud-for-woocommerce'),
+                ));
                 ?>
             </table>
             <?php $this->close_form(); ?>
         </div>
+
+        <div class="kc-card">
+            <h2><?php esc_html_e('Preview - what the customer will see', 'kigocloud-for-woocommerce'); ?></h2>
+            <p class="kc-desc">
+                <?php esc_html_e('Live preview of the R1 fields that appear on the checkout based on the current mode. Asterisk marks required fields.', 'kigocloud-for-woocommerce'); ?>
+            </p>
+            <?php $this->render_r1_preview($mode); ?>
+        </div>
+
+        <div class="kc-card">
+            <h2><?php esc_html_e('Test KigoCloud connection', 'kigocloud-for-woocommerce'); ?></h2>
+            <p class="kc-desc">
+                <?php esc_html_e('Sends a one-shot synthetic R1 invoice to KigoCloud using the saved API credentials and a dummy OIB. No real order is created. Shows the raw KigoCloud response so you can verify credentials, network and endpoint before going live.', 'kigocloud-for-woocommerce'); ?>
+            </p>
+            <p>
+                <button type="button" class="button button-secondary" id="kigocloud-test-push"
+                        data-nonce="<?php echo esc_attr(wp_create_nonce('kigocloud_test_push')); ?>"
+                        data-running-label="<?php esc_attr_e('Sending test invoice to KigoCloud...', 'kigocloud-for-woocommerce'); ?>">
+                    <?php esc_html_e('Send test R1 invoice', 'kigocloud-for-woocommerce'); ?>
+                </button>
+            </p>
+            <div id="kigocloud-test-push-result" class="kc-test-result" style="display:none;"></div>
+            <script>
+                /* If JS is disabled the result box stays hidden; with JS we
+                   reveal it so the test button has somewhere to render to. */
+                document.getElementById('kigocloud-test-push-result').style.display = '';
+            </script>
+        </div>
         <?php
+    }
+
+    private function render_r1_preview($mode)
+    {
+        if ($mode === 0) {
+            echo '<p class="kc-empty">' . esc_html__('R1 mode is off. No extra fields are added to the checkout.', 'kigocloud-for-woocommerce') . '</p>';
+            return;
+        }
+        ?>
+        <div class="kc-preview">
+            <div class="kc-preview-label"><?php esc_html_e('On the checkout, inside the billing address block:', 'kigocloud-for-woocommerce'); ?></div>
+
+            <?php if ($mode === 2): ?>
+                <div class="kc-preview-field kc-req">
+                    <strong><?php esc_html_e('Company name (for invoice)', 'kigocloud-for-woocommerce'); ?></strong>
+                    <span class="kc-placeholder">Symmetria d.o.o.</span>
+                </div>
+            <?php endif; ?>
+
+            <div class="kc-preview-field <?php echo $mode === 2 ? 'kc-req' : ''; ?>">
+                <strong><?php esc_html_e('OIB / VAT number', 'kigocloud-for-woocommerce'); ?></strong>
+                <span class="kc-placeholder">11 digits, e.g. 49942588956</span>
+            </div>
+
+            <?php if ($mode === 2): ?>
+                <div class="kc-preview-label" style="margin-top:14px;">
+                    <?php esc_html_e('The standard WooCommerce billing address (address, city, postcode, country) is shown above these fields and is used as the company address.', 'kigocloud-for-woocommerce'); ?>
+                </div>
+            <?php endif; ?>
+        </div>
+        <?php
+    }
+
+    /**
+     * AJAX handler for the "Send test R1 invoice" button. Builds a
+     * minimal synthetic payload and pushes it to the configured
+     * KigoCloud endpoint using the saved credentials. Returns a
+     * human-readable summary suitable for inline display.
+     */
+    public function ajax_test_push()
+    {
+        if (!current_user_can(self::CAPABILITY)) {
+            wp_send_json_error(array('message' => __('Permission denied.', 'kigocloud-for-woocommerce')), 403);
+        }
+        check_ajax_referer('kigocloud_test_push', 'nonce');
+
+        $username = get_option('kigocloud_username');
+        $password = get_option('kigocloud_password');
+        if (empty($username) || empty($password)) {
+            wp_send_json_error(array('message' => __('API username or password is empty. Fill them on the Connection tab first.', 'kigocloud-for-woocommerce')));
+        }
+
+        if ($username !== 'admin_demo') {
+            $password = md5($password);
+        }
+
+        $url = Woo_KigoCloud_Request::resolveApiUrl() . 'invoice/create';
+
+        $body = new stdClass();
+        $body->pin             = get_option('kigocloud_pin', '1');
+        $body->pos_type        = 1; // Invoice
+        $body->payment         = 'T'; // Transaction account
+        $body->note            = 'KigoCloud admin test push at ' . current_time('mysql');
+        $body->internal_number = 'test-' . wp_rand(1000, 9999);
+
+        $item              = new stdClass();
+        $item->reference   = 'kigocloud-test';
+        $item->item_name   = 'KigoCloud test item';
+        $item->quantity    = 1;
+        $item->price       = 1.25;
+        $item->vat_percent = 25;
+        $body->items       = array($item);
+
+        $client                  = new stdClass();
+        $client->oib             = '49942588956'; // valid sample OIB
+        $client->company_name    = 'KigoCloud test buyer';
+        $client->street          = 'Test 1';
+        $client->city            = 'Zagreb';
+        $client->zip             = '10000';
+        $client->email           = '';
+        $client->phone           = '';
+        $client->contact_person  = 'KigoCloud test buyer';
+        $client->country_iso     = 'HR';
+        $client->client_vat_type = 0;
+        $body->client            = $client;
+
+        $response = wp_remote_post($url, array(
+            'method'      => 'POST',
+            'timeout'     => 20,
+            'redirection' => 0,
+            'blocking'    => true,
+            'sslverify'   => false,
+            'data_format' => 'body',
+            'headers'     => array(
+                'HTTP_X_USERNAME' => $username,
+                'HTTP_X_PASSWORD' => $password,
+                'Content-Type'    => 'application/json',
+                'Accept'          => 'application/json',
+            ),
+            'body'        => wp_json_encode($body),
+        ));
+
+        if (is_wp_error($response)) {
+            Woo_KigoCloud_Request::log_call(0, 'invoice/create (test)', false, $response->get_error_message());
+            wp_send_json_error(array('message' => sprintf(
+                /* translators: %s: error message */
+                __('Network error: %s', 'kigocloud-for-woocommerce'),
+                $response->get_error_message()
+            )));
+        }
+
+        $code = (int) wp_remote_retrieve_response_code($response);
+        $raw  = wp_remote_retrieve_body($response);
+        $json = json_decode($raw);
+
+        if ($code >= 200 && $code < 300 && is_object($json) && !empty($json->pos_number)) {
+            $msg = sprintf(
+                /* translators: 1: doc number, 2: place short, 3: pos number */
+                __('OK. KigoCloud accepted the test invoice: %1$s/%2$s/%3$s', 'kigocloud-for-woocommerce'),
+                $json->pos_number,
+                isset($json->fina_data_place_short) ? $json->fina_data_place_short : '',
+                isset($json->fina_data_place_pos) ? $json->fina_data_place_pos : ''
+            );
+            Woo_KigoCloud_Request::log_call(0, 'invoice/create (test)', true, $msg);
+            wp_send_json_success(array('message' => $msg));
+        }
+
+        $hint = '';
+        if (is_object($json) && !empty($json->error)) {
+            $hint = (string) $json->error;
+        } elseif (is_object($json) && !empty($json->message)) {
+            $hint = (string) $json->message;
+        }
+        $message = sprintf(
+            /* translators: 1: http status, 2: response body */
+            __('KigoCloud returned HTTP %1$d. %2$s', 'kigocloud-for-woocommerce'),
+            $code,
+            $hint !== '' ? $hint : wp_trim_words(wp_strip_all_tags((string) $raw), 30, '...')
+        );
+        Woo_KigoCloud_Request::log_call(0, 'invoice/create (test)', false, $message);
+        wp_send_json_error(array('message' => $message));
     }
 
     private function render_tab_email()

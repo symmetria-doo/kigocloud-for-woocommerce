@@ -5,7 +5,7 @@ Tags: woocommerce, hrvatska fiskalizacija, croatian fiscalization, fiscalization
 Requires at least: 5.5
 Requires PHP: 7.2
 Tested up to: 6.9
-Stable tag: 2.1.1
+Stable tag: 2.1.2
 WC requires at least: 5.0
 WC tested up to: 9.4
 License: GPLv2 or later
@@ -45,6 +45,12 @@ This plugin is not hosted on the WordPress.org repository. Updates are delivered
 4. WooCommerce -> Settings -> KigoCloud, fill in your API credentials
 
 == Changelog ==
+
+= 2.1.2 =
+* New: AJAX tab switching on the KigoCloud admin page. Clicking a tab now fetches the new tab content via XHR, swaps it in place and updates the URL. Browser Back/Forward work via history.pushState. No jQuery, no build.
+* New: R1 admin tab now has a live preview pane that mirrors what the customer will see on the checkout based on the current mode (optional vs required, OIB only vs full block).
+* New: R1 admin tab has a "Send test R1 invoice" button. Posts a synthetic invoice to KigoCloud with the saved credentials and shows the raw response inline, so you can verify the connection without placing a real order. Test results are also written to the Logs tab.
+* New: R1 admin tab has a "Force billing company required" option. When enabled, marks the standard WooCommerce billing.company field as required everywhere (block and classic checkout, Customer Account address forms).
 
 = 2.1.1 =
 * Fix: R1 fields (OIB / company) now actually render on the block checkout. The previous registration silently failed because it passed unsupported keys (show_in_order_confirmation, attributes.pattern) to the Additional Checkout Fields API

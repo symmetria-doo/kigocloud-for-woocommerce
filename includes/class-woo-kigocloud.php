@@ -41,7 +41,7 @@ class Woo_KigoCloud {
      *
      * @since 1.0.0
      */
-    const PLUGIN_VERSION = '2.1.1';
+    const PLUGIN_VERSION = '2.1.2';
 
 	/**
 	 * The loader that's responsible for maintaining and registering all hooks that power
@@ -201,6 +201,7 @@ class Woo_KigoCloud {
 		$this->loader->add_action( 'admin_init', $plugin_admin_page, 'register_settings' );
 		$this->loader->add_action( 'admin_init', $plugin_admin_page, 'maybe_clear_logs' );
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin_page, 'enqueue_admin_css' );
+		$this->loader->add_action( 'wp_ajax_kigocloud_test_push', $plugin_admin_page, 'ajax_test_push' );
 
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
@@ -229,6 +230,13 @@ class Woo_KigoCloud {
             if (Woo_KigoCloud_R1::block_supported()) {
                 $this->loader->add_action('woocommerce_init', $plugin_r1, 'register_block_fields', 20);
                 $this->loader->add_action('woocommerce_store_api_checkout_update_order_from_request', $plugin_r1, 'sync_block_meta_to_legacy', 10, 2);
+            }
+
+            // Optional: force the standard billing.company field to be
+            // required on both classic and block checkouts.
+            if ('1' === (string) get_option('kigocloud_require_billing_company', '0')) {
+                $this->loader->add_filter('woocommerce_default_address_fields', $plugin_r1, 'force_company_required');
+                $this->loader->add_filter('woocommerce_billing_fields', $plugin_r1, 'force_classic_billing_company_required');
             }
         }
 
