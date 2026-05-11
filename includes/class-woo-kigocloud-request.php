@@ -392,16 +392,7 @@ if (!class_exists('Woo_KigoCloud_Request')) {
         }
 
         public function add_pdf_attachment($attachments, $email_id, $email_object){
-            // Avoiding errors and problems
-            if ( ! is_a( $email_object, 'WC_Order' ) || ! isset( $email_id ) ) {
-                return $attachments;
-            }
-
-            // Add attachemnt if manual invoice email is sent from admin
-            if( $email_id === 'customer_invoice' ){
-
-
-            }
+            return $attachments;
         }
 
         public function send_invoice_email($order, $body, $email, $documentTypeTitle, $formattedPosNumber, $fullName){

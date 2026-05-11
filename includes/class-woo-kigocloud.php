@@ -223,6 +223,13 @@ class Woo_KigoCloud {
 
         $this->loader->add_action('rest_api_init', $plugin_rest, 'register_sku_endpoint');
 		$this->loader->add_action('rest_api_init', $plugin_rest, 'register_product_sku_endpoint');
+
+		// Plugins list helpers (Settings link + GitHub link).
+		if ( defined( 'WOO_KIGOCLOUD_PLUGIN_FILE' ) ) {
+			$basename = plugin_basename( WOO_KIGOCLOUD_PLUGIN_FILE );
+			$this->loader->add_filter( 'plugin_action_links_' . $basename, $plugin_admin, 'plugin_action_links' );
+			$this->loader->add_filter( 'plugin_row_meta', $plugin_admin, 'plugin_row_meta', 10, 2 );
+		}
 	}
 
 	/**

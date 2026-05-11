@@ -1,168 +1,86 @@
 <?php
-
 /**
- * The admin-specific functionality of the plugin.
+ * Admin-side glue: WooCommerce settings tab, plugin action link, order
+ * meta display, mail-from override.
  *
- * @link       https://github.com/dpotocic
- * @since      1.0.0
- *
- * @package    Woo_KigoCloud
- * @subpackage Woo_KigoCloud/admin
+ * @link    https://github.com/dpotocic/kigocloud-for-woocommerce
+ * @since   1.0.0
+ * @package Woo_KigoCloud
  */
 
-/**
- * The admin-specific functionality of the plugin.
- *
- * @package    Woo_KigoCloud
- * @subpackage Woo_KigoCloud/admin
- * @author     Dejan Potocic <dpotocic@gmail.com>
- */
 class Woo_KigoCloud_Admin
 {
-
-    /**
-     * The ID of this plugin.
-     *
-     * @since    1.0.0
-     * @access   private
-     * @var      string $plugin_name The ID of this plugin.
-     */
+    /** @var string */
     private $plugin_name;
 
-    /**
-     * The version of this plugin.
-     *
-     * @since    1.0.0
-     * @access   private
-     * @var      string $version The current version of this plugin.
-     */
+    /** @var string */
     private $version;
 
-    /**
-     * Initialize the class and set its properties.
-     *
-     * @since    1.0.0
-     * @param      string $plugin_name The name of this plugin.
-     * @param      string $version     The version of this plugin.
-     */
     public function __construct($plugin_name, $version)
     {
-
         $this->plugin_name = $plugin_name;
         $this->version     = $version;
     }
 
-    /**
-     * Register the stylesheets for the admin area.
-     *
-     * @since    1.0.0
-     */
     public function enqueue_styles()
     {
-
-        /**
-         * This function is provided for demonstration purposes only.
-         *
-         * An instance of this class should be passed to the run() function
-         * defined in Woo_KigoCloud_Loader as all of the hooks are defined
-         * in that particular class.
-         *
-         * The Woo_KigoCloud_Loader will then create the relationship
-         * between the defined hooks and the functions defined in this
-         * class.
-         */
-
-        /*wp_enqueue_style(
-            $this->plugin_name,
-            plugin_dir_url(__FILE__) . 'css/kigocloud-for-woocommerce-admin.css',
-            array(),
-            $this->version,
-            'all'
-        );*/
+        // Reserved for future admin stylesheet.
     }
 
-    /**
-     * Register the JavaScript for the admin area.
-     *
-     * @since    1.0.0
-     */
     public function enqueue_scripts()
     {
-
-        /**
-         * This function is provided for demonstration purposes only.
-         *
-         * An instance of this class should be passed to the run() function
-         * defined in Woo_KigoCloud_Loader as all of the hooks are defined
-         * in that particular class.
-         *
-         * The Woo_KigoCloud_Loader will then create the relationship
-         * between the defined hooks and the functions defined in this
-         * class.
-         */
-
-        /*wp_enqueue_script(
-            $this->plugin_name,
-            plugin_dir_url(__FILE__) . 'js/kigocloud-for-woocommerce-admin.js',
-            array('jquery'),
-            $this->version,
-            false
-        );*/
+        // Reserved for future admin script.
     }
 
     /**
-     * Change From email field of WP mails
+     * Settings link in the Plugins list row.
      *
-     * @param  string $changeEmail
-     * @return string
+     * @param array $links
+     * @return array
      */
+    public function plugin_action_links($links)
+    {
+        $settings_link = sprintf(
+            '<a href="%s">%s</a>',
+            esc_url(admin_url('admin.php?page=wc-settings&tab=kigocloud')),
+            esc_html__('Settings', 'kigocloud-for-woocommerce')
+        );
+        array_unshift($links, $settings_link);
+
+        return $links;
+    }
+
+    /**
+     * Extra metadata link in the Plugins list row (GitHub).
+     *
+     * @param array  $plugin_meta
+     * @param string $plugin_file
+     * @return array
+     */
+    public function plugin_row_meta($plugin_meta, $plugin_file)
+    {
+        if (defined('WOO_KIGOCLOUD_PLUGIN_FILE') && $plugin_file === plugin_basename(WOO_KIGOCLOUD_PLUGIN_FILE)) {
+            $plugin_meta[] = sprintf(
+                '<a href="%s" target="_blank" rel="noopener">%s</a>',
+                'https://github.com/dpotocic/kigocloud-for-woocommerce',
+                esc_html__('GitHub', 'kigocloud-for-woocommerce')
+            );
+        }
+        return $plugin_meta;
+    }
+
     public function change_wp_email_from($email)
     {
-        $changeEmail = esc_attr(get_option('kigocloud_email_from'));
-        if (!empty($changeEmail) && $changeEmail !== '') {
-            return $changeEmail;
-        }
-
-        return $email;
+        $override = esc_attr(get_option('kigocloud_email_from'));
+        return $override !== '' ? $override : $email;
     }
 
-    /**
-     * Change From field of WP mails
-     *
-     * @param  string $fromName
-     * @return string
-     */
     public function change_wp_email_from_name($fromName)
     {
-        $changeFromName = esc_attr(get_option('kigocloud_email_from_name'));
-        if (!empty($changeFromName) && $changeFromName !== '') {
-            return $changeFromName;
-        }
-
-        return $fromName;
+        $override = esc_attr(get_option('kigocloud_email_from_name'));
+        return $override !== '' ? $override : $fromName;
     }
 
-    /**
-     * Add plugin options page
-     *
-     * @since  1.0.0
-     */
-    public function add_plugin_options_page()
-    {
-        add_submenu_page(
-            'woocommerce',
-            esc_html__('KigoCloud', 'kigocloud-for-woocommerce'),
-            esc_html__('KigoCloud', 'kigocloud'),
-            'manage_options',
-            $this->plugin_name,
-            array($this, 'render_admin_options_page')
-        );
-    }
-
-    /**
-     * @param $settings_tabs
-     * @return mixed
-     */
     public static function add_woocommerce_settings_tab($settings_tabs)
     {
         $settings_tabs['kigocloud'] = __('KigoCloud', 'kigocloud-for-woocommerce');
@@ -172,64 +90,129 @@ class Woo_KigoCloud_Admin
     public static function update_woocommerce_settings()
     {
         woocommerce_update_options(self::get_woocommerce_settings_options());
-	    // Mark settings as saved and remove the migration notice
-	    update_option('kigocloud_show_migration_notice', 0);
+        update_option('kigocloud_show_migration_notice', 0);
     }
 
     public static function add_woocommerce_settings()
     {
-		update_option('kigocloud_show_migration_notice', 0);
-
+        update_option('kigocloud_show_migration_notice', 0);
         woocommerce_admin_fields(self::get_woocommerce_settings_options());
     }
 
     public static function get_woocommerce_settings_options()
     {
+        // Translatable token labels for document types.
         __('pos_type_0', 'kigocloud-for-woocommerce');
         __('pos_type_1', 'kigocloud-for-woocommerce');
         __('pos_type_2', 'kigocloud-for-woocommerce');
 
-        /*$paymentFields = [
-            'payment_title' => array(
-                'name' => __('Payment settings', 'kigocloud-for-woocommerce'),
-                'type' => 'title',
-                'desc' => '',
-            ),
-        ];*/
-        $paymentFields = [];
+        $form_fields = self::connection_fields();
+        $form_fields += self::payment_gateway_fields();
+        $form_fields += self::misc_fields();
+        $form_fields += self::email_fields();
+        $form_fields += self::vat_invoice_fields();
+        $form_fields += self::custom_mapping_fields();
 
-        // $gateways = WC()->payment_gateways->get_available_payment_gateways();
-	    $all_gateways = WC()->payment_gateways->payment_gateways();
-	    $gateways = array();
-	    foreach ( $all_gateways as $gateway ) {
-		    if ( 'yes' === $gateway->enabled ) {
-			    $gateways[] = $gateway;
-		    }
-	    }
-        foreach ($gateways as $k => $gateway) {
-            $paymentFields['start_'.esc_attr($gateway->id)] = array(
+        return apply_filters('kigocloud_settings_fields', $form_fields);
+    }
+
+    private static function connection_fields()
+    {
+        return array(
+            'connection_title' => array(
+                'name' => __('Connection', 'kigocloud-for-woocommerce'),
+                'type' => 'title',
+                'desc' => __('KigoCloud API credentials and endpoint.', 'kigocloud-for-woocommerce'),
+            ),
+            'kigocloud_api_url' => array(
+                'title'       => __('API endpoint', 'kigocloud-for-woocommerce'),
+                'name'        => 'api_url',
+                'type'        => 'text',
+                'id'          => 'kigocloud_api_url',
+                'description' => __('Leave empty to use the default https://app.kigo.cloud/hr/api/v1/', 'kigocloud-for-woocommerce'),
+                'desc_tip'    => true,
+                'placeholder' => 'https://app.kigo.cloud/hr/api/v1/',
+                'default'     => '',
+                'css'         => 'width:380px;',
+            ),
+            'kigocloud_username' => array(
+                'title'       => __('API username', 'kigocloud-for-woocommerce'),
+                'name'        => 'username',
+                'type'        => 'text',
+                'id'          => 'kigocloud_username',
+                'description' => __('KigoCloud account username.', 'kigocloud-for-woocommerce'),
+                'desc_tip'    => true,
+                'default'     => 'admin_demo',
+                'css'         => 'width:240px;',
+            ),
+            'kigocloud_password' => array(
+                'title'       => __('API password', 'kigocloud-for-woocommerce'),
+                'type'        => 'password',
+                'name'        => 'password',
+                'id'          => 'kigocloud_password',
+                'description' => __('KigoCloud account password.', 'kigocloud-for-woocommerce'),
+                'desc_tip'    => true,
+                'default'     => 'admin_demo',
+                'css'         => 'width:240px;',
+            ),
+            'kigocloud_pin' => array(
+                'title'       => __('Employee PIN', 'kigocloud-for-woocommerce'),
+                'type'        => 'text',
+                'name'        => 'pin',
+                'id'          => 'kigocloud_pin',
+                'description' => __('KigoCloud employee PIN used when creating documents.', 'kigocloud-for-woocommerce'),
+                'desc_tip'    => true,
+                'default'     => '1',
+                'css'         => 'width:120px;',
+            ),
+            'connection_section_end' => array('type' => 'sectionend'),
+        );
+    }
+
+    private static function payment_gateway_fields()
+    {
+        $paymentFields = array(
+            'gateways_title' => array(
+                'name' => __('Payment gateways', 'kigocloud-for-woocommerce'),
+                'type' => 'title',
+                'desc' => __('For each enabled gateway, choose the document type, payment method, and the order status that triggers the KigoCloud API call.', 'kigocloud-for-woocommerce'),
+            ),
+            'gateways_intro_end' => array('type' => 'sectionend'),
+        );
+
+        if (!function_exists('WC') || !WC()->payment_gateways) {
+            return $paymentFields;
+        }
+
+        $all_gateways = WC()->payment_gateways->payment_gateways();
+        foreach ($all_gateways as $gateway) {
+            if ('yes' !== $gateway->enabled) {
+                continue;
+            }
+            $gid = esc_attr($gateway->id);
+
+            $paymentFields['gw_start_' . $gid] = array(
                 'name' => esc_html($gateway->title),
                 'type' => 'title',
             );
 
-            $paymentFields['pos_type-' . esc_attr($gateway->id)] = array(
+            $paymentFields['pos_type-' . $gid] = array(
                 'title'   => __('Document type', 'kigocloud-for-woocommerce'),
                 'type'    => 'select',
-                'name'        => 'pos_type-' . esc_attr($gateway->id),
-                'id'          => 'kigocloud_pos_type-' . esc_attr($gateway->id),
+                'name'    => 'pos_type-' . $gid,
+                'id'      => 'kigocloud_pos_type-' . $gid,
                 'options' => array(
                     '0' => __('Disabled', 'kigocloud-for-woocommerce'),
                     '1' => __('Invoice', 'kigocloud-for-woocommerce'),
                     '2' => __('Offer', 'kigocloud-for-woocommerce'),
                 ),
                 'default' => '0',
-                'css'     => 'width:150px;',
+                'css'     => 'width:200px;',
             );
-
-            $paymentFields['payment_type-' . esc_attr($gateway->id)] = array(
-                'title'   => __('Payment type', 'kigocloud-for-woocommerce'),
-                'name'        => 'payment_type-' . esc_attr($gateway->id),
-                'id'          => 'kigocloud_payment_type-' . esc_attr($gateway->id),
+            $paymentFields['payment_type-' . $gid] = array(
+                'title'   => __('Payment method', 'kigocloud-for-woocommerce'),
+                'name'    => 'payment_type-' . $gid,
+                'id'      => 'kigocloud_payment_type-' . $gid,
                 'type'    => 'select',
                 'options' => array(
                     'T' => __('Transaction account', 'kigocloud-for-woocommerce'),
@@ -239,244 +222,160 @@ class Woo_KigoCloud_Admin
                     'O' => __('Other', 'kigocloud-for-woocommerce'),
                 ),
                 'default' => 'T',
-                'css'     => 'width:200px;',
+                'css'     => 'width:240px;',
             );
-	        $paymentFields['on_status-' . esc_attr($gateway->id)] = array(
-		        'title'   => __('On status', 'kigocloud-for-woocommerce'),
-		        'name'        => 'on_status-' . esc_attr($gateway->id),
-		        'id'          => 'kigocloud_on_status-' . esc_attr($gateway->id),
-		        'type'    => 'select',
-		        'options' => array(
-			        '0' => __('Order Creation', 'kigocloud-for-woocommerce'),
-			        '1' => __('Order Completed', 'kigocloud-for-woocommerce'),
-		        ),
-		        'default' => '1',
-		        'css'     => 'width:200px;',
-	        );
-            $paymentFields['pdf_payment_type-' . esc_attr($gateway->id)] = array(
-                'title'   => __('Send Email with document PDF', 'kigocloud-for-woocommerce'),
-                'name'        => 'pdf_payment_type-' . esc_attr($gateway->id),
-                'id'          => 'kigocloud_pdf_payment_type-' . esc_attr($gateway->id),
+            $paymentFields['on_status-' . $gid] = array(
+                'title'   => __('Trigger on', 'kigocloud-for-woocommerce'),
+                'name'    => 'on_status-' . $gid,
+                'id'      => 'kigocloud_on_status-' . $gid,
+                'type'    => 'select',
+                'options' => array(
+                    '0' => __('Order created', 'kigocloud-for-woocommerce'),
+                    '1' => __('Order completed', 'kigocloud-for-woocommerce'),
+                ),
+                'default' => '1',
+                'css'     => 'width:240px;',
+            );
+            $paymentFields['pdf_payment_type-' . $gid] = array(
+                'title'   => __('Send invoice PDF to customer', 'kigocloud-for-woocommerce'),
+                'name'    => 'pdf_payment_type-' . $gid,
+                'id'      => 'kigocloud_pdf_payment_type-' . $gid,
                 'type'    => 'select',
                 'options' => array(
                     '0' => __('No', 'kigocloud-for-woocommerce'),
                     '1' => __('Yes', 'kigocloud-for-woocommerce'),
                 ),
                 'default' => '0',
-                'css'     => 'width:200px;',
+                'css'     => 'width:160px;',
             );
-            $paymentFields['end_'.esc_attr($gateway->id)] = array(
-                'type' => 'sectionend',
-            );
+            $paymentFields['gw_end_' . $gid] = array('type' => 'sectionend');
         }
 
-        //$paymentFields['payment_section_end'] = array('type' => 'sectionend');
+        return $paymentFields;
+    }
 
-        $form_fields = array(
-            'api_account_title'       => array(
-                'name' => __('API account', 'kigocloud-for-woocommerce'),
+    private static function misc_fields()
+    {
+        return array(
+            'misc_title' => array(
+                'name' => __('Order options', 'kigocloud-for-woocommerce'),
                 'type' => 'title',
-                'desc' => '',
             ),
-            'username'                => array(
-                'title'       => __('API Username', 'kigocloud-for-woocommerce'),
-                'name'        => 'username',
-                'type'        => 'text',
-                'id'          => 'kigocloud_username',
-                'description' => __('Enter API username here', 'kigocloud-for-woocommerce'),
-                'desc_tip'    => true,
-                'default'     => 'admin_demo',
-                'css'         => 'width:150px;',
-            ),
-            'password'                => array(
-                'title'       => __('API Password', 'kigocloud-for-woocommerce'),
-                'type'        => 'text',
-                'name'        => 'password',
-                'id'          => 'kigocloud_password',
-                'description' => __('Enter API password here', 'kigocloud-for-woocommerce'),
-                'desc_tip'    => true,
-                'default'     => 'admin_demo',
-                'css'         => 'width:150px;',
-            ),
-            'api_account_section_end' => array(
-                'type' => 'sectionend',
-            ),
-        );
-
-        $form_fields += $paymentFields;
-
-        $form_fields += array(
-            'api_misc_title'          => array(
-                'name' => __('Misc', 'kigocloud-for-woocommerce'),
-                'type' => 'title',
-                'desc' => '',
-            ),
-            'pin'                     => array(
-                'title'       => __('Employee PIN', 'kigocloud-for-woocommerce'),
-                'type'        => 'text',
-                'name'        => 'pin',
-                'id'          => 'kigocloud_pin',
-                'description' => __('Enter API employee PIN here', 'kigocloud-for-woocommerce'),
-                'desc_tip'    => true,
-                'default'     => '1',
-                'css'         => 'width:150px;',
-            ),
-            'shipping_reference'      => array(
-                'title'       => __('Shipping Reference Number', 'kigocloud-for-woocommerce'),
+            'kigocloud_shipping_reference' => array(
+                'title'       => __('Shipping reference number', 'kigocloud-for-woocommerce'),
                 'type'        => 'text',
                 'name'        => 'shipping_reference',
                 'id'          => 'kigocloud_shipping_reference',
-                'placeholder' => __('Enter Shipping Reference Number here', 'kigocloud-for-woocommerce'),
+                'description' => __('KigoCloud item reference used for the shipping line. Leave empty for "shipping".', 'kigocloud-for-woocommerce'),
                 'desc_tip'    => true,
-                'css'         => 'width:250px;',
+                'placeholder' => 'shipping',
+                'css'         => 'width:240px;',
             ),
-            'api_misc_section_end'    => array(
-                'type' => 'sectionend',
+            'kigocloud_fill_empty_sku' => array(
+                'title'       => __('Fill empty SKU before sending', 'kigocloud-for-woocommerce'),
+                'type'        => 'select',
+                'options'     => array(
+                    0 => __('No', 'kigocloud-for-woocommerce'),
+                    1 => __('Yes (use product ID)', 'kigocloud-for-woocommerce'),
+                ),
+                'name'        => 'fill_empty_sku',
+                'id'          => 'kigocloud_fill_empty_sku',
+                'description' => __('When enabled, missing SKUs are replaced with sku-<item_id> so the KigoCloud item lookup never fails.', 'kigocloud-for-woocommerce'),
+                'desc_tip'    => true,
+                'default'     => 0,
+                'css'         => 'width:240px;',
             ),
-            'email_title_section'       => array(
-                'name' => __('E-mail settings', 'kigocloud-for-woocommerce'),
+            'misc_section_end' => array('type' => 'sectionend'),
+        );
+    }
+
+    private static function email_fields()
+    {
+        return array(
+            'email_title' => array(
+                'name' => __('Email', 'kigocloud-for-woocommerce'),
                 'type' => 'title',
-                'desc' => __('This change is global.', 'kigocloud-for-woocommerce'),
+                'desc' => __('Overrides the From / Reply-To headers on outgoing WordPress mail. Global, not just KigoCloud emails.', 'kigocloud-for-woocommerce'),
             ),
-            'kigocloud_email_from_name'                => array(
+            'kigocloud_email_from_name' => array(
                 'title'       => __('From name', 'kigocloud-for-woocommerce'),
                 'name'        => 'from_name',
                 'type'        => 'text',
                 'id'          => 'kigocloud_email_from_name',
-                'description' => __('Enter \'From\' Name field here', 'kigocloud-for-woocommerce'),
                 'desc_tip'    => true,
-                'default'     => null,
-                'css'         => 'width:150px;',
+                'description' => __('Displayed name in the From header.', 'kigocloud-for-woocommerce'),
+                'default'     => '',
+                'css'         => 'width:240px;',
             ),
-            'kigocloud_email_from'                => array(
-                'title'       => __('From e-mail', 'kigocloud-for-woocommerce'),
-                'type'        => 'text',
-                'name'        => 'password',
+            'kigocloud_email_from' => array(
+                'title'       => __('From email', 'kigocloud-for-woocommerce'),
+                'type'        => 'email',
+                'name'        => 'from_email',
                 'id'          => 'kigocloud_email_from',
-                'description' => __('Enter \'From\' E-mail here', 'kigocloud-for-woocommerce'),
                 'desc_tip'    => true,
-                'default'     => null,
-                'css'         => 'width:150px;',
+                'description' => __('Address used in the From header.', 'kigocloud-for-woocommerce'),
+                'default'     => '',
+                'css'         => 'width:280px;',
             ),
-            'kigocloud_reply_to'                => array(
-                'title'       => __('Reply-To E-mail', 'kigocloud-for-woocommerce'),
-                'type'        => 'text',
+            'kigocloud_reply_to' => array(
+                'title'       => __('Reply-To email', 'kigocloud-for-woocommerce'),
+                'type'        => 'email',
                 'name'        => 'reply_to',
                 'id'          => 'kigocloud_reply_to',
-                'description' => __('Enter \'Reply-To\' E-mail here', 'kigocloud-for-woocommerce'),
                 'desc_tip'    => true,
-                'default'     => null,
-                'css'         => 'width:150px;',
+                'description' => __('Address used in the Reply-To header.', 'kigocloud-for-woocommerce'),
+                'default'     => '',
+                'css'         => 'width:280px;',
             ),
-            'kigocloud_fill_empty_sku'                => array(
-	            'title'       => __('Fill empty SKU before sending order to API', 'kigocloud-for-woocommerce'),
-	            'type'    => 'select',
-	            'options' => array(
-		            0 => __('No', 'kigocloud-for-woocommerce'),
-		            1 => __('Yes', 'kigocloud-for-woocommerce'),
-	            ),
-	            'name'        => 'fill_empty_sku',
-	            'id'          => 'kigocloud_fill_empty_sku',
-	            'description' => __('Enter \'Reply-To\' E-mail here', 'kigocloud-for-woocommerce'),
-	            'desc_tip'    => true,
-	            'default'     => null,
-	            'css'         => 'width:150px;',
-            ),
-            'email_title_section_end' => array(
-                'type' => 'sectionend',
-            )
+            'email_section_end' => array('type' => 'sectionend'),
         );
+    }
 
-        $order_form_fields = array(
-            'api_status_title'       => array(
-                'name' => __('Order Statuses', 'kigocloud-for-woocommerce'),
+    private static function vat_invoice_fields()
+    {
+        return array(
+            'vat_invoices_title' => array(
+                'name' => __('R1 customer fields', 'kigocloud-for-woocommerce'),
                 'type' => 'title',
-                'desc' => __('Before any Kigo API call, plugin will check if call has already been made for same order', 'kigocloud-for-woocommerce'),
+                'desc' => __('Adds company-related fields to checkout for B2B invoicing: company name, address, city, postcode, OIB (VAT number). Works on both classic and block checkout (WC 8.6+).', 'kigocloud-for-woocommerce'),
             ),
-            'kigocloud_skip_status_order_created'                => array(
-                'title'       => __('Skip create Kigo document on Order Status Created', 'kigocloud-for-woocommerce'),
-                'name'        => 'skip_status_order_created',
-                'type'        => 'select',
-                'id'          => 'kigocloud_skip_status_order_created',
-                'desc_tip'    => true,
-                'default'     => 0,
-                'options'     => array(
-                    '0' => __('No, create Kigo document on Order Created status', 'kigocloud-for-woocommerce'),
-                    '1' => __('Yes, skip this order status', 'kigocloud-for-woocommerce'),
+            'kigocloud_vat_invoices' => array(
+                'title'    => __('Mode', 'kigocloud-for-woocommerce'),
+                'name'     => 'vat_invoices',
+                'type'     => 'select',
+                'id'       => 'kigocloud_vat_invoices',
+                'desc_tip' => true,
+                'default'  => 0,
+                'options'  => array(
+                    '0' => __('Off', 'kigocloud-for-woocommerce'),
+                    '1' => __('Show OIB / VAT field only', 'kigocloud-for-woocommerce'),
+                    '2' => __('Show full R1 block (company, address, city, postcode, OIB)', 'kigocloud-for-woocommerce'),
                 ),
-                'css'         => 'width:400px;',
+                'css'      => 'width:420px;',
             ),
-            'kigocloud_skip_status_order_completed'                => array(
-                'title'       => __('Skip create Kigo document on Order Status Completed', 'kigocloud-for-woocommerce'),
-                'name'        => 'skip_status_order_completed',
-                'type'        => 'select',
-                'id'          => 'kigocloud_skip_status_order_completed',
-                'desc_tip'    => true,
-                'default'     => 0,
-                'options'     => array(
-                    '0' => __('No, create Kigo document on Order Completed status', 'kigocloud-for-woocommerce'),
-                    '1' => __('Yes, skip skip this order status', 'kigocloud-for-woocommerce'),
-                ),
-                'css'         => 'width:400px;',
-            ),
-            'api_status_title_section_end' => array(
-                'type' => 'sectionend',
-            ),
+            'vat_invoices_section_end' => array('type' => 'sectionend'),
         );
+    }
 
-		// @deprecated
-        // $form_fields += $order_form_fields;
-
-        $vat_invoice_form_fields = array(
-            'vat_invoices_section'       => array(
-                'name' => __('VAT Invoice', 'kigocloud-for-woocommerce'),
-                'type' => 'title',
-                'desc' => __('Enable VAT Invoice fields on Checkout form: Company Name, Company Adress, Company VAT', 'kigocloud-for-woocommerce'),
-            ),
-            'kigocloud_vat_invoices'                => array(
-                'title'       => __('Checkout fields', 'kigocloud-for-woocommerce'),
-                'name'        => 'api_vat_invoices',
-                'type'        => 'select',
-                'id'          => 'kigocloud_vat_invoices',
-                'desc_tip'    => true,
-                'default'     => 0,
-                'options'     => array(
-                    '0' => __('Do not show VAT Invoice fields on Checkout', 'kigocloud-for-woocommerce'),
-                    '1' => __('Show VAT field only', 'kigocloud-for-woocommerce'),
-                    '2' => __('Show All VAT Invoice fields on Checkout', 'kigocloud-for-woocommerce'),
-                ),
-                'css'         => 'width:400px;',
-            ),
-            'vat_invoices_section_end' => array(
-                'type' => 'sectionend',
-            ),
-        );
-
-        $form_fields += $vat_invoice_form_fields;
-
-        $custom_mapping_fileds = array(
-            'custom_mapping_start'       => array(
+    private static function custom_mapping_fields()
+    {
+        return array(
+            'custom_mapping_title' => array(
                 'name' => __('Custom mapping', 'kigocloud-for-woocommerce'),
                 'type' => 'title',
-                'desc' => __('Use this option to override default billing information with custom data from order meta data using format: source_meta:target.data, source_meta1:target.data1', 'kigocloud-for-woocommerce'),
+                'desc' => __('Override billing data with values from other order meta keys. Format: source_meta:target.field, comma-separated.', 'kigocloud-for-woocommerce'),
             ),
-            'kigocloud_custom_mapping'                => array(
-                'title'       => __('Custom mapping', 'kigocloud-for-woocommerce'),
-                'name'        => 'custom_mapping',
-                'type'        => 'textarea',
-                'id'          => 'kigocloud_custom_mapping',
-                'desc_tip'    =>  __('Example: r1_oib_tvrtke:_billing_vat_number, r1_ime_tvrtke:billing.company, r1_adresa_tvrtke:billing.address_1', 'kigocloud-for-woocommerce'),
-                'default'     => '',
-                'css'         => 'width:400px;min-height:100px;',
+            'kigocloud_custom_mapping' => array(
+                'title'    => __('Mapping rules', 'kigocloud-for-woocommerce'),
+                'name'     => 'custom_mapping',
+                'type'     => 'textarea',
+                'id'       => 'kigocloud_custom_mapping',
+                'desc_tip' => __('Example: r1_oib_tvrtke:_billing_vat_number, r1_ime_tvrtke:billing.company, r1_adresa_tvrtke:billing.address_1', 'kigocloud-for-woocommerce'),
+                'default'  => '',
+                'css'      => 'width:600px;min-height:120px;font-family:monospace;',
             ),
-            'custom_mapping_end' => array(
-                'type' => 'sectionend',
-            ),
+            'custom_mapping_end' => array('type' => 'sectionend'),
         );
-
-        $form_fields += $custom_mapping_fileds;
-
-        return apply_filters('kigocloud', $form_fields);
     }
 
     /**
@@ -488,45 +387,29 @@ class Woo_KigoCloud_Admin
         $billing_vat  = get_post_meta($order->get_id(), '_billing_vat_number', true);
 
         if (!empty($shipping_vat)) {
-            echo '<p><strong>'
-                 . __('Shipping VAT number', 'kigocloud-for-woocommerce')
-                 . '</strong><br />'
-                 . esc_html($shipping_vat)
-                 . '</p>';
+            echo '<p><strong>' . esc_html__('Shipping VAT number', 'kigocloud-for-woocommerce') . '</strong><br />' . esc_html($shipping_vat) . '</p>';
         }
-
         if (!empty($billing_vat)) {
-            echo '<p><strong>'
-                 . __('Billing VAT number', 'kigocloud-for-woocommerce')
-                 . '</strong><br />'
-                 . esc_html($billing_vat)
-                 . '</p>';
+            echo '<p><strong>' . esc_html__('Billing VAT number', 'kigocloud-for-woocommerce') . '</strong><br />' . esc_html($billing_vat) . '</p>';
         }
 
-        $isVATInvoice  = get_post_meta($order->get_id(), 'kigocloud_vat_invoices_checkbox', true);
+        $isVATInvoice = get_post_meta($order->get_id(), 'kigocloud_vat_invoices_checkbox', true);
         if (!empty($isVATInvoice)) {
-            echo '<strong>' . __('Is VAT Invoice', 'kigocloud-for-woocommerce') . ':</strong>&nbsp;' . ($isVATInvoice ? esc_html__('Yes', 'kigocloud-for-woocommerce') : esc_html__('No', 'kigocloud-for-woocommerce')) . '<br>';
-        }
-        $vatCompany  = get_post_meta($order->get_id(), 'kigocloud_vat_invoices_company', true);
-        if (!empty($vatCompany)) {
-            echo '<strong>' . __('Company Name', 'kigocloud-for-woocommerce') . ':</strong>&nbsp;' . esc_html($vatCompany) . '<br>';
-        }
-        $vatAddress  = get_post_meta($order->get_id(), 'kigocloud_vat_invoices_address', true);
-        if (!empty($vatAddress)) {
-            echo '<strong>'. __('Company Address', 'kigocloud-for-woocommerce'). ':</strong>&nbsp;'. esc_html($vatAddress) . '<br>';
-        }
-        $vatCity  = get_post_meta($order->get_id(), 'kigocloud_vat_invoices_city', true);
-        if (!empty($vatCity)) {
-            echo '<strong>'. __('Company City', 'kigocloud-for-woocommerce'). ':</strong>&nbsp;'. esc_html($vatCity) . '<br>';
-        }
-        $vatZip  = get_post_meta($order->get_id(), 'kigocloud_vat_invoices_zip', true);
-        if (!empty($vatZip)) {
-            echo '<strong>'. __('Company ZIP', 'kigocloud-for-woocommerce') . ':</strong>&nbsp;' . esc_html($vatZip) . '<br>';
+            echo '<p><strong>' . esc_html__('R1 invoice', 'kigocloud-for-woocommerce') . ':</strong> ' . esc_html__('Yes', 'kigocloud-for-woocommerce') . '</p>';
         }
 
-        $vatVAT = get_post_meta($order->get_id(), 'kigocloud_vat_invoices_vat_number', true);
-        if (!empty($vatVAT)) {
-            echo '<strong> ' . __('Company VAT number', 'kigocloud-for-woocommerce') . ':</strong>&nbsp;' . esc_html($vatVAT) . '<br>';
+        $rows = array(
+            'kigocloud_vat_invoices_company'    => __('Company', 'kigocloud-for-woocommerce'),
+            'kigocloud_vat_invoices_address'    => __('Company address', 'kigocloud-for-woocommerce'),
+            'kigocloud_vat_invoices_city'       => __('Company city', 'kigocloud-for-woocommerce'),
+            'kigocloud_vat_invoices_zip'        => __('Company postcode', 'kigocloud-for-woocommerce'),
+            'kigocloud_vat_invoices_vat_number' => __('Company VAT', 'kigocloud-for-woocommerce'),
+        );
+        foreach ($rows as $key => $label) {
+            $val = get_post_meta($order->get_id(), $key, true);
+            if (!empty($val)) {
+                echo '<p><strong>' . esc_html($label) . ':</strong> ' . esc_html($val) . '</p>';
+            }
         }
     }
 
@@ -535,94 +418,81 @@ class Woo_KigoCloud_Admin
      */
     public function display_admin_order_kigocloud($order)
     {
-        $pos_number = get_post_meta($order->get_id(), '_kigocloud_pos_number', true);
+        $pos_number    = get_post_meta($order->get_id(), '_kigocloud_pos_number', true);
         $document_type = get_post_meta($order->get_id(), '_kigocloud_doc_type', true);
 
         if (!empty($pos_number)) {
-            echo '<p class="form-field form-field-wide wc-order-pos-number"><strong> '
-                 . __('KigoCloud document', 'kigocloud-for-woocommerce')
-                 . ': </strong>'
-                 . (!empty($document_type) ? esc_html($document_type) . ' ' : '')
-                 . esc_html($pos_number)
-                 . '</p>';
+            echo '<p class="form-field form-field-wide wc-order-pos-number"><strong>'
+                . esc_html__('KigoCloud document', 'kigocloud-for-woocommerce')
+                . ':</strong> '
+                . (!empty($document_type) ? esc_html($document_type) . ' ' : '')
+                . esc_html($pos_number)
+                . '</p>';
         }
     }
 
-	public function show_admin_notice(){
-		$old_version = get_option('kigocloud_version', '1.0.0');
-		$new_version = Woo_KigoCloud::PLUGIN_VERSION;
-		$this->show_migration_admin_notice($old_version, $new_version);
-	}
+    public function show_admin_notice()
+    {
+        $old_version = get_option('kigocloud_version', '1.0.0');
+        $new_version = Woo_KigoCloud::PLUGIN_VERSION;
+        $this->show_migration_admin_notice($old_version, $new_version);
+    }
 
-	/**
-	 * @param $old_version
-	 * @param $new_version
-	 *
-	 * @return void
-	 */
-	public function show_migration_admin_notice($old_version, $new_version) {
-		// Only show the notice if the current user can manage options
-		if (!current_user_can('manage_options')) {
-			return;
-		}
+    public function show_migration_admin_notice($old_version, $new_version)
+    {
+        if (!current_user_can('manage_options')) {
+            return;
+        }
+        $settings_saved = get_option('kigocloud_show_migration_notice', 0);
+        if ($settings_saved != 1) {
+            return;
+        }
 
-		// Check if settings have been saved
-		$settings_saved = get_option('kigocloud_show_migration_notice', 0); // Default to '0' (not saved)
-		if ($settings_saved != 1) {
-			return; // Exit early if settings were saved
-		}
+        echo '<div class="notice notice-warning">';
+        echo '<p><strong>' . esc_html__('KigoCloud for WooCommerce has been updated to version', 'kigocloud-for-woocommerce') . ' ' . esc_html($new_version) . '.</strong></p>';
+        echo '<p>' . esc_html__('Please review and save your settings to ensure everything works correctly.', 'kigocloud-for-woocommerce') . '</p>';
+        echo '<p><a href="' . esc_url(admin_url('admin.php?page=wc-settings&tab=kigocloud')) . '" class="button button-primary">' . esc_html__('Review and save settings', 'kigocloud-for-woocommerce') . '</a></p>';
+        echo '</div>';
+    }
 
-		// Show the notice only if the plugin was updated to 1.7.0 from an earlier version
-		//if (version_compare($old_version, '1.7.0', '<') && version_compare($new_version, '1.7.0', '>=')) {
-			echo '<div class="notice notice-warning">';
-			echo '<p><strong>' . esc_html__('KigoCloud for WooCommerce has been updated to version', 'kigocloud-for-woocommerce') . ' ' . esc_html($new_version) . '.</strong></p>';
-			echo '<p>' . esc_html__('Please review and save your settings to ensure everything works correctly.', 'kigocloud-for-woocommerce') . '</p>';
-			echo '<p><a href="' . esc_url(admin_url('admin.php?page=wc-settings&tab=kigocloud')) . '" class="button button-primary">' . esc_html__('Review & Save Settings', 'kigocloud-for-woocommerce') . '</a></p>';
-			echo '</div>';
-		//}
-	}
+    /**
+     * Notice shown only if the legacy classic-checkout R1 mode is selected
+     * but the site uses the block checkout. The block branch handles R1 via
+     * Woo_KigoCloud_Block_Checkout (WC 8.6+); for WC < 8.6 we warn the user.
+     */
+    public function checkout_block_admin_notice()
+    {
+        if (!is_admin()) {
+            return;
+        }
+        $enableVatInvoice = (int) get_option('kigocloud_vat_invoices', 0);
+        if ($enableVatInvoice === 0) {
+            return;
+        }
+        if (!function_exists('has_block') || !function_exists('wc_get_page_id')) {
+            return;
+        }
 
-	/**
-	 * Show admin notice if WooCommerce Checkout Block is used
-	 * and VAT invoice feature is enabled.
-	 */
-	public function checkout_block_admin_notice()
-	{
-		// samo u adminu
-		if (!is_admin()) {
-			return;
-		}
+        $checkout_page_id = wc_get_page_id('checkout');
+        if (!$checkout_page_id) {
+            return;
+        }
+        $content = get_post_field('post_content', $checkout_page_id);
 
-		// samo ako je VAT opcija uključena
-		$enableVatInvoice = get_option('kigocloud_vat_invoices', 0);
-		if ((int)$enableVatInvoice === 0) {
-			return;
-		}
+        if (!has_block('woocommerce/checkout', $content)) {
+            return;
+        }
 
-		// provjera postoji li Checkout block
-		if (!function_exists('has_block')) {
-			return;
-		}
+        // Block checkout is in use. Check if WC version supports Additional Checkout Fields API.
+        $wc_supports_block_r1 = defined('WC_VERSION') && version_compare(WC_VERSION, '8.6.0', '>=');
+        if ($wc_supports_block_r1) {
+            return; // Block branch handles it.
+        }
 
-		$checkout_page_id = wc_get_page_id('checkout');
-		if (!$checkout_page_id) {
-			return;
-		}
-
-		$content = get_post_field('post_content', $checkout_page_id);
-
-		if (has_block('woocommerce/checkout', $content)) {
-			echo '<div class="notice notice-error is-dismissible">
-			    <p><strong>KigoCloud plugin – R1 računi</strong></p>			
-			    <p>
-			        Na stranici za naplatu (Checkout) detektiran je <strong>WooCommerce Checkout Block</strong>.
-			        WooCommerce Checkout Blokovi trenutno ne podržavaju dodavanje prilagođenih polja potrebnih za izdavanje R1 računa (npr. OIB, naziv tvrtke, adresa i slično).
-			        Kako bi funkcionalnost R1 računa ispravno radila, potrebno je koristiti <strong>Classic Checkout</strong>.
-			    </p>			
-			    <p>
-			        Molimo zamijenite Checkout Block s klasičnim checkoutom pomoću shortcode <code>[woocommerce_checkout]</code>
-			    </p>
-			</div>';
-		}
-	}
+        echo '<div class="notice notice-warning is-dismissible"><p><strong>'
+            . esc_html__('KigoCloud R1 fields require WooCommerce 8.6 or newer for the block checkout.', 'kigocloud-for-woocommerce')
+            . '</strong></p><p>'
+            . esc_html__('You are using the block checkout on an older WooCommerce version that does not support custom checkout fields. Either upgrade WooCommerce or switch the checkout page back to the [woocommerce_checkout] shortcode.', 'kigocloud-for-woocommerce')
+            . '</p></div>';
+    }
 }
