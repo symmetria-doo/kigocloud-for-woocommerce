@@ -5,7 +5,7 @@ Tags: woocommerce, hrvatska fiskalizacija, croatian fiscalization, fiscalization
 Requires at least: 5.5
 Requires PHP: 7.2
 Tested up to: 6.9
-Stable tag: 2.0.0
+Stable tag: 2.1.0
 WC requires at least: 5.0
 WC tested up to: 9.4
 License: GPLv2 or later
@@ -45,6 +45,13 @@ This plugin is not hosted on the WordPress.org repository. Updates are delivered
 4. WooCommerce -> Settings -> KigoCloud, fill in your API credentials
 
 == Changelog ==
+
+= 2.1.0 =
+* New dedicated KigoCloud admin page (top-level menu) with proper nav-tab navigation: Connection, Orders, R1, Email, Mapping, Logs, About
+* Per-gateway settings now render as a single table instead of a vertical wall of inputs
+* New Logs tab with the last 50 KigoCloud API calls (success/error indicator, order link, message)
+* Declares WooCommerce HPOS and cart/checkout block compatibility so WC no longer flags the plugin as incompatible
+* Removed the legacy WooCommerce settings tab; all configuration lives on the standalone KigoCloud page
 
 = 2.0.0 =
 * Forked from kigokasa-api-for-woocommerce 1.7.2 for the KigoCloud brand
