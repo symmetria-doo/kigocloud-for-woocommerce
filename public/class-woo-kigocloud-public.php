@@ -1,246 +1,34 @@
 <?php
-
 /**
- * The public-facing functionality of the plugin.
+ * Public-facing functionality.
  *
- * @link       https://github.com/dpotocic
- * @since      1.0.0
+ * Currently a thin placeholder. R1 checkout fields live in
+ * Woo_KigoCloud_R1 (includes/class-woo-kigocloud-r1.php).
  *
- * @package    Woo_KigoCloud
- * @subpackage Woo_KigoCloud/public
+ * @package Woo_KigoCloud
  */
 
-/**
- * The public-facing functionality of the plugin.
- *
- * Defines the plugin name, version, and two examples hooks for how to
- * enqueue the public-facing stylesheet and JavaScript.
- *
- * @package    Woo_KigoCloud
- * @subpackage Woo_KigoCloud/public
- * @author     Dejan Potocic <dpotocic@gmail.com>
- */
-class Woo_KigoCloud_Public {
+class Woo_KigoCloud_Public
+{
+    /** @var string */
+    private $plugin_name;
 
-	/**
-	 * The ID of this plugin.
-	 *
-	 * @since    1.0.0
-	 * @access   private
-	 * @var      string    $plugin_name    The ID of this plugin.
-	 */
-	private $plugin_name;
+    /** @var string */
+    private $version;
 
-	/**
-	 * The version of this plugin.
-	 *
-	 * @since    1.0.0
-	 * @access   private
-	 * @var      string    $version    The current version of this plugin.
-	 */
-	private $version;
-
-	/**
-	 * Initialize the class and set its properties.
-	 *
-	 * @since    1.0.0
-	 * @param      string    $plugin_name       The name of the plugin.
-	 * @param      string    $version    The version of this plugin.
-	 */
-	public function __construct( $plugin_name, $version ) {
-
-		$this->plugin_name = $plugin_name;
-		$this->version = $version;
-
-	}
-
-	public function enqueue_styles() {
-		// Reserved for future public stylesheet.
-	}
-
-	public function enqueue_scripts() {
-		// Reserved for future public script.
-	}
-
-    /**
-     * @param $fields
-     * @return mixed
-     */
-    public function add_checkout_vat_fields($fields)
+    public function __construct($plugin_name, $version)
     {
-        $fields['shipping']['shipping_vat_number'] = array(
-            'label' => esc_html__('VAT number', 'kigocloud-for-woocommerce'),
-            'placeholder' => _x('12345678901', 'placeholder', 'kigocloud-for-woocommerce'),
-            'required' => false,
-            'class' => array('form-row-wide'),
-            'clear' => true,
-        );
-
-        $fields['billing']['billing_vat_number'] = array(
-            'label' => esc_html__('VAT number', 'kigocloud-for-woocommerce'),
-            'placeholder' => _x('12345678901', 'placeholder', 'kigocloud-for-woocommerce'),
-            'required' => false,
-            'class' => array('form-row-wide'),
-            'clear' => true,
-        );
-
-        return $fields;
+        $this->plugin_name = $plugin_name;
+        $this->version     = $version;
     }
 
-    /**
-     * @param $checkout
-     * @return void
-     */
-    public function add_checkout_vat_invoice_form($checkout)
+    public function enqueue_styles()
     {
-        echo '<div id="kigocloud_vat_invoices_form"><strong>' . __('VAT Invoice', 'kigocloud-for-woocommerce') . '</strong><p>' . __('Do you need VAT Invoice?', 'kigocloud-for-woocommerce') . '</p>';
-
-        woocommerce_form_field('kigocloud_vat_invoices_checkbox', array(
-            'type' => 'checkbox',
-            'class' => array('form-row-wide'),
-            'label' => __('Yes', 'kigocloud-for-woocommerce'),
-        ), $checkout->get_value('kigocloud_vat_invoices_checkbox'));
-
-        echo '<div id="kigocloud_vat_invoices_fields">';
-        woocommerce_form_field('kigocloud_vat_invoices_company', array(
-            'type' => 'text',
-            'class' => array('form-row-wide'),
-            'label' => __('Company name', 'kigocloud-for-woocommerce'),
-            'required' => true,
-            'placeholder' => _x('Enter company name', 'placeholder', 'woocommerce'),
-        ), $checkout->get_value('r1_ime_tvrtke'));
-
-        woocommerce_form_field('kigocloud_vat_invoices_address', array(
-            'type' => 'text',
-            'class' => array('form-row-wide'),
-            'label' => __('Company address', 'kigocloud-for-woocommerce'),
-            'required' => true,
-            'placeholder' => _x('Enter company address', 'placeholder', 'woocommerce'),
-        ), $checkout->get_value('kigocloud_vat_invoices_address'));
-
-        woocommerce_form_field('kigocloud_vat_invoices_city', array(
-            'type' => 'text',
-            'class' => array('form-row-wide'),
-            'label' => __('City', 'kigocloud-for-woocommerce'),
-            'required' => true,
-            'placeholder' => _x('Enter company city', 'placeholder', 'woocommerce'),
-        ), $checkout->get_value('kigocloud_vat_invoices_city'));
-
-        woocommerce_form_field('kigocloud_vat_invoices_zip', array(
-            'type' => 'text',
-            'class' => array('form-row-wide'),
-            'label' => __('Zip code', 'kigocloud-for-woocommerce'),
-            'required' => true,
-            'placeholder' => _x('Enter company zip code', 'placeholder', 'woocommerce'),
-        ), $checkout->get_value('kigocloud_vat_invoices_zip'));
-
-        woocommerce_form_field('kigocloud_vat_invoices_vat_number', array(
-            'type' => 'text',
-            'class' => array('form-row-wide'),
-            'label' => __('VAT number', 'kigocloud-for-woocommerce'),
-            'required' => true,
-            'placeholder' => _x('Enter company VAT number', 'placeholder', 'woocommerce'),
-        ), $checkout->get_value('kigocloud_vat_invoices_vat_number'));
-        echo '</div>';
-        echo '</div>';
+        // Reserved for future public stylesheet.
     }
 
-    /**
-     * @return void
-     */
-    public function validate_vat_invoice_form()
+    public function enqueue_scripts()
     {
-        if (isset($_POST['kigocloud_vat_invoices_checkbox']) && !empty($_POST['kigocloud_vat_invoices_checkbox'])) {
-            if (empty($_POST['kigocloud_vat_invoices_company'])) {
-                wc_add_notice(__('Company name is mandatory', 'kigocloud-for-woocommerce'), 'error');
-            }
-
-            if (empty($_POST['kigocloud_vat_invoices_address'])) {
-                wc_add_notice(__('Company address is mandatory', 'kigocloud-for-woocommerce'), 'error');
-            }
-
-            if (empty($_POST['kigocloud_vat_invoices_city'])) {
-                wc_add_notice(__('Company city is mandatory', 'kigocloud-for-woocommerce'), 'error');
-            }
-
-            if (empty($_POST['kigocloud_vat_invoices_zip'])) {
-                wc_add_notice(__('Company zip is mandatory', 'kigocloud-for-woocommerce'), 'error');
-            }
-
-            if (strlen($_POST['kigocloud_vat_invoices_vat_number']) !== 11) {
-                wc_add_notice(__('Company VAT has to have 11 characters', 'kigocloud-for-woocommerce'), 'error');
-            }
-
-            if ($this->validateVAT($_POST['kigocloud_vat_invoices_vat_number']) == false) {
-                wc_add_notice(__('Invalid VAT.', 'kigocloud-for-woocommerce'), 'error');
-            }
-        }
-    }
-
-    /**
-     * @param $order_id
-     * @return void
-     */
-    public function vat_invoice_form_update_order_meta( $order_id ) {
-        $order = wc_get_order( $order_id );
-
-        if (isset($_POST['kigocloud_vat_invoices_checkbox'])) {
-            $order->update_meta_data('kigocloud_vat_invoices_checkbox', esc_attr($_POST['kigocloud_vat_invoices_checkbox']));
-        }
-        if (isset($_POST['kigocloud_vat_invoices_company'])) {
-            $order->update_meta_data('kigocloud_vat_invoices_company', esc_attr($_POST['kigocloud_vat_invoices_company']));
-        }
-        if (isset($_POST['kigocloud_vat_invoices_address'])) {
-            $order->update_meta_data('kigocloud_vat_invoices_address', esc_attr($_POST['kigocloud_vat_invoices_address']));
-        }
-        if (isset($_POST['kigocloud_vat_invoices_city'])) {
-            $order->update_meta_data('kigocloud_vat_invoices_city', esc_attr($_POST['kigocloud_vat_invoices_city']));
-        }
-        if (isset($_POST['kigocloud_vat_invoices_zip'])) {
-            $order->update_meta_data('kigocloud_vat_invoices_zip', esc_attr($_POST['kigocloud_vat_invoices_zip']));
-        }
-        if (isset($_POST['kigocloud_vat_invoices_vat_number'])) {
-            $order->update_meta_data('kigocloud_vat_invoices_vat_number', esc_attr($_POST['kigocloud_vat_invoices_vat_number']));
-        }
-
-        $order->save();
-    }
-
-    /**
-     * @param $fields
-     * @return mixed
-     */
-    public function vat_invoice_form_override_checkout_fields( $fields ) {
-        unset($fields['billing']['billing_company']);
-
-        return $fields;
-    }
-
-    /**
-     * @param $oib
-     * @return bool
-     */
-    private function validateVAT($oib)
-    {
-        if (strlen($oib) == 11 and is_numeric($oib)) {
-            $a = 10;
-            for ($i = 0; $i < 10; $i++) {
-                $a = $a + intval(substr($oib, $i, 1), 10);
-                $a = $a % 10;
-                if ($a == 0) {
-                    $a = 10;
-                }
-                $a *= 2;
-                $a = $a % 11;
-            }
-
-            $kontrolni = 11 - $a;
-            if ($kontrolni == 10) {
-                $kontrolni = 0;
-            }
-            return $kontrolni == intval(substr($oib, 10, 1), 10);
-        }
-
-        return false;
+        // Reserved for future public script.
     }
 }

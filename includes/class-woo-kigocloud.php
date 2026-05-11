@@ -150,6 +150,11 @@ class Woo_KigoCloud {
 		 */
 		require_once plugin_dir_path(dirname( __FILE__ ) ) . 'includes/class-woo-kigocloud-updater.php';
 
+		/**
+		 * R1 customer fields (classic + block checkout).
+		 */
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-woo-kigocloud-r1.php';
+
 
 		$this->loader = new Woo_KigoCloud_Loader();
 
@@ -186,23 +191,34 @@ class Woo_KigoCloud {
         $plugin_request = new Woo_KigoCloud_Request();
         $plugin_rest = new Woo_KigoCloud_Rest();
 		$plugin_updater = new Woo_KigoCloud_Updater();
+		$plugin_r1 = new Woo_KigoCloud_R1();
 
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
 
         $this->loader->add_action('woocommerce_order_status_changed', $plugin_request, 'on_order_status_change',14,3);
 
-        $enableVatInvoice = get_option('kigocloud_vat_invoices', 0);
-		if ($enableVatInvoice){
-			$this->loader->add_action('admin_notices',$plugin_admin,'checkout_block_admin_notice');
-		}
-        if ($enableVatInvoice == 2) {
-            $this->loader->add_action('woocommerce_after_checkout_billing_form', $plugin_public, 'add_checkout_vat_invoice_form');
-            $this->loader->add_action('woocommerce_init', $plugin_public, 'validate_vat_invoice_form');
-            $this->loader->add_action('woocommerce_checkout_update_order_meta', $plugin_public, 'vat_invoice_form_update_order_meta');
-            $this->loader->add_filter('woocommerce_checkout_fields', $plugin_public, 'vat_invoice_form_override_checkout_fields');
-        }else if ($enableVatInvoice == 1){
-            $this->loader->add_action('woocommerce_checkout_fields', $plugin_public, 'add_checkout_vat_fields');
+        $r1_mode = Woo_KigoCloud_R1::mode();
+        if ($r1_mode > 0) {
+            // Admin warning for block checkout on WC versions that lack the field API.
+            $this->loader->add_action('admin_notices', $plugin_admin, 'checkout_block_admin_notice');
+
+            // Classic checkout hooks.
+            if ($r1_mode === 2) {
+                $this->loader->add_action('woocommerce_after_checkout_billing_form', $plugin_r1, 'classic_render_full');
+                $this->loader->add_action('woocommerce_checkout_process', $plugin_r1, 'classic_validate_full');
+                $this->loader->add_action('woocommerce_checkout_update_order_meta', $plugin_r1, 'classic_save_full');
+                $this->loader->add_filter('woocommerce_checkout_fields', $plugin_r1, 'classic_override_fields');
+            } else {
+                $this->loader->add_filter('woocommerce_checkout_fields', $plugin_r1, 'classic_add_vat_field');
+            }
+
+            // Block checkout (WC 8.6+) via Additional Checkout Fields API.
+            if (Woo_KigoCloud_R1::block_supported()) {
+                $this->loader->add_action('woocommerce_init', $plugin_r1, 'register_block_fields', 20);
+                $this->loader->add_filter('woocommerce_blocks_validate_additional_field', $plugin_r1, 'validate_block_additional_field', 10, 3);
+                $this->loader->add_action('woocommerce_store_api_checkout_update_order_from_request', $plugin_r1, 'sync_block_meta_to_legacy', 10, 2);
+            }
         }
 
         $this->loader->add_action('woocommerce_admin_order_data_after_shipping_address', $plugin_admin, 'display_admin_order_meta');
