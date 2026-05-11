@@ -1,0 +1,367 @@
+# Copyright (C) 2020 Symmetria d.o.o.
+# This file is distributed under the same license as the Woo KigoCloud Integration plugin.
+msgid ""
+msgstr ""
+"Project-Id-Version: Woo KigoCloud Integration\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/woo-kigocloud-"
+"api\n"
+"POT-Creation-Date: 2025-02-02 22:37+0100\n"
+"PO-Revision-Date: 2025-02-02 22:37+0100\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 3.5\n"
+"X-Domain: kigocloud-for-woocommerce\n"
+"X-Poedit-KeywordsList: __\n"
+"X-Poedit-Basepath: ..\n"
+"X-Poedit-SearchPath-0: .\n"
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:168
+msgid "KigoCloud"
+msgstr ""
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:188
+msgid "pos_type_0"
+msgstr "Disabled"
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:189
+msgid "pos_type_1"
+msgstr "Invoice"
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:190
+msgid "pos_type_2"
+msgstr "Offer"
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:209
+msgid "Document type"
+msgstr ""
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:214
+msgid "Disabled"
+msgstr ""
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:215
+msgid "Invoice"
+msgstr ""
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:216
+msgid "Offer"
+msgstr ""
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:223
+msgid "Payment type"
+msgstr ""
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:228
+msgid "Transaction account"
+msgstr ""
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:229
+msgid "Card"
+msgstr ""
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:230
+msgid "Cash"
+msgstr ""
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:231
+msgid "Cheque"
+msgstr ""
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:232
+msgid "Other"
+msgstr ""
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:238
+msgid "On status"
+msgstr ""
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:243
+msgid "Order Creation"
+msgstr ""
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:244
+msgid "Order Completed"
+msgstr ""
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:250
+msgid "Send Email with document PDF"
+msgstr ""
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:255
+msgid "No"
+msgstr ""
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:256
+#: public/class-kigocloud-for-woocommerce-public.php:139
+msgid "Yes"
+msgstr ""
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:270
+msgid "API account"
+msgstr ""
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:275
+msgid "API Username"
+msgstr ""
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:279
+msgid "Enter API username here"
+msgstr ""
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:285
+msgid "API Password"
+msgstr ""
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:289
+msgid "Enter API password here"
+msgstr ""
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:303
+msgid "Misc"
+msgstr ""
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:308
+msgid "Employee PIN"
+msgstr ""
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:312
+msgid "Enter API employee PIN here"
+msgstr ""
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:318
+msgid "Shipping Reference Number"
+msgstr ""
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:322
+msgid "Enter Shipping Reference Number here"
+msgstr ""
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:330
+msgid "E-mail settings"
+msgstr ""
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:332
+msgid "This change is global."
+msgstr ""
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:335
+msgid "From name"
+msgstr ""
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:339
+msgid "Enter 'From' Name field here"
+msgstr ""
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:345
+msgid "From e-mail"
+msgstr ""
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:349
+msgid "Enter 'From' E-mail here"
+msgstr ""
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:355
+msgid "Reply-To E-mail"
+msgstr ""
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:359
+msgid "Enter 'Reply-To' E-mail here"
+msgstr ""
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:371
+msgid "Order Statuses"
+msgstr ""
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:373
+msgid ""
+"Before any Kigo API call, plugin will check if call has already been made "
+"for same order"
+msgstr ""
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:376
+msgid "Skip create Kigo document on Order Status Created"
+msgstr ""
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:383
+msgid "No, create Kigo document on Order Created status"
+msgstr ""
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:384
+msgid "Yes, skip this order status"
+msgstr ""
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:389
+msgid "Skip create Kigo document on Order Status Completed"
+msgstr ""
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:396
+msgid "No, create Kigo document on Order Completed status"
+msgstr ""
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:397
+msgid "Yes, skip skip this order status"
+msgstr ""
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:410
+#: public/class-kigocloud-for-woocommerce-public.php:134
+msgid "VAT Invoice"
+msgstr ""
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:412
+msgid ""
+"Enable VAT Invoice fields on Checkout form: Company Name, Company Adress, "
+"Company VAT"
+msgstr ""
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:415
+msgid "Checkout fields"
+msgstr ""
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:422
+msgid "Do not show VAT Invoice fields on Checkout"
+msgstr ""
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:423
+msgid "Show VAT field only"
+msgstr ""
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:424
+msgid "Show All VAT Invoice fields on Checkout"
+msgstr ""
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:437
+#: admin/class-kigocloud-for-woocommerce-admin.php:442
+msgid "Custom mapping"
+msgstr ""
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:439
+msgid ""
+"Use this option to override default billing information with custom data "
+"from order meta data using format: source_meta:target.data, source_meta1:"
+"target.data1"
+msgstr ""
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:446
+msgid ""
+"Example: r1_oib_tvrtke:_billing_vat_number, r1_ime_tvrtke:billing.company, "
+"r1_adresa_tvrtke:billing.address_1"
+msgstr ""
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:470
+msgid "Shipping VAT number"
+msgstr ""
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:478
+msgid "Billing VAT number"
+msgstr ""
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:486
+msgid "Is VAT Invoice"
+msgstr ""
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:490
+msgid "Company Name"
+msgstr ""
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:494
+msgid "Company Address"
+msgstr ""
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:498
+msgid "Company City"
+msgstr ""
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:502
+msgid "Company ZIP"
+msgstr ""
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:507
+msgid "Company VAT number"
+msgstr ""
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:521
+msgid "KigoCloud document"
+msgstr ""
+
+#: includes/class-kigocloud-for-woocommerce-request.php:137
+msgid "pos_type_"
+msgstr ""
+
+#: includes/class-kigocloud-for-woocommerce-request.php:151
+msgid "Web Order #"
+msgstr ""
+
+#: includes/class-kigocloud-for-woocommerce-request.php:207
+msgid "Dostava"
+msgstr ""
+
+#: includes/class-kigocloud-for-woocommerce-request.php:359
+#, php-format
+msgid "KigoCloud %1$s created with document number %2$s and payment type %3$s"
+msgstr ""
+
+#: includes/class-kigocloud-for-woocommerce-request.php:406
+#, php-format
+msgid "%1$s sending you %2$s no. %3$s"
+msgstr ""
+
+#: includes/class-kigocloud-for-woocommerce-request.php:415
+#, php-format
+msgid ""
+"Hi %1$s,<br /><br />Thank you for your order.<br /><br />Your %2$s with "
+"number <b>%3$s</b> is in the attachment.<br /><br />We look forward to "
+"fulfilling your order soon."
+msgstr ""
+
+#: public/class-kigocloud-for-woocommerce-public.php:134
+msgid "Do you need VAT Invoice?"
+msgstr ""
+
+#: public/class-kigocloud-for-woocommerce-public.php:146
+msgid "Company name"
+msgstr ""
+
+#: public/class-kigocloud-for-woocommerce-public.php:154
+msgid "Company address"
+msgstr ""
+
+#: public/class-kigocloud-for-woocommerce-public.php:162
+msgid "City"
+msgstr ""
+
+#: public/class-kigocloud-for-woocommerce-public.php:170
+msgid "Zip code"
+msgstr ""
+
+#: public/class-kigocloud-for-woocommerce-public.php:178
+msgid "VAT number"
+msgstr ""
+
+#: public/class-kigocloud-for-woocommerce-public.php:193
+msgid "Company name is mandatory"
+msgstr ""
+
+#: public/class-kigocloud-for-woocommerce-public.php:197
+msgid "Company address is mandatory"
+msgstr ""
+
+#: public/class-kigocloud-for-woocommerce-public.php:201
+msgid "Company city is mandatory"
+msgstr ""
+
+#: public/class-kigocloud-for-woocommerce-public.php:205
+msgid "Company zip is mandatory"
+msgstr ""
+
+#: public/class-kigocloud-for-woocommerce-public.php:209
+msgid "Company VAT has to have 11 characters"
+msgstr ""
+
+#: public/class-kigocloud-for-woocommerce-public.php:213
+msgid "Invalid VAT."
+msgstr ""

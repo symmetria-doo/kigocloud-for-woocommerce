@@ -1,0 +1,32 @@
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# Build artifacts
+*.zip
+*.tar.gz
+build/
+dist/
+
+# Composer (if used)
+vendor/.git/
+composer.phar
+composer.lock
+
+# Node (if used for blocks build later)
+node_modules/
+package-lock.json
+yarn.lock
+
+# Compiled translations (generated from .po)
+languages/*.mo
+
+# WordPress dev artifacts
+.htaccess
+debug.log
+error_log
+wp-cli.local.yml

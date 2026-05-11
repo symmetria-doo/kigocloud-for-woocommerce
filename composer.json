@@ -1,0 +1,25 @@
+{
+    "name": "dpotocic/kigocloud-for-woocommerce",
+    "description": "Sends WooCommerce orders to KigoCloud (R1 invoices, fiscalization, inventory).",
+    "type": "wordpress-plugin",
+    "license": "GPL-2.0-or-later",
+    "homepage": "https://github.com/dpotocic/kigocloud-for-woocommerce",
+    "authors": [
+        {
+            "name": "Dejan Potocic",
+            "email": "dpotocic@gmail.com",
+            "homepage": "https://github.com/dpotocic"
+        }
+    ],
+    "require": {
+        "php": ">=7.2"
+    },
+    "require-dev": {
+        "yahnis-elsts/plugin-update-checker": "^5.4"
+    },
+    "config": {
+        "vendor-dir": "vendor",
+        "preferred-install": "dist",
+        "sort-packages": true
+    }
+}

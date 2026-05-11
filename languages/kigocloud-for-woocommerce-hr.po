@@ -1,0 +1,398 @@
+# Copyright (C) 2020 Symmetria d.o.o.
+# This file is distributed under the same license as the Woo KigoCloud Integration plugin.
+msgid ""
+msgstr ""
+"Project-Id-Version: Woo KigoCloud Integration\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/woo-kigocloud-"
+"api\n"
+"POT-Creation-Date: 2025-02-02 22:37+0100\n"
+"PO-Revision-Date: 2025-02-02 22:43+0100\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: hr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<12 || n%100>14) ? 1 : 2);\n"
+"X-Generator: Poedit 3.5\n"
+"X-Domain: kigocloud-for-woocommerce\n"
+"X-Poedit-Basepath: ..\n"
+"X-Poedit-SearchPath-0: .\n"
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:168
+#, fuzzy
+#| msgid "KigoCloud document"
+msgid "KigoCloud"
+msgstr "Kigo dokument"
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:188
+msgid "pos_type_0"
+msgstr "Onemogućeno"
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:189
+msgid "pos_type_1"
+msgstr "Račun"
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:190
+msgid "pos_type_2"
+msgstr "Ponuda"
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:209
+msgid "Document type"
+msgstr "Tip dokumenta"
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:214
+msgid "Disabled"
+msgstr "Onemogućeno"
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:215
+msgid "Invoice"
+msgstr "Račun"
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:216
+msgid "Offer"
+msgstr "Ponuda"
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:223
+msgid "Payment type"
+msgstr "Način plaćanja"
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:228
+msgid "Transaction account"
+msgstr "Transakcijski račun"
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:229
+msgid "Card"
+msgstr "Kartica"
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:230
+msgid "Cash"
+msgstr "Gotovina"
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:231
+msgid "Cheque"
+msgstr "Ček"
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:232
+msgid "Other"
+msgstr "Ostalo"
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:238
+msgid "On status"
+msgstr "Na status narudžbe"
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:243
+msgid "Order Creation"
+msgstr "Narudžba napravljena"
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:244
+msgid "Order Completed"
+msgstr "Narudžba završena"
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:250
+msgid "Send Email with document PDF"
+msgstr "Šalji email s PDFom ponude/računa"
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:255
+msgid "No"
+msgstr "Ne"
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:256
+#: public/class-kigocloud-for-woocommerce-public.php:139
+msgid "Yes"
+msgstr "Da"
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:270
+msgid "API account"
+msgstr "API korisnički račun"
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:275
+msgid "API Username"
+msgstr "API korisničko ime"
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:279
+msgid "Enter API username here"
+msgstr "Unesite API korisničko ime"
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:285
+msgid "API Password"
+msgstr "API Zaporka"
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:289
+msgid "Enter API password here"
+msgstr "Unesite API zaporku ovdje"
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:303
+msgid "Misc"
+msgstr "Ostalo"
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:308
+msgid "Employee PIN"
+msgstr "PIN zaposlenika"
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:312
+msgid "Enter API employee PIN here"
+msgstr "Unesite PIN zaposlenika ovdje"
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:318
+msgid "Shipping Reference Number"
+msgstr "Šifra usluge dostave"
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:322
+msgid "Enter Shipping Reference Number here"
+msgstr "Unesite šifru usluge dostave ovdje"
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:330
+msgid "E-mail settings"
+msgstr "E-mail postavke"
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:332
+msgid "This change is global."
+msgstr "Ova promjena je globalna"
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:335
+msgid "From name"
+msgstr "Od ime"
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:339
+msgid "Enter 'From' Name field here"
+msgstr "Unesite 'Od' Ime ovdje"
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:345
+msgid "From e-mail"
+msgstr "Od e-mail"
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:349
+msgid "Enter 'From' E-mail here"
+msgstr "Unesite 'Od' E-mail ovdje"
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:355
+msgid "Reply-To E-mail"
+msgstr "Odgovori na E-mail"
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:359
+msgid "Enter 'Reply-To' E-mail here"
+msgstr "Unesite 'Od' E-mail ovdje"
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:371
+#, fuzzy
+#| msgid "On status"
+msgid "Order Statuses"
+msgstr "Status narudžbe"
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:373
+msgid ""
+"Before any Kigo API call, plugin will check if call has already been made "
+"for same order"
+msgstr ""
+"Prije bilo kakvog Kigo API poziva, dodatak će provjeriti je li poziv već "
+"izvršen za istu narudžbu."
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:376
+msgid "Skip create Kigo document on Order Status Created"
+msgstr "Preskoči izradu Kigo dokumenta prilikom kreiranja statusa narudžbe"
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:383
+msgid "No, create Kigo document on Order Created status"
+msgstr "Ne, izradi Kigo dokument prilikom kreiranja statusa narudžbe"
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:384
+msgid "Yes, skip this order status"
+msgstr "Da, preskoči ovaj status narudžbe"
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:389
+msgid "Skip create Kigo document on Order Status Completed"
+msgstr "Preskoči izradu Kigo dokumenta kada je narudžba dovršena"
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:396
+msgid "No, create Kigo document on Order Completed status"
+msgstr ""
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:397
+msgid "Yes, skip skip this order status"
+msgstr "Da, preskoči ovaj status narudžbe"
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:410
+#: public/class-kigocloud-for-woocommerce-public.php:134
+msgid "VAT Invoice"
+msgstr "Pravne osobe"
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:412
+msgid ""
+"Enable VAT Invoice fields on Checkout form: Company Name, Company Adress, "
+"Company VAT"
+msgstr "Prikaži polja R1 računa na formi plaćanja: Naziv, Adresa, OIB"
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:415
+msgid "Checkout fields"
+msgstr "Polja plaćanja"
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:422
+msgid "Do not show VAT Invoice fields on Checkout"
+msgstr "Ne prikazuj polja R1 računa na plaćanju"
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:423
+msgid "Show VAT field only"
+msgstr "Prikaži samo OIB polje na plaćanju"
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:424
+msgid "Show All VAT Invoice fields on Checkout"
+msgstr "Prikaži sva polja R1 računa na plaćanju"
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:437
+#: admin/class-kigocloud-for-woocommerce-admin.php:442
+msgid "Custom mapping"
+msgstr "Dodatno mapiranje"
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:439
+msgid ""
+"Use this option to override default billing information with custom data "
+"from order meta data using format: source_meta:target.data, source_meta1:"
+"target.data1"
+msgstr ""
+"Koristite ovu opciju za zamjenu zadanih podataka za naplatu prilagođenim "
+"podacima iz meta podataka narudžbe, koristeći format: izvor_meta:cilj."
+"podatak, izvor_meta1:cilj.podatak1"
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:446
+msgid ""
+"Example: r1_oib_tvrtke:_billing_vat_number, r1_ime_tvrtke:billing.company, "
+"r1_adresa_tvrtke:billing.address_1"
+msgstr ""
+"Primjer: r1_oib_tvrtke:_billing_vat_number, r1_ime_tvrtke:billing.company, "
+"r1_adresa_tvrtke:billing.address_1"
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:470
+msgid "Shipping VAT number"
+msgstr "OIB dostave"
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:478
+msgid "Billing VAT number"
+msgstr "OIB plaćanja"
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:486
+msgid "Is VAT Invoice"
+msgstr "R1 Račun"
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:490
+msgid "Company Name"
+msgstr "Naziv Tvrtke"
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:494
+msgid "Company Address"
+msgstr "Adresa Tvrtke"
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:498
+msgid "Company City"
+msgstr "Grad Tvrtke"
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:502
+msgid "Company ZIP"
+msgstr "Poštanski br."
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:507
+msgid "Company VAT number"
+msgstr "OIB Tvrtke"
+
+#: admin/class-kigocloud-for-woocommerce-admin.php:521
+msgid "KigoCloud document"
+msgstr "Kigo dokument"
+
+#: includes/class-kigocloud-for-woocommerce-request.php:137
+#, fuzzy
+#| msgid "pos_type_0"
+msgid "pos_type_"
+msgstr "Onemogućeno"
+
+#: includes/class-kigocloud-for-woocommerce-request.php:151
+msgid "Web Order #"
+msgstr "Web Narudžba #"
+
+#: includes/class-kigocloud-for-woocommerce-request.php:207
+msgid "Dostava"
+msgstr ""
+
+#: includes/class-kigocloud-for-woocommerce-request.php:359
+#, php-format
+msgid "KigoCloud %1$s created with document number %2$s and payment type %3$s"
+msgstr "KigoCloud %1$s dokument dodan s brojem %2$s i načinom plaćanja %3$s"
+
+#: includes/class-kigocloud-for-woocommerce-request.php:406
+#, php-format
+msgid "%1$s sending you %2$s no. %3$s"
+msgstr "%1$s vam šalje %2$s br. %3$s"
+
+#: includes/class-kigocloud-for-woocommerce-request.php:415
+#, php-format
+msgid ""
+"Hi %1$s,<br /><br />Thank you for your order.<br /><br />Your %2$s with "
+"number <b>%3$s</b> is in the attachment.<br /><br />We look forward to "
+"fulfilling your order soon."
+msgstr ""
+"Poštovani %1$s,<br /><br />hvala vam na vašoj narudžbi.<br /><br />Vaš %2$s "
+"sa brojem <b>%3$s</b> je u prilogu.<br /><br />Vaša narudžba će uskoro biti "
+"spremna."
+
+#: public/class-kigocloud-for-woocommerce-public.php:134
+msgid "Do you need VAT Invoice?"
+msgstr "Trebate R1 račun?"
+
+#: public/class-kigocloud-for-woocommerce-public.php:146
+msgid "Company name"
+msgstr "Naziv tvrtke"
+
+#: public/class-kigocloud-for-woocommerce-public.php:154
+msgid "Company address"
+msgstr "Adresa tvrtke"
+
+#: public/class-kigocloud-for-woocommerce-public.php:162
+msgid "City"
+msgstr "Grad tvrtke"
+
+#: public/class-kigocloud-for-woocommerce-public.php:170
+msgid "Zip code"
+msgstr "Poštanski broj tvrtke"
+
+#: public/class-kigocloud-for-woocommerce-public.php:178
+msgid "VAT number"
+msgstr "OIB tvrtke"
+
+#: public/class-kigocloud-for-woocommerce-public.php:193
+msgid "Company name is mandatory"
+msgstr "Naziv tvrtke je obavezan"
+
+#: public/class-kigocloud-for-woocommerce-public.php:197
+msgid "Company address is mandatory"
+msgstr "Adresa tvrtke je obavezna"
+
+#: public/class-kigocloud-for-woocommerce-public.php:201
+msgid "Company city is mandatory"
+msgstr "Grad tvrtke je obavezan"
+
+#: public/class-kigocloud-for-woocommerce-public.php:205
+msgid "Company zip is mandatory"
+msgstr "Poštanski broj tvrtke je obavezan"
+
+#: public/class-kigocloud-for-woocommerce-public.php:209
+msgid "Company VAT has to have 11 characters"
+msgstr "OIB tvrtke mora imati 11 znakova"
+
+#: public/class-kigocloud-for-woocommerce-public.php:213
+msgid "Invalid VAT."
+msgstr "Neispravan OIB"
+
+#~ msgid "Document number"
+#~ msgstr "Broj dokumenta"
+
+#~ msgid "Your %1$s %2$s"
+#~ msgstr "Vaš"
+
+#~ msgid "Flat Rate Shipping Reference Number"
+#~ msgstr "Šifra usluge 'Flat rate' dostave"
+
+#~ msgid "Document type for payment"
+#~ msgstr "Tip dokumenta za plaćanje"
+
+#~ msgid "Payment type for "
+#~ msgstr "Tip plaćanja za"
