@@ -545,6 +545,12 @@ class Woo_KigoCloud_Admin_Page
         </div>
 
         <div class="kc-card">
+            <h2><?php esc_html_e('Block checkout diagnostics', 'kigocloud-for-woocommerce'); ?></h2>
+            <p class="kc-desc"><?php esc_html_e('Live status of the Additional Checkout Fields integration for the WooCommerce block checkout. If the R1 fields are missing from the checkout, the row that is red below points to the cause.', 'kigocloud-for-woocommerce'); ?></p>
+            <?php $this->render_r1_diagnostics(); ?>
+        </div>
+
+        <div class="kc-card">
             <h2><?php esc_html_e('Test KigoCloud connection', 'kigocloud-for-woocommerce'); ?></h2>
             <p class="kc-desc">
                 <?php esc_html_e('Sends a one-shot synthetic R1 invoice to KigoCloud using the saved API credentials and a dummy OIB. No real order is created. Shows the raw KigoCloud response so you can verify credentials, network and endpoint before going live.', 'kigocloud-for-woocommerce'); ?>
@@ -563,6 +569,95 @@ class Woo_KigoCloud_Admin_Page
                 document.getElementById('kigocloud-test-push-result').style.display = '';
             </script>
         </div>
+        <?php
+    }
+
+    private function render_r1_diagnostics()
+    {
+        $wc_version            = defined('WC_VERSION') ? WC_VERSION : null;
+        $fn_exists             = function_exists('woocommerce_register_additional_checkout_field');
+        $mode                  = Woo_KigoCloud_R1::mode();
+        $block_supported       = Woo_KigoCloud_R1::block_supported();
+        $checkout_uses_block   = Woo_KigoCloud_R1::checkout_uses_block();
+        $register_attempted    = Woo_KigoCloud_R1::$register_attempted;
+        $register_status       = Woo_KigoCloud_R1::$register_status;
+        $checkout_page_id      = function_exists('wc_get_page_id') ? wc_get_page_id('checkout') : 0;
+        $checkout_edit_link    = $checkout_page_id ? get_edit_post_link($checkout_page_id) : '';
+
+        $rows = array(
+            array(
+                'label'   => __('WooCommerce version', 'kigocloud-for-woocommerce'),
+                'ok'      => $wc_version && version_compare($wc_version, '8.9', '>='),
+                'value'   => $wc_version ? $wc_version : __('not detected', 'kigocloud-for-woocommerce'),
+                'hint'    => __('Additional Checkout Fields API was officially shipped in WooCommerce 8.9. On 8.6-8.8 the function exists but may not render fields reliably; upgrading WC is the fix.', 'kigocloud-for-woocommerce'),
+            ),
+            array(
+                'label'   => __('Field API function available', 'kigocloud-for-woocommerce'),
+                'ok'      => $fn_exists,
+                'value'   => $fn_exists ? 'woocommerce_register_additional_checkout_field()' : __('missing', 'kigocloud-for-woocommerce'),
+                'hint'    => __('If missing, WooCommerce is too old to register checkout fields via PHP; upgrade WC.', 'kigocloud-for-woocommerce'),
+            ),
+            array(
+                'label'   => __('R1 mode', 'kigocloud-for-woocommerce'),
+                'ok'      => $mode > 0,
+                'value'   => $mode === 0 ? __('Off', 'kigocloud-for-woocommerce') : ($mode === 1 ? __('OIB only', 'kigocloud-for-woocommerce') : __('Full R1 block', 'kigocloud-for-woocommerce')),
+                'hint'    => __('When set to Off the plugin registers nothing on the checkout.', 'kigocloud-for-woocommerce'),
+            ),
+            array(
+                'label'   => __('Checkout page uses block', 'kigocloud-for-woocommerce'),
+                'ok'      => $checkout_uses_block,
+                'value'   => $checkout_uses_block ? __('Yes', 'kigocloud-for-woocommerce') : __('No (classic [woocommerce_checkout] shortcode)', 'kigocloud-for-woocommerce'),
+                'hint'    => $checkout_edit_link
+                    ? sprintf(__('Block checkout fields only appear if the Checkout page actually contains the WooCommerce checkout block. <a href="%s">Edit checkout page</a>.', 'kigocloud-for-woocommerce'), esc_url($checkout_edit_link))
+                    : __('Block checkout fields only appear if the Checkout page actually contains the WooCommerce checkout block.', 'kigocloud-for-woocommerce'),
+            ),
+            array(
+                'label'   => __('Hook fired this request', 'kigocloud-for-woocommerce'),
+                'ok'      => $register_attempted,
+                'value'   => $register_attempted ? __('Yes, register_block_fields() was called', 'kigocloud-for-woocommerce') : __('No - woocommerce_init never reached our handler', 'kigocloud-for-woocommerce'),
+                'hint'    => __('If No, another plugin or fatal error is preventing woocommerce_init from running through to our handler. Check the WP debug.log.', 'kigocloud-for-woocommerce'),
+            ),
+            array(
+                'label'   => __('Registration status', 'kigocloud-for-woocommerce'),
+                'ok'      => $register_status === 'ok',
+                'value'   => $register_status === '' ? __('not yet attempted', 'kigocloud-for-woocommerce') : $register_status,
+                'hint'    => __('"ok" means WC accepted both field registrations. Any other value points to the rejection reason.', 'kigocloud-for-woocommerce'),
+            ),
+        );
+        ?>
+        <table class="kc-gateway-table" style="margin-top:6px;">
+            <thead>
+                <tr>
+                    <th style="width:280px;"><?php esc_html_e('Check', 'kigocloud-for-woocommerce'); ?></th>
+                    <th><?php esc_html_e('Result', 'kigocloud-for-woocommerce'); ?></th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($rows as $r): ?>
+                    <tr>
+                        <td><strong><?php echo esc_html($r['label']); ?></strong></td>
+                        <td>
+                            <span class="<?php echo $r['ok'] ? 'kc-status-ok' : 'kc-status-bad'; ?>">
+                                <?php echo $r['ok'] ? 'OK' : '!'; ?>
+                            </span>
+                            &nbsp;<?php echo esc_html($r['value']); ?>
+                            <?php if (!empty($r['hint']) && !$r['ok']): ?>
+                                <div style="color:#50575e;font-size:12px;margin-top:4px;"><?php echo wp_kses_post($r['hint']); ?></div>
+                            <?php endif; ?>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+                <tr>
+                    <td><strong><?php esc_html_e('Field IDs registered', 'kigocloud-for-woocommerce'); ?></strong></td>
+                    <td>
+                        <code><?php echo esc_html(Woo_KigoCloud_R1::FIELD_R1_VAT_NUMBER); ?></code>
+                        <?php if (Woo_KigoCloud_R1::mode() === 2): ?>
+                            <br><code><?php echo esc_html(Woo_KigoCloud_R1::FIELD_R1_COMPANY); ?></code>
+                        <?php endif; ?>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
         <?php
     }
 

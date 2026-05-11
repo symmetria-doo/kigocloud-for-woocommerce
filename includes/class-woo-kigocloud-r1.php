@@ -17,12 +17,30 @@
 
 class Woo_KigoCloud_R1
 {
-    const FIELD_R1_TOGGLE     = 'kigocloud/r1_invoice';
-    const FIELD_R1_VAT_NUMBER = 'kigocloud/r1_vat_number';
-    const FIELD_R1_COMPANY    = 'kigocloud/r1_company';
-    const FIELD_R1_ADDRESS    = 'kigocloud/r1_address';
-    const FIELD_R1_CITY       = 'kigocloud/r1_city';
-    const FIELD_R1_ZIP        = 'kigocloud/r1_zip';
+    const FIELD_R1_TOGGLE     = 'kigocloud/r1-invoice';
+    const FIELD_R1_VAT_NUMBER = 'kigocloud/r1-vat-number';
+    const FIELD_R1_COMPANY    = 'kigocloud/r1-company';
+    const FIELD_R1_ADDRESS    = 'kigocloud/r1-address';
+    const FIELD_R1_CITY       = 'kigocloud/r1-city';
+    const FIELD_R1_ZIP        = 'kigocloud/r1-zip';
+
+    /**
+     * Flips to true the moment register_block_fields() actually
+     * gets called this request. Read by the diagnostics panel on
+     * the R1 admin tab so we can tell whether the woocommerce_init
+     * hook even fired for the plugin.
+     *
+     * @var bool
+     */
+    public static $register_attempted = false;
+
+    /**
+     * Holds the last exception / WP_Error / message from a failed
+     * registration attempt for the diagnostics panel.
+     *
+     * @var string
+     */
+    public static $register_status = '';
 
     /**
      * Returns the active R1 mode:
@@ -70,54 +88,96 @@ class Woo_KigoCloud_R1
     /**
      * Registers extra checkout fields with the Additional Checkout Fields
      * API. Must run on `woocommerce_init` so that the API is loaded.
+     *
+     * Kept deliberately minimal (id + label + location + required + type)
+     * so we hit exactly the documented WC contract. Validation moves
+     * to a separate filter so a sanitize_callback / validate_callback
+     * type mismatch can't silently kill the registration.
      */
     public function register_block_fields()
     {
-        if (!self::block_supported()) {
+        self::$register_attempted = true;
+
+        if (!function_exists('woocommerce_register_additional_checkout_field')) {
+            self::$register_status = 'function-missing';
             return;
         }
+
         $mode = self::mode();
         if ($mode === 0) {
+            self::$register_status = 'mode-off';
             return;
         }
 
-        // OIB / VAT number is needed for both R1 modes. For mode 2
-        // (full R1 block) it is required; for mode 1 (OIB only) it is
-        // optional so B2C customers can still check out without an OIB.
-        woocommerce_register_additional_checkout_field(array(
-            'id'                => self::FIELD_R1_VAT_NUMBER,
-            'label'             => __('OIB / VAT number', 'kigocloud-for-woocommerce'),
-            'location'          => 'address',
-            'type'              => 'text',
-            'required'          => ($mode === 2),
-            'sanitize_callback' => static function ($value) {
-                return preg_replace('/[^0-9]/', '', (string) $value);
-            },
-            'validate_callback' => static function ($value) {
-                $value = trim((string) $value);
-                if ($value === '') {
-                    return;
-                }
-                if (!Woo_KigoCloud_R1::is_valid_oib($value)) {
-                    return new \WP_Error(
-                        'kigocloud_invalid_oib',
-                        __('OIB must be 11 digits and pass the checksum.', 'kigocloud-for-woocommerce')
-                    );
-                }
-            },
-        ));
+        try {
+            woocommerce_register_additional_checkout_field(array(
+                'id'       => self::FIELD_R1_VAT_NUMBER,
+                'label'    => __('OIB / VAT number', 'kigocloud-for-woocommerce'),
+                'location' => 'address',
+                'type'     => 'text',
+                'required' => ($mode === 2),
+            ));
 
-        if ($mode !== 2) {
-            return;
+            if ($mode === 2) {
+                woocommerce_register_additional_checkout_field(array(
+                    'id'       => self::FIELD_R1_COMPANY,
+                    'label'    => __('Company name (for invoice)', 'kigocloud-for-woocommerce'),
+                    'location' => 'address',
+                    'type'     => 'text',
+                    'required' => true,
+                ));
+            }
+
+            self::$register_status = 'ok';
+        } catch (\Throwable $e) {
+            self::$register_status = 'exception: ' . $e->getMessage();
         }
+    }
 
-        woocommerce_register_additional_checkout_field(array(
-            'id'       => self::FIELD_R1_COMPANY,
-            'label'    => __('Company name (for invoice)', 'kigocloud-for-woocommerce'),
-            'location' => 'address',
-            'type'     => 'text',
-            'required' => true,
-        ));
+    /**
+     * Sanitizes the OIB additional checkout field (block) before WC
+     * persists it on the order. Hook: woocommerce_sanitize_additional_field.
+     *
+     * @param mixed  $value
+     * @param string $key   namespaced field id, e.g. "kigocloud/r1-vat-number"
+     * @return mixed
+     */
+    public function sanitize_block_additional_field($value, $key)
+    {
+        if ($key === self::FIELD_R1_VAT_NUMBER) {
+            return preg_replace('/[^0-9]/', '', (string) $value);
+        }
+        return $value;
+    }
+
+    /**
+     * Validates the OIB additional checkout field (block) on submit.
+     * Hook: woocommerce_validate_additional_field.
+     *
+     * @param \WP_Error|null $errors
+     * @param string         $key
+     * @param mixed          $value
+     * @return \WP_Error|null
+     */
+    public function validate_block_additional_field($errors, $key, $value)
+    {
+        if ($key !== self::FIELD_R1_VAT_NUMBER) {
+            return $errors;
+        }
+        $value = trim((string) $value);
+        if ($value === '') {
+            return $errors;
+        }
+        if (!self::is_valid_oib($value)) {
+            if (!($errors instanceof \WP_Error)) {
+                $errors = new \WP_Error();
+            }
+            $errors->add(
+                'kigocloud_invalid_oib',
+                __('OIB must be 11 digits and pass the checksum.', 'kigocloud-for-woocommerce')
+            );
+        }
+        return $errors;
     }
 
     /**

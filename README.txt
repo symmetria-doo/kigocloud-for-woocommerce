@@ -5,7 +5,7 @@ Tags: woocommerce, hrvatska fiskalizacija, croatian fiscalization, fiscalization
 Requires at least: 5.5
 Requires PHP: 7.2
 Tested up to: 6.9
-Stable tag: 2.1.2
+Stable tag: 2.1.3
 WC requires at least: 5.0
 WC tested up to: 9.4
 License: GPLv2 or later
@@ -45,6 +45,12 @@ This plugin is not hosted on the WordPress.org repository. Updates are delivered
 4. WooCommerce -> Settings -> KigoCloud, fill in your API credentials
 
 == Changelog ==
+
+= 2.1.3 =
+* Fix attempt: simplified block-checkout R1 field registration to the documented minimum (id, label, location, type, required) so WooCommerce can no longer silently reject the registration over an unexpected key
+* Sanitize and validate moved off the closure args and onto the dedicated woocommerce_sanitize_additional_field / woocommerce_validate_additional_field filters
+* Field IDs renamed from kigocloud/r1_vat_number to kigocloud/r1-vat-number (hyphens) to match the API's id pattern conservatively
+* New: Block-checkout diagnostics panel on the R1 admin tab. Shows WC version, whether the field API function exists, whether our hook fires this request, the live registration status, and the registered field IDs. If the fields are missing from the checkout, the red row in this panel points to the cause
 
 = 2.1.2 =
 * New: AJAX tab switching on the KigoCloud admin page. Clicking a tab now fetches the new tab content via XHR, swaps it in place and updates the URL. Browser Back/Forward work via history.pushState. No jQuery, no build.
