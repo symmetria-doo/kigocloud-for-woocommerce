@@ -47,6 +47,27 @@ function kigocloud_deactivate_plugin_name() {
 register_activation_hook( __FILE__, 'kigocloud_activate_plugin_name' );
 register_deactivation_hook( __FILE__, 'kigocloud_deactivate_plugin_name' );
 
+// Auto-update against GitHub Releases.
+$kigocloud_puc_bootstrap = WOO_KIGOCLOUD_PLUGIN_DIR . 'vendor/plugin-update-checker/plugin-update-checker.php';
+if ( file_exists( $kigocloud_puc_bootstrap ) ) {
+	require_once $kigocloud_puc_bootstrap;
+	if ( class_exists( '\\YahnisElsts\\PluginUpdateChecker\\v5\\PucFactory' ) ) {
+		$kigocloud_update_checker = \YahnisElsts\PluginUpdateChecker\v5\PucFactory::buildUpdateChecker(
+			'https://github.com/dpotocic/kigocloud-for-woocommerce/',
+			__FILE__,
+			'kigocloud-for-woocommerce'
+		);
+		$kigocloud_update_checker->setBranch( 'main' );
+		// Release assets are the uploaded zip files attached to a GitHub
+		// Release. enableReleaseAssets() makes the updater download the
+		// zip instead of a tarball of the repo.
+		$vcs_api = $kigocloud_update_checker->getVcsApi();
+		if ( $vcs_api && method_exists( $vcs_api, 'enableReleaseAssets' ) ) {
+			$vcs_api->enableReleaseAssets();
+		}
+	}
+}
+
 require WOO_KIGOCLOUD_PLUGIN_DIR . 'includes/class-woo-kigocloud.php';
 
 function kigocloud_run_plugin_name() {

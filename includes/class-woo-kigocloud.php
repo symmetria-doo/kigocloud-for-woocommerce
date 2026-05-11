@@ -146,9 +146,10 @@ class Woo_KigoCloud {
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-woo-kigocloud-public.php';
 
 		/**
-		 * The class responsible for updating the plugin.
+		 * Runs data migrations on version bump. Not the auto-updater
+		 * (that lives in the main plugin file via plugin-update-checker).
 		 */
-		require_once plugin_dir_path(dirname( __FILE__ ) ) . 'includes/class-woo-kigocloud-updater.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-woo-kigocloud-migrator.php';
 
 		/**
 		 * R1 customer fields (classic + block checkout).
@@ -190,7 +191,7 @@ class Woo_KigoCloud {
         $plugin_public = new Woo_KigoCloud_Public($this->get_plugin_name(), $this->get_version());
         $plugin_request = new Woo_KigoCloud_Request();
         $plugin_rest = new Woo_KigoCloud_Rest();
-		$plugin_updater = new Woo_KigoCloud_Updater();
+		$plugin_migrator = new Woo_KigoCloud_Migrator();
 		$plugin_r1 = new Woo_KigoCloud_R1();
 
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
@@ -234,7 +235,7 @@ class Woo_KigoCloud {
         $this->loader->add_filter( 'wp_mail_from', $plugin_admin, 'change_wp_email_from');
         $this->loader->add_filter( 'wp_mail_from_name', $plugin_admin, 'change_wp_email_from_name');
 
-		$this->loader->add_action( 'init', $plugin_updater, 'check_for_updates' );
+		$this->loader->add_action( 'init', $plugin_migrator, 'check_for_updates' );
 		$this->loader->add_action( 'admin_notices', $plugin_admin, 'show_admin_notice' );
 
         $this->loader->add_action('rest_api_init', $plugin_rest, 'register_sku_endpoint');
