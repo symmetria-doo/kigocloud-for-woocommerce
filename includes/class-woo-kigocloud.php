@@ -138,6 +138,7 @@ class Woo_KigoCloud {
 		 * The class responsible for defining all actions that occur in the admin area.
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-woo-kigocloud-admin.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-woo-kigocloud-admin-page.php';
 
 		/**
 		 * The class responsible for defining all actions that occur in the public-facing
@@ -188,11 +189,18 @@ class Woo_KigoCloud {
 	private function define_admin_hooks() {
 
 		$plugin_admin = new Woo_KigoCloud_Admin($this->get_plugin_name(), $this->get_version());
+        $plugin_admin_page = new Woo_KigoCloud_Admin_Page();
         $plugin_public = new Woo_KigoCloud_Public($this->get_plugin_name(), $this->get_version());
         $plugin_request = new Woo_KigoCloud_Request();
         $plugin_rest = new Woo_KigoCloud_Rest();
 		$plugin_migrator = new Woo_KigoCloud_Migrator();
 		$plugin_r1 = new Woo_KigoCloud_R1();
+
+		// Modern KigoCloud admin page (top-level menu, tabs).
+		$this->loader->add_action( 'admin_menu', $plugin_admin_page, 'register_menu' );
+		$this->loader->add_action( 'admin_init', $plugin_admin_page, 'register_settings' );
+		$this->loader->add_action( 'admin_init', $plugin_admin_page, 'maybe_clear_logs' );
+		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin_page, 'enqueue_admin_css' );
 
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
@@ -226,9 +234,10 @@ class Woo_KigoCloud {
         $this->loader->add_action('woocommerce_admin_order_data_after_order_details', $plugin_admin, 'display_admin_order_kigocloud');
 
 
-        $this->loader->add_filter( 'woocommerce_settings_tabs_array',$plugin_admin, 'add_woocommerce_settings_tab', 50 );
-        $this->loader->add_action( 'woocommerce_settings_tabs_kigocloud', $plugin_admin, 'add_woocommerce_settings' );
-        $this->loader->add_action( 'woocommerce_update_options_kigocloud', $plugin_admin, 'update_woocommerce_settings' );
+        // Settings live on the standalone KigoCloud admin page (see
+        // Woo_KigoCloud_Admin_Page). The WooCommerce settings tab is
+        // intentionally not registered, so the only configuration
+        // surface is `WP Admin > KigoCloud`.
 
         $this->loader->add_filter( 'woocommerce_email_attachments', $plugin_request, 'add_pdf_attachment', 10, 3 );
 

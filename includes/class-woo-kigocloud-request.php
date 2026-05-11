@@ -367,6 +367,7 @@ if (!class_exists('Woo_KigoCloud_Request')) {
             if (is_wp_error($response)) {
                 $error_code    = wp_remote_retrieve_response_code($response);
                 $error_message = wp_remote_retrieve_response_message($response);
+                self::log_call($order->get_id(), $command, false, 'HTTP ' . $error_code . ': ' . $error_message);
                 return new \WP_Error($error_code, $error_message);
             }
 
@@ -377,18 +378,48 @@ if (!class_exists('Woo_KigoCloud_Request')) {
                 $note = __('KigoCloud %1$s created with document number %2$s and payment type %3$s', 'kigocloud-for-woocommerce');
                 $order->add_order_note(sprintf($note, $documentTypeTitle, $formattedPosNumber, $body->payment_label));
 
-                //$order->set_meta_data(['_kigocloud_id_pos' => $body->id_pos, 'kigocloud_pos_number' => $body->pos_number]);
                 $order->save();
 
                 update_post_meta($order->get_id(), '_kigocloud_id_pos', $body->id_pos);
                 update_post_meta($order->get_id(), '_kigocloud_pos_number', $formattedPosNumber);
                 update_post_meta($order->get_id(), '_kigocloud_doc_type', $documentTypeTitle);
 
+                self::log_call($order->get_id(), $command, true, $documentTypeTitle . ' ' . $formattedPosNumber);
+
                 $sendPdf = get_option('kigocloud_pdf_payment_type-' . esc_attr($orderData['payment_method']));
                 if ($sendPdf === '1') {
                     $this->send_invoice_email($order, $body, sanitize_email($email), $documentTypeTitle, $formattedPosNumber, $fullName);
                 }
+            } else {
+                $msg = isset($body->error) ? (string) $body->error : (isset($body->message) ? (string) $body->message : __('No document number returned', 'kigocloud-for-woocommerce'));
+                self::log_call($order->get_id(), $command, false, $msg);
             }
+        }
+
+        /**
+         * Appends a single entry to the kigocloud_recent_logs option,
+         * trimmed to the last 50 entries. Shown on the Logs tab in the
+         * KigoCloud admin page.
+         *
+         * @param int    $order_id
+         * @param string $endpoint
+         * @param bool   $ok
+         * @param string $message
+         */
+        public static function log_call($order_id, $endpoint, $ok, $message = '')
+        {
+            $logs = (array) get_option('kigocloud_recent_logs', array());
+            $logs[] = array(
+                'time'     => current_time('mysql'),
+                'order_id' => (int) $order_id,
+                'endpoint' => (string) $endpoint,
+                'ok'       => (bool) $ok,
+                'message'  => (string) $message,
+            );
+            if (count($logs) > 50) {
+                $logs = array_slice($logs, -50);
+            }
+            update_option('kigocloud_recent_logs', $logs, false);
         }
 
         public function add_pdf_attachment($attachments, $email_id, $email_object){

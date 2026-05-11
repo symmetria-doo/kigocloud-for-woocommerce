@@ -47,6 +47,15 @@ function kigocloud_deactivate_plugin_name() {
 register_activation_hook( __FILE__, 'kigocloud_activate_plugin_name' );
 register_deactivation_hook( __FILE__, 'kigocloud_deactivate_plugin_name' );
 
+// Declare compatibility with WooCommerce features so HPOS and the
+// cart/checkout block do not flag the plugin as incompatible.
+add_action( 'before_woocommerce_init', function () {
+	if ( class_exists( '\\Automattic\\WooCommerce\\Utilities\\FeaturesUtil' ) ) {
+		\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'custom_order_tables', __FILE__, true );
+		\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'cart_checkout_blocks', __FILE__, true );
+	}
+} );
+
 // Auto-update against GitHub Releases.
 $kigocloud_puc_bootstrap = WOO_KIGOCLOUD_PLUGIN_DIR . 'vendor/plugin-update-checker/plugin-update-checker.php';
 if ( file_exists( $kigocloud_puc_bootstrap ) ) {

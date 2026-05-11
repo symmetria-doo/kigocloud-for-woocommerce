@@ -42,7 +42,7 @@ class Woo_KigoCloud_Admin
     {
         $settings_link = sprintf(
             '<a href="%s">%s</a>',
-            esc_url(admin_url('admin.php?page=wc-settings&tab=kigocloud')),
+            esc_url(admin_url('admin.php?page=kigocloud')),
             esc_html__('Settings', 'kigocloud-for-woocommerce')
         );
         array_unshift($links, $settings_link);
@@ -451,7 +451,7 @@ class Woo_KigoCloud_Admin
         echo '<div class="notice notice-warning">';
         echo '<p><strong>' . esc_html__('KigoCloud for WooCommerce has been updated to version', 'kigocloud-for-woocommerce') . ' ' . esc_html($new_version) . '.</strong></p>';
         echo '<p>' . esc_html__('Please review and save your settings to ensure everything works correctly.', 'kigocloud-for-woocommerce') . '</p>';
-        echo '<p><a href="' . esc_url(admin_url('admin.php?page=wc-settings&tab=kigocloud')) . '" class="button button-primary">' . esc_html__('Review and save settings', 'kigocloud-for-woocommerce') . '</a></p>';
+        echo '<p><a href="' . esc_url(admin_url('admin.php?page=kigocloud')) . '" class="button button-primary">' . esc_html__('Review and save settings', 'kigocloud-for-woocommerce') . '</a></p>';
         echo '</div>';
     }
 
