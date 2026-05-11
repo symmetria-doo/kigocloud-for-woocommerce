@@ -5,7 +5,7 @@ Tags: woocommerce, hrvatska fiskalizacija, croatian fiscalization, fiscalization
 Requires at least: 5.5
 Requires PHP: 7.2
 Tested up to: 6.9
-Stable tag: 2.1.0
+Stable tag: 2.1.1
 WC requires at least: 5.0
 WC tested up to: 9.4
 License: GPLv2 or later
@@ -45,6 +45,11 @@ This plugin is not hosted on the WordPress.org repository. Updates are delivered
 4. WooCommerce -> Settings -> KigoCloud, fill in your API credentials
 
 == Changelog ==
+
+= 2.1.1 =
+* Fix: R1 fields (OIB / company) now actually render on the block checkout. The previous registration silently failed because it passed unsupported keys (show_in_order_confirmation, attributes.pattern) to the Additional Checkout Fields API
+* Validation moved from a separate filter into the sanitize_callback / validate_callback args so it follows the documented API contract
+* R1 mode 2 now correctly marks OIB and company name fields as required on the block checkout (was optional in 2.1.0)
 
 = 2.1.0 =
 * New dedicated KigoCloud admin page (top-level menu) with proper nav-tab navigation: Connection, Orders, R1, Email, Mapping, Logs, About

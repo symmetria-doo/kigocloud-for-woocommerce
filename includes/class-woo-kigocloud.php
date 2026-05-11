@@ -41,7 +41,7 @@ class Woo_KigoCloud {
      *
      * @since 1.0.0
      */
-    const PLUGIN_VERSION = '2.1.0';
+    const PLUGIN_VERSION = '2.1.1';
 
 	/**
 	 * The loader that's responsible for maintaining and registering all hooks that power
@@ -223,9 +223,11 @@ class Woo_KigoCloud {
             }
 
             // Block checkout (WC 8.6+) via Additional Checkout Fields API.
+            // Validation lives in the sanitize/validate callbacks passed
+            // to woocommerce_register_additional_checkout_field, so we
+            // only need the registration hook and the meta-sync hook here.
             if (Woo_KigoCloud_R1::block_supported()) {
                 $this->loader->add_action('woocommerce_init', $plugin_r1, 'register_block_fields', 20);
-                $this->loader->add_filter('woocommerce_blocks_validate_additional_field', $plugin_r1, 'validate_block_additional_field', 10, 3);
                 $this->loader->add_action('woocommerce_store_api_checkout_update_order_from_request', $plugin_r1, 'sync_block_meta_to_legacy', 10, 2);
             }
         }

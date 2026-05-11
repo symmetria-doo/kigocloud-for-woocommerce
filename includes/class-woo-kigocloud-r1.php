@@ -81,70 +81,45 @@ class Woo_KigoCloud_R1
             return;
         }
 
-        // OIB / VAT number is needed for both modes.
+        // OIB / VAT number is needed for both R1 modes. For mode 2
+        // (full R1 block) it is required; for mode 1 (OIB only) it is
+        // optional so B2C customers can still check out without an OIB.
         woocommerce_register_additional_checkout_field(array(
-            'id'         => self::FIELD_R1_VAT_NUMBER,
-            'label'      => __('OIB / VAT number', 'kigocloud-for-woocommerce'),
-            'location'   => 'address',
-            'type'       => 'text',
-            'required'   => false,
-            'attributes' => array(
-                'maxlength'   => '11',
-                'pattern'     => '[0-9]{11}',
-                'inputmode'   => 'numeric',
-                'autocomplete' => 'off',
-            ),
-            'show_in_order_confirmation' => true,
+            'id'                => self::FIELD_R1_VAT_NUMBER,
+            'label'             => __('OIB / VAT number', 'kigocloud-for-woocommerce'),
+            'location'          => 'address',
+            'type'              => 'text',
+            'required'          => ($mode === 2),
+            'sanitize_callback' => static function ($value) {
+                return preg_replace('/[^0-9]/', '', (string) $value);
+            },
+            'validate_callback' => static function ($value) {
+                $value = trim((string) $value);
+                if ($value === '') {
+                    return;
+                }
+                if (!Woo_KigoCloud_R1::is_valid_oib($value)) {
+                    return new \WP_Error(
+                        'kigocloud_invalid_oib',
+                        __('OIB must be 11 digits and pass the checksum.', 'kigocloud-for-woocommerce')
+                    );
+                }
+            },
         ));
 
         if ($mode !== 2) {
             return;
         }
 
-        // Full R1 block adds explicit company-billing fields that don't
-        // overlap with the built-in billing address (billing.address_1 etc.
-        // are already there; we only need a dedicated company name field
-        // labelled clearly as "Company name", separate from the optional
-        // billing.company).
         woocommerce_register_additional_checkout_field(array(
             'id'       => self::FIELD_R1_COMPANY,
             'label'    => __('Company name (for invoice)', 'kigocloud-for-woocommerce'),
             'location' => 'address',
             'type'     => 'text',
-            'required' => false,
-            'show_in_order_confirmation' => true,
+            'required' => true,
         ));
     }
 
-    /**
-     * Validates additional checkout fields on the block checkout.
-     * Hook: woocommerce_blocks_validate_additional_field
-     *
-     * @param WP_Error $errors
-     * @param string   $field_key   namespaced field id, e.g. "kigocloud/r1_vat_number"
-     * @param mixed    $field_value
-     * @return WP_Error
-     */
-    public function validate_block_additional_field($errors, $field_key, $field_value)
-    {
-        if (!($errors instanceof WP_Error)) {
-            $errors = new WP_Error();
-        }
-        if ($field_key !== self::FIELD_R1_VAT_NUMBER) {
-            return $errors;
-        }
-        $value = trim((string) $field_value);
-        if ($value === '') {
-            return $errors;
-        }
-        if (!self::is_valid_oib($value)) {
-            $errors->add(
-                'kigocloud_invalid_oib',
-                __('OIB must be 11 digits and pass the checksum.', 'kigocloud-for-woocommerce')
-            );
-        }
-        return $errors;
-    }
 
     /**
      * When the Store API creates the order, copy the additional checkout
