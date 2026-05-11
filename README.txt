@@ -5,7 +5,7 @@ Tags: woocommerce, hrvatska fiskalizacija, croatian fiscalization, fiscalization
 Requires at least: 5.5
 Requires PHP: 7.2
 Tested up to: 6.9
-Stable tag: 2.1.3
+Stable tag: 2.1.4
 WC requires at least: 5.0
 WC tested up to: 9.4
 License: GPLv2 or later
@@ -45,6 +45,11 @@ This plugin is not hosted on the WordPress.org repository. Updates are delivered
 4. WooCommerce -> Settings -> KigoCloud, fill in your API credentials
 
 == Changelog ==
+
+= 2.1.4 =
+* Admin: every tab is now pre-rendered in the DOM. Switching tabs is an instant show/hide (no fetch, no reload). One Save All button at the bottom posts the entire admin in a single options.php request, persisting every option across every tab in one go.
+* Added an additional row to the R1 diagnostics panel listing the Gutenberg blocks found on the WooCommerce checkout page so it is obvious when the page is missing a woocommerce/checkout block.
+* Sticky save bar at the bottom of the form so the Save button is always visible regardless of how far down a long tab the user scrolls.
 
 = 2.1.3 =
 * Fix attempt: simplified block-checkout R1 field registration to the documented minimum (id, label, location, type, required) so WooCommerce can no longer silently reject the registration over an unexpected key

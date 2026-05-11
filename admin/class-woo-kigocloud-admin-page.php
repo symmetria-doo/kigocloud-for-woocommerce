@@ -34,19 +34,16 @@ class Woo_KigoCloud_Admin_Page
 
     public function register_settings()
     {
-        // Each tab uses its own option group. We hand-render the fields
-        // inside each tab so we don't have to deal with add_settings_field
-        // ceremony, but we still register the settings so the options.php
-        // POST endpoint accepts the values.
+        // Everything lives under a single option group so the whole
+        // admin page is a single form with one Save button and one
+        // POST to options.php that saves every option in one shot.
         $opts_by_group = $this->settings_map();
-        foreach ($opts_by_group as $group => $opts) {
+        foreach ($opts_by_group as $opts) {
             foreach ($opts as $opt) {
-                register_setting($group, $opt);
+                register_setting('kigocloud_settings', $opt);
             }
         }
 
-        // Per-gateway settings are dynamic; register them all on load
-        // if WC is available.
         if (function_exists('WC') && WC()->payment_gateways) {
             foreach (WC()->payment_gateways->payment_gateways() as $gateway) {
                 if ('yes' !== $gateway->enabled) {
@@ -54,7 +51,7 @@ class Woo_KigoCloud_Admin_Page
                 }
                 $gid = esc_attr($gateway->id);
                 foreach (array('pos_type', 'payment_type', 'on_status', 'pdf_payment_type') as $stem) {
-                    register_setting('kigocloud_orders', 'kigocloud_' . $stem . '-' . $gid);
+                    register_setting('kigocloud_settings', 'kigocloud_' . $stem . '-' . $gid);
                 }
             }
         }
@@ -158,6 +155,17 @@ class Woo_KigoCloud_Admin_Page
             .kigocloud-admin .kc-test-running { background: #f0f6fc; color: #2271b1; border: 1px solid #2271b1; }
             .kigocloud-admin .kc-test-ok      { background: #edfaef; color: #00a32a; border: 1px solid #00a32a; }
             .kigocloud-admin .kc-test-bad     { background: #fcf0f1; color: #d63638; border: 1px solid #d63638; }
+            .kigocloud-admin .kigocloud-save-row {
+                position: sticky; bottom: 0; z-index: 5;
+                background: rgba(240, 240, 241, .92); backdrop-filter: blur(6px);
+                margin: 0 -20px -20px;
+                padding: 12px 20px;
+                border-top: 1px solid #c3c4c7;
+                display: flex; align-items: center; gap: 14px;
+            }
+            .kigocloud-admin .kigocloud-save-hint { color: #50575e; font-size: 12px; }
+            .kigocloud-admin .nav-tab { cursor: pointer; }
+            .kigocloud-admin .kigocloud-tab-pane[hidden] { display: none; }
         ';
         wp_register_style('kigocloud-admin', false, array(), Woo_KigoCloud::PLUGIN_VERSION);
         wp_enqueue_style('kigocloud-admin');
@@ -182,6 +190,9 @@ class Woo_KigoCloud_Admin_Page
         if (!isset($tabs[$current])) {
             $current = 'connection';
         }
+
+        // settings-updated message (options.php redirects with ?settings-updated=true)
+        $settings_saved = isset($_GET['settings-updated']) && $_GET['settings-updated'] === 'true';
         ?>
         <div class="wrap kigocloud-admin">
             <h1>
@@ -189,25 +200,45 @@ class Woo_KigoCloud_Admin_Page
                 <span class="kc-version-pill">v<?php echo esc_html(Woo_KigoCloud::PLUGIN_VERSION); ?></span>
             </h1>
 
-            <?php settings_errors('kigocloud'); ?>
+            <?php if ($settings_saved): ?>
+                <div class="notice notice-success is-dismissible">
+                    <p><strong><?php esc_html_e('Settings saved.', 'kigocloud-for-woocommerce'); ?></strong></p>
+                </div>
+            <?php endif; ?>
 
             <nav class="nav-tab-wrapper">
                 <?php foreach ($tabs as $slug => $label): ?>
                     <a href="<?php echo esc_url(admin_url('admin.php?page=' . self::PAGE_SLUG . '&tab=' . $slug)); ?>"
-                       class="nav-tab <?php echo $current === $slug ? 'nav-tab-active' : ''; ?>">
+                       class="nav-tab <?php echo $current === $slug ? 'nav-tab-active' : ''; ?>"
+                       data-tab-target="<?php echo esc_attr($slug); ?>">
                         <?php echo esc_html($label); ?>
                     </a>
                 <?php endforeach; ?>
             </nav>
 
-            <div class="kigocloud-tab-content">
-                <?php
-                $method = 'render_tab_' . $current;
-                if (method_exists($this, $method)) {
-                    $this->{$method}();
-                }
-                ?>
-            </div>
+            <form method="post" action="<?php echo esc_url(admin_url('options.php')); ?>" class="kigocloud-form">
+                <?php settings_fields('kigocloud_settings'); ?>
+                <input type="hidden" name="_wp_http_referer" value="<?php echo esc_attr(admin_url('admin.php?page=' . self::PAGE_SLUG)); ?>" />
+
+                <div class="kigocloud-tab-content">
+                    <?php foreach ($tabs as $slug => $label):
+                        $method = 'render_tab_' . $slug;
+                        if (!method_exists($this, $method)) {
+                            continue;
+                        }
+                        $hidden = ($slug === $current) ? '' : 'style="display:none;"';
+                    ?>
+                        <div class="kigocloud-tab-pane" data-tab="<?php echo esc_attr($slug); ?>" <?php echo $hidden; ?>>
+                            <?php $this->{$method}(); ?>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+
+                <p class="kigocloud-save-row">
+                    <?php submit_button(__('Save all settings', 'kigocloud-for-woocommerce'), 'primary', 'submit', false); ?>
+                    <span class="kigocloud-save-hint"><?php esc_html_e('One Save covers every tab.', 'kigocloud-for-woocommerce'); ?></span>
+                </p>
+            </form>
         </div>
         <?php
     }
@@ -255,33 +286,14 @@ class Woo_KigoCloud_Admin_Page
         );
     }
 
-    private function open_form($option_group)
-    {
-        echo '<form method="post" action="' . esc_url(admin_url('options.php')) . '">';
-        settings_fields($option_group);
-        echo '<input type="hidden" name="_wp_http_referer" value="' . esc_attr(admin_url('admin.php?page=' . self::PAGE_SLUG . '&tab=' . $this->current_tab_for_form($option_group))) . '" />';
-    }
-
-    private function current_tab_for_form($option_group)
-    {
-        $map = array(
-            'kigocloud_connection' => 'connection',
-            'kigocloud_orders'     => 'orders',
-            'kigocloud_r1'         => 'r1',
-            'kigocloud_email'      => 'email',
-            'kigocloud_mapping'    => 'mapping',
-        );
-        return isset($map[$option_group]) ? $map[$option_group] : 'connection';
-    }
-
-    private function close_form($submit_label = null)
-    {
-        if ($submit_label === null) {
-            $submit_label = __('Save changes', 'kigocloud-for-woocommerce');
-        }
-        submit_button($submit_label);
-        echo '</form>';
-    }
+    /**
+     * No-op helpers. The whole admin page is now a single form rendered
+     * once in render_page(); per-tab open_form / close_form would produce
+     * nested forms which break submit. Keep the methods so the rest of
+     * the file can call them without if-checks.
+     */
+    private function open_form($option_group) {}
+    private function close_form($submit_label = null) {}
 
     private function text_field($key, $label, $args = array())
     {
@@ -575,6 +587,8 @@ class Woo_KigoCloud_Admin_Page
     private function render_r1_diagnostics()
     {
         $wc_version            = defined('WC_VERSION') ? WC_VERSION : null;
+        $wp_version            = get_bloginfo('version');
+        $php_version           = PHP_VERSION;
         $fn_exists             = function_exists('woocommerce_register_additional_checkout_field');
         $mode                  = Woo_KigoCloud_R1::mode();
         $block_supported       = Woo_KigoCloud_R1::block_supported();
@@ -584,7 +598,38 @@ class Woo_KigoCloud_Admin_Page
         $checkout_page_id      = function_exists('wc_get_page_id') ? wc_get_page_id('checkout') : 0;
         $checkout_edit_link    = $checkout_page_id ? get_edit_post_link($checkout_page_id) : '';
 
+        $checkout_blocks = array();
+        if ($checkout_page_id && function_exists('parse_blocks')) {
+            $content = get_post_field('post_content', $checkout_page_id);
+            $parsed  = parse_blocks($content);
+            $stack   = $parsed;
+            while (!empty($stack)) {
+                $b = array_shift($stack);
+                if (!empty($b['blockName'])) {
+                    $checkout_blocks[] = $b['blockName'];
+                }
+                if (!empty($b['innerBlocks'])) {
+                    foreach ($b['innerBlocks'] as $ib) {
+                        $stack[] = $ib;
+                    }
+                }
+            }
+        }
+        $checkout_blocks = array_unique(array_filter($checkout_blocks));
+
         $rows = array(
+            array(
+                'label'   => __('WordPress version', 'kigocloud-for-woocommerce'),
+                'ok'      => version_compare($wp_version, '6.4', '>='),
+                'value'   => $wp_version,
+                'hint'    => __('Block checkout works best on WP 6.4+. Older WP may render Gutenberg blocks unreliably.', 'kigocloud-for-woocommerce'),
+            ),
+            array(
+                'label'   => __('PHP version', 'kigocloud-for-woocommerce'),
+                'ok'      => version_compare($php_version, '7.2', '>='),
+                'value'   => $php_version,
+                'hint'    => __('Plugin requires PHP 7.2 minimum.', 'kigocloud-for-woocommerce'),
+            ),
             array(
                 'label'   => __('WooCommerce version', 'kigocloud-for-woocommerce'),
                 'ok'      => $wc_version && version_compare($wc_version, '8.9', '>='),
@@ -653,6 +698,27 @@ class Woo_KigoCloud_Admin_Page
                         <code><?php echo esc_html(Woo_KigoCloud_R1::FIELD_R1_VAT_NUMBER); ?></code>
                         <?php if (Woo_KigoCloud_R1::mode() === 2): ?>
                             <br><code><?php echo esc_html(Woo_KigoCloud_R1::FIELD_R1_COMPANY); ?></code>
+                        <?php endif; ?>
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong><?php esc_html_e('Blocks on checkout page', 'kigocloud-for-woocommerce'); ?></strong></td>
+                    <td>
+                        <?php if (empty($checkout_blocks)): ?>
+                            <span class="kc-status-bad">!</span>
+                            <?php esc_html_e('No Gutenberg blocks detected on the checkout page. The page is likely using the classic [woocommerce_checkout] shortcode.', 'kigocloud-for-woocommerce'); ?>
+                        <?php else: ?>
+                            <?php foreach ($checkout_blocks as $bn): ?>
+                                <?php $is_target = ($bn === 'woocommerce/checkout'); ?>
+                                <span class="<?php echo $is_target ? 'kc-status-ok' : ''; ?>">
+                                    <code><?php echo esc_html($bn); ?></code>
+                                </span><br>
+                            <?php endforeach; ?>
+                            <?php if (!in_array('woocommerce/checkout', $checkout_blocks, true)): ?>
+                                <div style="color:#d63638;font-size:12px;margin-top:6px;">
+                                    <?php esc_html_e('The page has blocks but none of them is woocommerce/checkout. Additional Checkout Fields are rendered only by the canonical checkout block - swap the current block for woocommerce/checkout.', 'kigocloud-for-woocommerce'); ?>
+                                </div>
+                            <?php endif; ?>
                         <?php endif; ?>
                     </td>
                 </tr>
