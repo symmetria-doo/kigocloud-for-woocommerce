@@ -4,6 +4,16 @@ All notable changes to KigoCloud for WooCommerce are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.8] - 2026-05-12
+
+### Added
+- GitHub Actions release workflow (`.github/workflows/release.yml`). Every pushed `vX.Y.Z` tag now triggers an automated build that:
+  - Produces a clean `kigocloud-for-woocommerce.zip` with the right plugin folder structure WordPress expects (`kigocloud-for-woocommerce/...`, no version suffix).
+  - Excludes dev-only files (`.git/`, `.github/`, `.idea/`, `node_modules/`, `.gitignore`, `composer.lock`, `CONTRIBUTING.md`).
+  - Creates a fresh GitHub Release for the tag with auto-generated notes.
+  - Attaches the zip as a release asset so `plugin-update-checker` on installed sites can pull it directly.
+- Releases are now zero-touch: `git tag vX.Y.Z && git push origin vX.Y.Z` is enough.
+
 ## [2.1.7] - 2026-05-12
 
 ### Added
@@ -83,6 +93,7 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Notes
 - For changes prior to 2.0.0 see the [kigokasa-api-for-woocommerce](https://wordpress.org/plugins/kigokasa-api-for-woocommerce/) history.
 
+[2.1.8]: https://github.com/dpotocic/kigocloud-for-woocommerce/releases/tag/v2.1.8
 [2.1.7]: https://github.com/dpotocic/kigocloud-for-woocommerce/releases/tag/v2.1.7
 [2.1.6]: https://github.com/dpotocic/kigocloud-for-woocommerce/releases/tag/v2.1.6
 [2.1.5]: https://github.com/dpotocic/kigocloud-for-woocommerce/releases/tag/v2.1.5

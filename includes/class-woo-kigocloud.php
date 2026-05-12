@@ -41,7 +41,7 @@ class Woo_KigoCloud {
      *
      * @since 1.0.0
      */
-    const PLUGIN_VERSION = '2.1.7';
+    const PLUGIN_VERSION = '2.1.8';
 
 	/**
 	 * The loader that's responsible for maintaining and registering all hooks that power

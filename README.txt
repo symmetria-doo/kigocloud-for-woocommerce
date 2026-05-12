@@ -5,7 +5,7 @@ Tags: woocommerce, hrvatska fiskalizacija, croatian fiscalization, fiscalization
 Requires at least: 5.5
 Requires PHP: 7.2
 Tested up to: 6.9
-Stable tag: 2.1.7
+Stable tag: 2.1.8
 WC requires at least: 5.0
 WC tested up to: 9.4
 License: GPLv2 or later
@@ -47,6 +47,9 @@ This plugin is not hosted on the WordPress.org repository. Updates are delivered
 == Changelog ==
 
 The canonical changelog lives at https://github.com/dpotocic/kigocloud-for-woocommerce/blob/main/CHANGELOG.md - the section below is a mirror for the WordPress.org-style README format.
+
+= 2.1.8 =
+* Build: new GitHub Actions release workflow. Every pushed vX.Y.Z tag now triggers an automated build that produces a clean kigocloud-for-woocommerce.zip with the proper plugin folder structure and attaches it to a freshly created GitHub Release with auto-generated notes. No more manual zip uploads per release.
 
 = 2.1.7 =
 * Docs: new top-level CHANGELOG.md following the Keep-a-Changelog format, linked from README.md and from the admin About tab.

@@ -1,0 +1,56 @@
+name: Release
+
+# Triggered when a version tag is pushed. Builds the plugin zip with
+# the proper folder structure WordPress expects and attaches it to a
+# GitHub Release. plugin-update-checker on every installed site reads
+# this release asset to deliver auto-updates.
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build plugin zip
+        run: |
+          set -euo pipefail
+          STAGING="${RUNNER_TEMP}/staging"
+          PLUGIN_DIR="${STAGING}/kigocloud-for-woocommerce"
+          mkdir -p "${PLUGIN_DIR}"
+
+          # Copy plugin files into a folder named exactly after the slug.
+          # WP expects the unzipped dir to be the plugin slug (no version
+          # suffix), which the auto-generated GitHub Source zip violates.
+          rsync -a \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='.idea' \
+            --exclude='node_modules' \
+            --exclude='.gitignore' \
+            --exclude='composer.lock' \
+            --exclude='CONTRIBUTING.md' \
+            --exclude='*.zip' \
+            --exclude='.DS_Store' \
+            --exclude='Thumbs.db' \
+            ./ "${PLUGIN_DIR}/"
+
+          cd "${STAGING}"
+          ZIP_NAME="kigocloud-for-woocommerce.zip"
+          zip -r -q "${ZIP_NAME}" kigocloud-for-woocommerce
+          mv "${ZIP_NAME}" "${GITHUB_WORKSPACE}/"
+          ls -lh "${GITHUB_WORKSPACE}/${ZIP_NAME}"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: kigocloud-for-woocommerce.zip
+          generate_release_notes: true
+          fail_on_unmatched_files: true
