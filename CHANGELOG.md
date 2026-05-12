@@ -4,6 +4,11 @@ All notable changes to KigoCloud for WooCommerce are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.9] - 2026-05-12
+
+### Notes
+- Test release to verify the end-to-end auto-update path: tag is pushed, GitHub Actions builds and attaches the zip, `plugin-update-checker` on installed sites picks it up and surfaces "Update available" in the WP Plugins screen. No functional changes.
+
 ## [2.1.8] - 2026-05-12
 
 ### Added
@@ -93,6 +98,7 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Notes
 - For changes prior to 2.0.0 see the [kigokasa-api-for-woocommerce](https://wordpress.org/plugins/kigokasa-api-for-woocommerce/) history.
 
+[2.1.9]: https://github.com/dpotocic/kigocloud-for-woocommerce/releases/tag/v2.1.9
 [2.1.8]: https://github.com/dpotocic/kigocloud-for-woocommerce/releases/tag/v2.1.8
 [2.1.7]: https://github.com/dpotocic/kigocloud-for-woocommerce/releases/tag/v2.1.7
 [2.1.6]: https://github.com/dpotocic/kigocloud-for-woocommerce/releases/tag/v2.1.6
