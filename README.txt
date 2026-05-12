@@ -5,7 +5,7 @@ Tags: woocommerce, hrvatska fiskalizacija, croatian fiscalization, fiscalization
 Requires at least: 5.5
 Requires PHP: 7.2
 Tested up to: 6.9
-Stable tag: 2.1.9
+Stable tag: 2.1.10
 WC requires at least: 5.0
 WC tested up to: 9.4
 License: GPLv2 or later
@@ -47,6 +47,9 @@ This plugin is not hosted on the WordPress.org repository. Updates are delivered
 == Changelog ==
 
 The canonical changelog lives at https://github.com/dpotocic/kigocloud-for-woocommerce/blob/main/CHANGELOG.md - the section below is a mirror for the WordPress.org-style README format.
+
+= 2.1.10 =
+* Update check interval lowered from the plugin-update-checker default of 12 hours to 1 hour. Self-hosted plugins have no wordpress.org throttle concerns, so faster propagation of fixes is worth the marginal API traffic. Admin still gets the same red badge on the Plugins menu - just within an hour of a new release instead of within a day.
 
 = 2.1.9 =
 * Test release for verifying the end-to-end auto-update path: tag pushed, GitHub Actions builds the zip, plugin-update-checker on installed sites picks it up and surfaces "Update available" in WP Plugins.

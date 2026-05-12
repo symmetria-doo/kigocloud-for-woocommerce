@@ -10,7 +10,7 @@
  * Plugin Name:       KigoCloud for WooCommerce
  * Plugin URI:        https://github.com/dpotocic/kigocloud-for-woocommerce
  * Description:       Sends WooCommerce orders to KigoCloud (R1 invoices, fiscalization, inventory). Supports both classic and block checkout for R1 customer fields.
- * Version:           2.1.9
+ * Version:           2.1.10
  * Requires at least: 5.5
  * Requires PHP:      7.2
  * Requires Plugins:  woocommerce
@@ -29,7 +29,7 @@ if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
-define( 'WOO_KIGOCLOUD_PLUGIN_NAME_VERSION', '2.1.9' );
+define( 'WOO_KIGOCLOUD_PLUGIN_NAME_VERSION', '2.1.10' );
 define( 'WOO_KIGOCLOUD_PLUGIN_FILE', __FILE__ );
 define( 'WOO_KIGOCLOUD_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'WOO_KIGOCLOUD_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
@@ -67,6 +67,11 @@ if ( file_exists( $kigocloud_puc_bootstrap ) ) {
 			'kigocloud-for-woocommerce'
 		);
 		$kigocloud_update_checker->setBranch( 'main' );
+		// Check GitHub Releases every hour instead of the 12-hour
+		// plugin-update-checker default. This is a self-hosted plugin
+		// with no wordpress.org rate-limit concerns, so faster
+		// notification of fixes is worth the small extra API traffic.
+		$kigocloud_update_checker->setCheckPeriod( 1 );
 		// Release assets are the uploaded zip files attached to a GitHub
 		// Release. enableReleaseAssets() makes the updater download the
 		// zip instead of a tarball of the repo.
