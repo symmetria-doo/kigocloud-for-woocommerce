@@ -341,6 +341,12 @@ if (!class_exists('Woo_KigoCloud_Request')) {
                 'sslverify'   => false,
                 'data_format' => 'body',
                 'headers'     => array(
+                    // KigoCloud server reads literal header names via
+                    // apache_request_headers() and matches keys
+                    // "HTTP_X_USERNAME" / "HTTP_X_PASSWORD" (see
+                    // protected/modules/v1/components/RestController.php
+                    // line 102). Do NOT change these to the more standard
+                    // "X-Username" form - the server will not see them.
                     'HTTP_X_USERNAME' => $username,
                     'HTTP_X_PASSWORD' => $password,
                     'Expect'          => '',

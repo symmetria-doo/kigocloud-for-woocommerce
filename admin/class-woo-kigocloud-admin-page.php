@@ -771,11 +771,15 @@ class Woo_KigoCloud_Admin_Page
         }
         check_ajax_referer('kigocloud_test_push', 'nonce');
 
-        $username = get_option('kigocloud_username');
-        $password = get_option('kigocloud_password');
-        if (empty($username) || empty($password)) {
-            wp_send_json_error(array('message' => __('API username or password is empty. Fill them on the Connection tab first.', 'kigocloud-for-woocommerce')));
-        }
+        $username = (string) get_option('kigocloud_username', 'admin_demo');
+        $password = (string) get_option('kigocloud_password', 'admin_demo');
+
+        // Empty options on a fresh install means the admin has not yet
+        // hit Save All. Fall back to the same defaults the form shows
+        // so the test still goes through (and surfaces real credential
+        // errors from KigoCloud) instead of bailing locally.
+        if ($username === '') { $username = 'admin_demo'; }
+        if ($password === '') { $password = 'admin_demo'; }
 
         if ($username !== 'admin_demo') {
             $password = md5($password);
