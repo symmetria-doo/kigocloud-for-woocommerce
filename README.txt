@@ -5,7 +5,7 @@ Tags: woocommerce, hrvatska fiskalizacija, croatian fiscalization, fiscalization
 Requires at least: 5.5
 Requires PHP: 7.2
 Tested up to: 6.9
-Stable tag: 2.1.6
+Stable tag: 2.1.7
 WC requires at least: 5.0
 WC tested up to: 9.4
 License: GPLv2 or later
@@ -45,6 +45,11 @@ This plugin is not hosted on the WordPress.org repository. Updates are delivered
 4. WooCommerce -> Settings -> KigoCloud, fill in your API credentials
 
 == Changelog ==
+
+The canonical changelog lives at https://github.com/dpotocic/kigocloud-for-woocommerce/blob/main/CHANGELOG.md - the section below is a mirror for the WordPress.org-style README format.
+
+= 2.1.7 =
+* Docs: new top-level CHANGELOG.md following the Keep-a-Changelog format, linked from README.md and from the admin About tab.
 
 = 2.1.6 =
 * Fix: reverted the X-Username / X-Password auth header rename. The KigoCloud server reads incoming headers via apache_request_headers() and matches the literal keys "HTTP_X_USERNAME" / "HTTP_X_PASSWORD" (see protected/modules/v1/components/RestController.php line 102). Switching to standard "X-Username" form was wrong here - the server would not see those headers and returned "Unauthorized. No username/password.". Both real-order push and the Test push button now use the literal HTTP_X_USERNAME / HTTP_X_PASSWORD header names again.

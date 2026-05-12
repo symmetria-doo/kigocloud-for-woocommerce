@@ -41,6 +41,10 @@ git clone git@github.com:dpotocic/kigocloud-for-woocommerce.git
 
 No build step is required for the core plugin. See `CONTRIBUTING.md` for the release workflow.
 
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for the full version history.
+
 ## License
 
 GPL-2.0+. See `LICENSE` for details.

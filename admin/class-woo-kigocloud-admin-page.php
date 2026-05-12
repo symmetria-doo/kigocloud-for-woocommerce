@@ -1004,6 +1004,10 @@ class Woo_KigoCloud_Admin_Page
                     <td><a href="https://github.com/dpotocic/kigocloud-for-woocommerce/releases" target="_blank" rel="noopener">github.com/dpotocic/kigocloud-for-woocommerce/releases</a></td>
                 </tr>
                 <tr>
+                    <th><?php esc_html_e('Changelog', 'kigocloud-for-woocommerce'); ?></th>
+                    <td><a href="https://github.com/dpotocic/kigocloud-for-woocommerce/blob/main/CHANGELOG.md" target="_blank" rel="noopener">CHANGELOG.md</a></td>
+                </tr>
+                <tr>
                     <th><?php esc_html_e('API endpoint', 'kigocloud-for-woocommerce'); ?></th>
                     <td><code><?php echo esc_html(Woo_KigoCloud_Request::resolveApiUrl()); ?></code></td>
                 </tr>
