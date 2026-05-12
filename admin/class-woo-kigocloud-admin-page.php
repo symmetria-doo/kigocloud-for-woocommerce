@@ -997,15 +997,15 @@ class Woo_KigoCloud_Admin_Page
                 </tr>
                 <tr>
                     <th><?php esc_html_e('Source', 'kigocloud-for-woocommerce'); ?></th>
-                    <td><a href="https://github.com/dpotocic/kigocloud-for-woocommerce" target="_blank" rel="noopener">github.com/dpotocic/kigocloud-for-woocommerce</a></td>
+                    <td><a href="https://github.com/symmetria-doo/kigocloud-for-woocommerce" target="_blank" rel="noopener">github.com/symmetria-doo/kigocloud-for-woocommerce</a></td>
                 </tr>
                 <tr>
                     <th><?php esc_html_e('Releases', 'kigocloud-for-woocommerce'); ?></th>
-                    <td><a href="https://github.com/dpotocic/kigocloud-for-woocommerce/releases" target="_blank" rel="noopener">github.com/dpotocic/kigocloud-for-woocommerce/releases</a></td>
+                    <td><a href="https://github.com/symmetria-doo/kigocloud-for-woocommerce/releases" target="_blank" rel="noopener">github.com/symmetria-doo/kigocloud-for-woocommerce/releases</a></td>
                 </tr>
                 <tr>
                     <th><?php esc_html_e('Changelog', 'kigocloud-for-woocommerce'); ?></th>
-                    <td><a href="https://github.com/dpotocic/kigocloud-for-woocommerce/blob/main/CHANGELOG.md" target="_blank" rel="noopener">CHANGELOG.md</a></td>
+                    <td><a href="https://github.com/symmetria-doo/kigocloud-for-woocommerce/blob/main/CHANGELOG.md" target="_blank" rel="noopener">CHANGELOG.md</a></td>
                 </tr>
                 <tr>
                     <th><?php esc_html_e('API endpoint', 'kigocloud-for-woocommerce'); ?></th>

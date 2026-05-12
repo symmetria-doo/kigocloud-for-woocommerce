@@ -3,7 +3,7 @@
  * Admin-side glue: WooCommerce settings tab, plugin action link, order
  * meta display, mail-from override.
  *
- * @link    https://github.com/dpotocic/kigocloud-for-woocommerce
+ * @link    https://github.com/symmetria-doo/kigocloud-for-woocommerce
  * @since   1.0.0
  * @package Woo_KigoCloud
  */
@@ -62,7 +62,7 @@ class Woo_KigoCloud_Admin
         if (defined('WOO_KIGOCLOUD_PLUGIN_FILE') && $plugin_file === plugin_basename(WOO_KIGOCLOUD_PLUGIN_FILE)) {
             $plugin_meta[] = sprintf(
                 '<a href="%s" target="_blank" rel="noopener">%s</a>',
-                'https://github.com/dpotocic/kigocloud-for-woocommerce',
+                'https://github.com/symmetria-doo/kigocloud-for-woocommerce',
                 esc_html__('GitHub', 'kigocloud-for-woocommerce')
             );
         }

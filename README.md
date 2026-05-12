@@ -22,7 +22,7 @@ WordPress plugin that sends WooCommerce orders to the KigoCloud service. Handles
 
 ## Installation
 
-1. Download the latest release zip from [Releases](https://github.com/dpotocic/kigocloud-for-woocommerce/releases).
+1. Download the latest release zip from [Releases](https://github.com/symmetria-doo/kigocloud-for-woocommerce/releases).
 2. In WordPress admin: Plugins -> Add New -> Upload Plugin -> choose the zip -> Install.
 3. Activate the plugin.
 4. WooCommerce -> Settings -> KigoCloud tab. Fill in API credentials.
@@ -36,7 +36,7 @@ API endpoint defaults to `https://app.kigo.cloud/hr/api/v1/`. To point at a diff
 ## Development
 
 ```bash
-git clone git@github.com:dpotocic/kigocloud-for-woocommerce.git
+git clone git@github.com:symmetria-doo/kigocloud-for-woocommerce.git
 ```
 
 No build step is required for the core plugin. See `CONTRIBUTING.md` for the release workflow.
@@ -51,4 +51,4 @@ GPL-2.0+. See `LICENSE` for details.
 
 ## Credits
 
-Forked from `kigokasa-api-for-woocommerce` originally authored by Dejan Potocic at Symmetria d.o.o. The KigoCloud line is maintained by Dejan Potocic at [github.com/dpotocic](https://github.com/dpotocic).
+Forked from `kigokasa-api-for-woocommerce` originally authored by Dejan Potocic at Symmetria d.o.o. The KigoCloud line is maintained by Dejan Potočić at Symmetria d.o.o. on [github.com/symmetria-doo](https://github.com/symmetria-doo).

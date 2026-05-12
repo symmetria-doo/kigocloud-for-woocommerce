@@ -3,7 +3,7 @@
 /**
  * Register all actions and filters for the plugin
  *
- * @link       https://github.com/dpotocic
+ * @link       https://github.com/symmetria-doo
  * @since      1.0.0
  *
  * @package    Woo_KigoCloud

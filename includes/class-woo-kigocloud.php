@@ -6,7 +6,7 @@
  * A class definition that includes attributes and functions used across both the
  * public-facing side of the site and the admin area.
  *
- * @link       https://github.com/dpotocic
+ * @link       https://github.com/symmetria-doo
  * @since      1.0.0
  *
  * @package    Woo_KigoCloud
@@ -41,7 +41,7 @@ class Woo_KigoCloud {
      *
      * @since 1.0.0
      */
-    const PLUGIN_VERSION = '2.1.10';
+    const PLUGIN_VERSION = '2.1.11';
 
 	/**
 	 * The loader that's responsible for maintaining and registering all hooks that power

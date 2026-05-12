@@ -5,7 +5,7 @@ Tags: woocommerce, hrvatska fiskalizacija, croatian fiscalization, fiscalization
 Requires at least: 5.5
 Requires PHP: 7.2
 Tested up to: 6.9
-Stable tag: 2.1.10
+Stable tag: 2.1.11
 WC requires at least: 5.0
 WC tested up to: 9.4
 License: GPLv2 or later
@@ -27,7 +27,7 @@ Highlights:
 * Sends invoice PDF to the customer by email after a successful KigoCloud document creation
 * In-place auto-update against GitHub Releases
 
-This plugin is not hosted on the WordPress.org repository. Updates are delivered from https://github.com/dpotocic/kigocloud-for-woocommerce.
+This plugin is not hosted on the WordPress.org repository. Updates are delivered from https://github.com/symmetria-doo/kigocloud-for-woocommerce.
 
 == Installation ==
 
@@ -39,14 +39,17 @@ This plugin is not hosted on the WordPress.org repository. Updates are delivered
 
 = Steps =
 
-1. Download the latest zip from https://github.com/dpotocic/kigocloud-for-woocommerce/releases
+1. Download the latest zip from https://github.com/symmetria-doo/kigocloud-for-woocommerce/releases
 2. WordPress admin -> Plugins -> Add New -> Upload Plugin
 3. Activate after upload
 4. WooCommerce -> Settings -> KigoCloud, fill in your API credentials
 
 == Changelog ==
 
-The canonical changelog lives at https://github.com/dpotocic/kigocloud-for-woocommerce/blob/main/CHANGELOG.md - the section below is a mirror for the WordPress.org-style README format.
+The canonical changelog lives at https://github.com/symmetria-doo/kigocloud-for-woocommerce/blob/main/CHANGELOG.md - the section below is a mirror for the WordPress.org-style README format.
+
+= 2.1.11 =
+* Repo home moved from github.com/dpotocic to github.com/symmetria-doo. All plugin headers, About-tab links, README links, CHANGELOG release URLs and the plugin-update-checker target now point at the symmetria-doo organisation. GitHub auto-redirects the old URL, so existing installs keep updating without manual intervention; this release just makes the new home canonical in the code.
 
 = 2.1.10 =
 * Update check interval lowered from the plugin-update-checker default of 12 hours to 1 hour. Self-hosted plugins have no wordpress.org throttle concerns, so faster propagation of fixes is worth the marginal API traffic. Admin still gets the same red badge on the Plugins menu - just within an hour of a new release instead of within a day.

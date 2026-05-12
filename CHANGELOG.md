@@ -4,6 +4,11 @@ All notable changes to KigoCloud for WooCommerce are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.11] - 2026-05-12
+
+### Changed
+- Repository home moved from `github.com/dpotocic` to `github.com/symmetria-doo`. All plugin headers (Plugin URI, Update URI, Author URI, `@link`), About-tab links, README and CHANGELOG release URLs, the `plugin-update-checker` target and `composer.json` package name now point at the `symmetria-doo` organisation. Existing installations keep updating through GitHub's permanent redirect; this release just makes the new home canonical in the code.
+
 ## [2.1.10] - 2026-05-12
 
 ### Changed
@@ -103,15 +108,16 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Notes
 - For changes prior to 2.0.0 see the [kigokasa-api-for-woocommerce](https://wordpress.org/plugins/kigokasa-api-for-woocommerce/) history.
 
-[2.1.10]: https://github.com/dpotocic/kigocloud-for-woocommerce/releases/tag/v2.1.10
-[2.1.9]: https://github.com/dpotocic/kigocloud-for-woocommerce/releases/tag/v2.1.9
-[2.1.8]: https://github.com/dpotocic/kigocloud-for-woocommerce/releases/tag/v2.1.8
-[2.1.7]: https://github.com/dpotocic/kigocloud-for-woocommerce/releases/tag/v2.1.7
-[2.1.6]: https://github.com/dpotocic/kigocloud-for-woocommerce/releases/tag/v2.1.6
-[2.1.5]: https://github.com/dpotocic/kigocloud-for-woocommerce/releases/tag/v2.1.5
-[2.1.4]: https://github.com/dpotocic/kigocloud-for-woocommerce/releases/tag/v2.1.4
-[2.1.3]: https://github.com/dpotocic/kigocloud-for-woocommerce/releases/tag/v2.1.3
-[2.1.2]: https://github.com/dpotocic/kigocloud-for-woocommerce/releases/tag/v2.1.2
-[2.1.1]: https://github.com/dpotocic/kigocloud-for-woocommerce/releases/tag/v2.1.1
-[2.1.0]: https://github.com/dpotocic/kigocloud-for-woocommerce/releases/tag/v2.1.0
-[2.0.0]: https://github.com/dpotocic/kigocloud-for-woocommerce/releases/tag/v2.0.0
+[2.1.11]: https://github.com/symmetria-doo/kigocloud-for-woocommerce/releases/tag/v2.1.11
+[2.1.10]: https://github.com/symmetria-doo/kigocloud-for-woocommerce/releases/tag/v2.1.10
+[2.1.9]: https://github.com/symmetria-doo/kigocloud-for-woocommerce/releases/tag/v2.1.9
+[2.1.8]: https://github.com/symmetria-doo/kigocloud-for-woocommerce/releases/tag/v2.1.8
+[2.1.7]: https://github.com/symmetria-doo/kigocloud-for-woocommerce/releases/tag/v2.1.7
+[2.1.6]: https://github.com/symmetria-doo/kigocloud-for-woocommerce/releases/tag/v2.1.6
+[2.1.5]: https://github.com/symmetria-doo/kigocloud-for-woocommerce/releases/tag/v2.1.5
+[2.1.4]: https://github.com/symmetria-doo/kigocloud-for-woocommerce/releases/tag/v2.1.4
+[2.1.3]: https://github.com/symmetria-doo/kigocloud-for-woocommerce/releases/tag/v2.1.3
+[2.1.2]: https://github.com/symmetria-doo/kigocloud-for-woocommerce/releases/tag/v2.1.2
+[2.1.1]: https://github.com/symmetria-doo/kigocloud-for-woocommerce/releases/tag/v2.1.1
+[2.1.0]: https://github.com/symmetria-doo/kigocloud-for-woocommerce/releases/tag/v2.1.0
+[2.0.0]: https://github.com/symmetria-doo/kigocloud-for-woocommerce/releases/tag/v2.0.0

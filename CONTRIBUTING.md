@@ -3,7 +3,7 @@
 ## Local setup
 
 ```bash
-git clone git@github.com:dpotocic/kigocloud-for-woocommerce.git
+git clone git@github.com:symmetria-doo/kigocloud-for-woocommerce.git
 ```
 
 The plugin runs as-is. `vendor/plugin-update-checker/` is committed so a fresh checkout has everything needed in WordPress.
