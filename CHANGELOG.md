@@ -4,6 +4,12 @@ All notable changes to KigoCloud for WooCommerce are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.12] - 2026-05-13
+
+### Fixed
+- **CRITICAL**: plugin failed to activate on a fresh install with `Call to undefined method YahnisElsts\PluginUpdateChecker\v5p6\Vcs\PluginUpdateChecker::setCheckPeriod()` (PHP fatal). The bug was introduced in 2.1.10. `plugin-update-checker` has no `setCheckPeriod()` setter - the check interval has to be passed as the 4th argument to `PucFactory::buildUpdateChecker()`. Switched to that signature.
+- Wrapped optional method calls (`setBranch`, `getVcsApi`, `enableReleaseAssets`) in `method_exists()` guards so any future PUC API change degrades gracefully instead of fatal-erroring.
+
 ## [2.1.11] - 2026-05-12
 
 ### Changed
@@ -108,6 +114,7 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Notes
 - For changes prior to 2.0.0 see the [kigokasa-api-for-woocommerce](https://wordpress.org/plugins/kigokasa-api-for-woocommerce/) history.
 
+[2.1.12]: https://github.com/symmetria-doo/kigocloud-for-woocommerce/releases/tag/v2.1.12
 [2.1.11]: https://github.com/symmetria-doo/kigocloud-for-woocommerce/releases/tag/v2.1.11
 [2.1.10]: https://github.com/symmetria-doo/kigocloud-for-woocommerce/releases/tag/v2.1.10
 [2.1.9]: https://github.com/symmetria-doo/kigocloud-for-woocommerce/releases/tag/v2.1.9

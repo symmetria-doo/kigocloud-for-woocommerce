@@ -5,7 +5,7 @@ Tags: woocommerce, hrvatska fiskalizacija, croatian fiscalization, fiscalization
 Requires at least: 5.5
 Requires PHP: 7.2
 Tested up to: 6.9
-Stable tag: 2.1.11
+Stable tag: 2.1.12
 WC requires at least: 5.0
 WC tested up to: 9.4
 License: GPLv2 or later
@@ -47,6 +47,9 @@ This plugin is not hosted on the WordPress.org repository. Updates are delivered
 == Changelog ==
 
 The canonical changelog lives at https://github.com/symmetria-doo/kigocloud-for-woocommerce/blob/main/CHANGELOG.md - the section below is a mirror for the WordPress.org-style README format.
+
+= 2.1.12 =
+* CRITICAL FIX: plugin failed to activate with "Call to undefined method ...PluginUpdateChecker::setCheckPeriod()" fatal error introduced in 2.1.10. plugin-update-checker has no setCheckPeriod() setter - the check interval has to be passed as the 4th argument to PucFactory::buildUpdateChecker(). Switched to that signature and wrapped optional method calls (setBranch, getVcsApi, enableReleaseAssets) in method_exists() guards so any future PUC API change degrades gracefully instead of fatal-erroring.
 
 = 2.1.11 =
 * Repo home moved from github.com/dpotocic to github.com/symmetria-doo. All plugin headers, About-tab links, README links, CHANGELOG release URLs and the plugin-update-checker target now point at the symmetria-doo organisation. GitHub auto-redirects the old URL, so existing installs keep updating without manual intervention; this release just makes the new home canonical in the code.
