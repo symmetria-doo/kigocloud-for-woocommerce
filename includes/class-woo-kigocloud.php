@@ -41,7 +41,7 @@ class Woo_KigoCloud {
      *
      * @since 1.0.0
      */
-    const PLUGIN_VERSION = '2.1.13';
+    const PLUGIN_VERSION = '2.1.14';
 
 	/**
 	 * The loader that's responsible for maintaining and registering all hooks that power
@@ -230,8 +230,11 @@ class Woo_KigoCloud {
             // The handler itself does the function_exists / mode check
             // at fire time when WC is guaranteed to be loaded.
             $this->loader->add_action('woocommerce_init', $plugin_r1, 'register_block_fields', 20);
+            // sanitize IS a filter: apply_filters($value, $key) -> returns value (CheckoutFields.php:865)
             $this->loader->add_filter('woocommerce_sanitize_additional_field', $plugin_r1, 'sanitize_block_additional_field', 10, 2);
-            $this->loader->add_filter('woocommerce_validate_additional_field', $plugin_r1, 'validate_block_additional_field', 10, 3);
+            // validate IS an action: do_action($errors, $field_id, $field_value) - WP_Error mutated in place (CheckoutFields.php:924)
+            $this->loader->add_action('woocommerce_validate_additional_field', $plugin_r1, 'validate_block_additional_field', 10, 3);
+            // store_api: do_action($order, $request) (CheckoutTrait.php:202)
             $this->loader->add_action('woocommerce_store_api_checkout_update_order_from_request', $plugin_r1, 'sync_block_meta_to_legacy', 10, 2);
 
             // Optional: force the standard billing.company field to be

@@ -4,6 +4,12 @@ All notable changes to KigoCloud for WooCommerce are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.14] - 2026-05-29
+
+### Changed
+- `Author` plugin header now reads `Symmetria d.o.o. (Dejan Potočić)` with Author URI `https://www.symmetria.hr/` (previously just `Dejan Potočić`). `composer.json` now lists both Symmetria d.o.o. and Dejan Potocic (Developer).
+- Registered `woocommerce_validate_additional_field` via `add_action` instead of `add_filter`. It is a `do_action` hook in WooCommerce core (`CheckoutFields.php:924`); the prior filter registration functioned by mutating the shared `WP_Error`, but the action registration is the documented contract.
+
 ## [2.1.13] - 2026-05-13
 
 ### Fixed
@@ -131,6 +137,7 @@ Full code audit. Approximately fifteen bugs fixed across the codebase:
 ### Notes
 - For changes prior to 2.0.0 see the [kigokasa-api-for-woocommerce](https://wordpress.org/plugins/kigokasa-api-for-woocommerce/) history.
 
+[2.1.14]: https://github.com/symmetria-doo/kigocloud-for-woocommerce/releases/tag/v2.1.14
 [2.1.13]: https://github.com/symmetria-doo/kigocloud-for-woocommerce/releases/tag/v2.1.13
 [2.1.12]: https://github.com/symmetria-doo/kigocloud-for-woocommerce/releases/tag/v2.1.12
 [2.1.11]: https://github.com/symmetria-doo/kigocloud-for-woocommerce/releases/tag/v2.1.11

@@ -5,7 +5,7 @@ Tags: woocommerce, hrvatska fiskalizacija, croatian fiscalization, fiscalization
 Requires at least: 5.5
 Requires PHP: 7.2
 Tested up to: 6.9
-Stable tag: 2.1.13
+Stable tag: 2.1.14
 WC requires at least: 5.0
 WC tested up to: 9.4
 License: GPLv2 or later
@@ -45,6 +45,10 @@ This plugin is not hosted on the WordPress.org repository. Updates are delivered
 4. WooCommerce -> Settings -> KigoCloud, fill in your API credentials
 
 == Changelog ==
+
+= 2.1.14 =
+* Author header now reads "Symmetria d.o.o. (Dejan Potočić)" with Author URI https://www.symmetria.hr/ (was just "Dejan Potočić"). composer.json lists both Symmetria d.o.o. and Dejan Potocic (Developer).
+* Registered woocommerce_validate_additional_field as an action (add_action) instead of a filter. It is a do_action hook in WooCommerce core; the previous filter registration worked by WP_Error side-effect but the action registration is the correct contract.
 
 The canonical changelog lives at https://github.com/symmetria-doo/kigocloud-for-woocommerce/blob/main/CHANGELOG.md - the section below is a mirror for the WordPress.org-style README format.
 

@@ -6,9 +6,14 @@
     "homepage": "https://github.com/symmetria-doo/kigocloud-for-woocommerce",
     "authors": [
         {
+            "name": "Symmetria d.o.o.",
+            "homepage": "https://www.symmetria.hr/"
+        },
+        {
             "name": "Dejan Potocic",
             "email": "dpotocic@gmail.com",
-            "homepage": "https://github.com/symmetria-doo"
+            "homepage": "https://github.com/symmetria-doo",
+            "role": "Developer"
         }
     ],
     "require": {
