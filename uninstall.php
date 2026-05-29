@@ -1,32 +1,48 @@
 <?php
-if (!current_user_can('activate_plugins')) {
-    return;
-}
+/**
+ * Triggered when an admin clicks "Delete" on the plugin in WP -> Plugins.
+ *
+ * Strategy: a single SQL DELETE that catches every option whose name
+ * starts with "kigocloud_" (or "_kigocloud_" for post-meta). Listing
+ * options manually leaks - older installs have legacy keys, per-gateway
+ * keys are dynamic, and WC may not even be loaded any more by the time
+ * we run.
+ *
+ * @package Woo_KigoCloud
+ */
 
-// If uninstall not called from WordPress, then exit.
 if (!defined('WP_UNINSTALL_PLUGIN')) {
     exit;
 }
 
-delete_option('kigocloud_username');
-delete_option('kigocloud_password');
-delete_option('kigocloud_employee_pin');
-delete_option('kigocloud_shipping_reference');
-delete_option('kigocloud_email_from_name');
-delete_option('kigocloud_email_from');
-
-
-$available_woo_gateways = \WC()->payment_gateways->get_available_payment_gateways();
-foreach ($available_woo_gateways as $gateway_woo_sett => $gateway_woo_val) {
-    delete_option('kigocloud_pos_type-' . esc_attr($gateway_woo_val->id));
-    delete_option('kigocloud_payment_type-' . esc_attr($gateway_woo_val->id));
-    delete_option('kigocloud_pdf_payment_type-' . esc_attr($gateway_woo_val->id));
+if (!current_user_can('activate_plugins')) {
+    return;
 }
 
-add_action('wp_mail_from_name', 'kigocloud_revert_default_email_name');
-function kigocloud_revert_default_email_name($name)
-{
-    return 'WordPress';
+global $wpdb;
+
+// All options.
+$wpdb->query(
+    "DELETE FROM {$wpdb->options} WHERE option_name LIKE 'kigocloud_%'"
+);
+
+// Site-wide options on multisite.
+if (is_multisite()) {
+    $wpdb->query(
+        "DELETE FROM {$wpdb->sitemeta} WHERE meta_key LIKE 'kigocloud_%'"
+    );
 }
 
+// Post-meta written on orders.
+$wpdb->query(
+    "DELETE FROM {$wpdb->postmeta} WHERE meta_key LIKE '_kigocloud_%' OR meta_key LIKE 'kigocloud_vat_invoices_%'"
+);
 
+// HPOS order meta (WC 8.0+ orders_meta table).
+$orders_meta = $wpdb->prefix . 'wc_orders_meta';
+$exists = $wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $orders_meta));
+if ($exists === $orders_meta) {
+    $wpdb->query(
+        "DELETE FROM {$orders_meta} WHERE meta_key LIKE '_kigocloud_%' OR meta_key LIKE 'kigocloud_vat_invoices_%'"
+    );
+}

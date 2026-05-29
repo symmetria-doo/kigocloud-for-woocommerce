@@ -5,7 +5,7 @@ Tags: woocommerce, hrvatska fiskalizacija, croatian fiscalization, fiscalization
 Requires at least: 5.5
 Requires PHP: 7.2
 Tested up to: 6.9
-Stable tag: 2.1.12
+Stable tag: 2.1.13
 WC requires at least: 5.0
 WC tested up to: 9.4
 License: GPLv2 or later
@@ -47,6 +47,21 @@ This plugin is not hosted on the WordPress.org repository. Updates are delivered
 == Changelog ==
 
 The canonical changelog lives at https://github.com/symmetria-doo/kigocloud-for-woocommerce/blob/main/CHANGELOG.md - the section below is a mirror for the WordPress.org-style README format.
+
+= 2.1.13 =
+* Audit: full code review across every plugin file, ~15 bugs fixed.
+* Activator: deactivate_plugins(__FILE__) was the activator file path, not the main plugin file - the bailout branch silently failed. Fixed to use WOO_KIGOCLOUD_PLUGIN_FILE. Removed 40+ lines of dead duplicate migration logic.
+* Deactivator: stopped deleting kigocloud_version on deactivate. The migrator would treat the next activation as a fresh install and re-run the pre-1.7.0 per-gateway settings migration, clobbering admin-tuned values.
+* Uninstall: rewrote as a single SQL wipe of every "kigocloud_%" option and "_kigocloud_%" post-meta / HPOS order meta. Previous version named a non-existent option (kigocloud_employee_pin), skipped most options, and registered an action filter that never fires.
+* R1: get_additional_field_value() only looked under "_wc_other/" prefix. WC stores "address"-location fields under "_wc_billing/" and "_wc_shipping/" instead. Block-checkout OIB / company values were therefore never synced to the legacy meta the request builder reads. Now tries all three prefixes.
+* Request: replaced legacy update_post_meta calls with $order->update_meta_data so order meta is written into HPOS order tables on stores that have migrated.
+* Request: same for display_admin_order_meta and display_admin_order_kigocloud - HPOS-safe meta reads.
+* Request: added is_object guard around the JSON response. Previous code accessed $body->pos_number even when json_decode() returned null, which would warn on PHP 8.x.
+* Request: PDF download now uses wp_remote_retrieve_body() and checks for a "%PDF" magic header before writing. Also removed the broken cleanup branch that called file_exists()/unlink() on an integer attachment id.
+* Request: customer note now suffixed with "\r\n" instead of the backwards "\n\r".
+* Request: removed two dead public methods (send_api_request, send_api_request_on_completed) and an unused private removeDir helper.
+* Custom mapping parser now skips malformed pairs instead of triggering an undefined-index notice on PHP 8.
+* Admin: dropped ~295 lines of dead WooCommerce settings tab code that nothing hooks any more.
 
 = 2.1.12 =
 * CRITICAL FIX: plugin failed to activate with "Call to undefined method ...PluginUpdateChecker::setCheckPeriod()" fatal error introduced in 2.1.10. plugin-update-checker has no setCheckPeriod() setter - the check interval has to be passed as the 4th argument to PucFactory::buildUpdateChecker(). Switched to that signature and wrapped optional method calls (setBranch, getVcsApi, enableReleaseAssets) in method_exists() guards so any future PUC API change degrades gracefully instead of fatal-erroring.

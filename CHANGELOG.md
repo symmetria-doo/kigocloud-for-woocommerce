@@ -4,6 +4,23 @@ All notable changes to KigoCloud for WooCommerce are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.13] - 2026-05-13
+
+### Fixed
+Full code audit. Approximately fifteen bugs fixed across the codebase:
+
+- **Activator**: `deactivate_plugins(plugin_basename(__FILE__))` resolved to the activator class file (not the main plugin file), so both bail-out branches silently failed. Switched to `WOO_KIGOCLOUD_PLUGIN_FILE`. Removed ~40 lines of dead duplicate migration logic that also contained an immediate double-assignment bug.
+- **Deactivator**: stopped deleting `kigocloud_version` on deactivate. The migrator would treat the next activation as a fresh install and re-run the pre-1.7.0 per-gateway settings migration, clobbering admin-tuned values. Only the post-update review notice flag is cleared now.
+- **Uninstall**: rewrote as a single SQL wipe of every `kigocloud_%` option and `_kigocloud_%` / `kigocloud_vat_invoices_%` post-meta and HPOS order meta. The previous file named a non-existent option (`kigocloud_employee_pin`), skipped most real options, and registered an action filter that would never fire.
+- **R1 block-checkout sync**: `get_additional_field_value()` looked under `_wc_other/<id>` only. WooCommerce stores `address`-location fields under `_wc_billing/<id>` and `_wc_shipping/<id>` instead - so OIB and company values entered through the block checkout never landed in the legacy `kigocloud_vat_invoices_*` meta the request builder reads. Now tries all three prefixes.
+- **HPOS metadata writes** (`Woo_KigoCloud_Request::execute_api_call`): replaced `update_post_meta` with `$order->update_meta_data` + `$order->save()`. Without this fix the `_kigocloud_id_pos`, `_kigocloud_pos_number` and `_kigocloud_doc_type` meta would have been written only to `wp_postmeta` on stores that have migrated to HPOS order tables - and the duplicate-call guard (`get_meta('_kigocloud_id_pos')`) would never see them, leading to duplicated KigoCloud documents on each status change.
+- **HPOS metadata reads** (`display_admin_order_meta`, `display_admin_order_kigocloud`): replaced `get_post_meta` with `$order->get_meta`.
+- **JSON safety**: `execute_api_call` accessed `$body->pos_number` even when `json_decode` returned `null`. PHP 8 turns that into a warning and would treat the order as having no document number, double-charging the next status transition. Added an `is_object` guard plus a structured log entry on malformed responses.
+- **PDF download**: `send_invoice_email` now uses `wp_remote_retrieve_body()` and checks for the `%PDF` magic header before writing. Removed the broken cleanup branch that called `file_exists()` / `unlink()` on an integer attachment id (always failed silently, left temp files on disk).
+- **Customer note suffix**: `"\n\r"` changed to the correct `"\r\n"`.
+- **Custom mapping parser**: skips malformed pairs (no colon, empty key, empty value) instead of triggering an undefined-index notice on PHP 8.
+- **Dead code removal**: deleted two dead public methods on the request class (`send_api_request`, `send_api_request_on_completed` - the originals from the kigokasa scaffolding, never hooked here), the unused `removeDir` helper, and ~295 lines of dead WooCommerce settings tab code in the admin class that nothing hooks since 2.1.0.
+
 ## [2.1.12] - 2026-05-13
 
 ### Fixed
@@ -114,6 +131,7 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Notes
 - For changes prior to 2.0.0 see the [kigokasa-api-for-woocommerce](https://wordpress.org/plugins/kigokasa-api-for-woocommerce/) history.
 
+[2.1.13]: https://github.com/symmetria-doo/kigocloud-for-woocommerce/releases/tag/v2.1.13
 [2.1.12]: https://github.com/symmetria-doo/kigocloud-for-woocommerce/releases/tag/v2.1.12
 [2.1.11]: https://github.com/symmetria-doo/kigocloud-for-woocommerce/releases/tag/v2.1.11
 [2.1.10]: https://github.com/symmetria-doo/kigocloud-for-woocommerce/releases/tag/v2.1.10

@@ -243,14 +243,28 @@ class Woo_KigoCloud_R1
 
     /**
      * Returns the value of an Additional Checkout Field on the order.
-     * Tries the official getter, falls back to direct meta lookup.
+     *
+     * WooCommerce stores additional fields under three different meta
+     * prefixes depending on the field's `location`:
+     *   - 'address' (billing+shipping) -> _wc_billing/<id> + _wc_shipping/<id>
+     *   - 'contact'                    -> _wc_other/<id>
+     *   - 'order'                      -> _wc_other/<id>
+     * Our R1 fields use 'address' location, so billing is the canonical
+     * source; we keep shipping and other as fallbacks for robustness.
+     *
+     * @param WC_Order $order
+     * @param string   $field_id  namespaced id, e.g. "kigocloud/r1-vat-number"
+     * @return string             value or '' if not set
      */
     private static function get_additional_field_value($order, $field_id)
     {
-        if (method_exists($order, 'get_meta')) {
-            // WC stores these under the namespaced meta key _wc_other/{id}.
-            $value = $order->get_meta('_wc_other/' . $field_id, true);
-            if ($value !== '' && $value !== null) {
+        if (!method_exists($order, 'get_meta')) {
+            return '';
+        }
+        $prefixes = array('_wc_billing/', '_wc_shipping/', '_wc_other/');
+        foreach ($prefixes as $prefix) {
+            $value = $order->get_meta($prefix . $field_id, true);
+            if ($value !== '' && $value !== null && $value !== false) {
                 return (string) $value;
             }
         }

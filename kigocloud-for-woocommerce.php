@@ -10,7 +10,7 @@
  * Plugin Name:       KigoCloud for WooCommerce
  * Plugin URI:        https://github.com/symmetria-doo/kigocloud-for-woocommerce
  * Description:       Sends WooCommerce orders to KigoCloud (R1 invoices, fiscalization, inventory). Supports both classic and block checkout for R1 customer fields.
- * Version:           2.1.12
+ * Version:           2.1.13
  * Requires at least: 5.5
  * Requires PHP:      7.2
  * Requires Plugins:  woocommerce
@@ -29,7 +29,7 @@ if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
-define( 'WOO_KIGOCLOUD_PLUGIN_NAME_VERSION', '2.1.12' );
+define( 'WOO_KIGOCLOUD_PLUGIN_NAME_VERSION', '2.1.13' );
 define( 'WOO_KIGOCLOUD_PLUGIN_FILE', __FILE__ );
 define( 'WOO_KIGOCLOUD_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'WOO_KIGOCLOUD_PLUGIN_URL', plugin_dir_url( __FILE__ ) );

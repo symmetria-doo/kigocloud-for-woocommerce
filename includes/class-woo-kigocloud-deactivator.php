@@ -1,38 +1,23 @@
 <?php
-
-/**
- * Fired during plugin deactivation
- *
- * @link       https://github.com/symmetria-doo
- * @since      1.0.0
- *
- * @package    Woo_KigoCloud
- * @subpackage Woo_KigoCloud/includes
- */
-
 /**
  * Fired during plugin deactivation.
  *
- * This class defines all code necessary to run during the plugin's deactivation.
+ * Intentionally minimal: we only clear the post-update review notice
+ * flag. User settings and the stored kigocloud_version are kept so
+ * the next activation does not look like a fresh install (which
+ * would re-trigger the pre-1.7.0 migrator and clobber per-gateway
+ * settings the admin tuned by hand).
  *
- * @since      1.0.0
- * @package    Woo_KigoCloud
- * @subpackage Woo_KigoCloud/includes
- * @author     Dejan Potocic <dpotocic@gmail.com>
+ * Permanent cleanup belongs in uninstall.php, which runs only when
+ * the admin deletes the plugin.
+ *
+ * @package Woo_KigoCloud
  */
-class Woo_KigoCloud_Deactivator {
 
-	/**
-	 * Short Description. (use period)
-	 *
-	 * Long Description.
-	 *
-	 * @since    1.0.0
-	 */
-	public static function deactivate() {
-		delete_option('kigocloud_show_migration_notice');
-
-		delete_option('kigocloud_version');
-	}
-
+class Woo_KigoCloud_Deactivator
+{
+    public static function deactivate()
+    {
+        delete_option('kigocloud_show_migration_notice');
+    }
 }

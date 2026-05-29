@@ -26,73 +26,26 @@ if (!class_exists('Woo_KigoCloud_Request')) {
         }
 
         /**
-         * @param WC_Order       $order         Order data.
-         * @param bool           $sent_to_admin Send to admin (default: false).
-         * @param bool           $plain_text    Plain text email (default: false).
-         * @param WC_Email_Order $email         Order email object.
+         * Hooked on `woocommerce_order_status_changed` (4 args, but we
+         * pull the order via wc_get_order for HPOS compatibility, so the
+         * 4th `$order` arg is intentionally unused).
+         *
+         * @param int    $order_id
+         * @param string $old_status
+         * @param string $new_status
          */
-        public function send_api_request($order, $sent_to_admin, $plain_text, $email)
+        public function on_order_status_change($order_id, $old_status, $new_status)
         {
-            if (is_admin()) { // Skip if its admin.
-                return;
-            }
-
-            if (1 === (int)get_option( 'kigocloud_skip_status_order_created' )) { // since v1.3.3
-                return;
-            }
-            $posId = get_post_meta($order->get_id(), '_kigocloud_id_pos');
-
-            //$posId = $order->get_meta('_kigocloud_id_pos');
-            if (!empty($posId)) { // Skip it if its already created
-                return;
-            }
-
-            $this->execute_api_call('invoice/create', $order);
-        }
-
-        /**
-         * @param int $order_id
-         */
-        public function send_api_request_on_completed($order_id)
-        {
-            if (!is_admin()) { // This should be only executed on admin
-                return;
-            }
-
-            if (1 === (int)get_option( 'kigocloud_skip_status_order_completed' )) { // since v1.3.3
-                return;
-            }
-
             $order = wc_get_order($order_id);
-            $posId = $order->get_meta('_kigocloud_id_pos');
-            if (!empty($posId)) { // Skip it if its already created
+            if (!$order) {
                 return;
             }
 
-            // Execute only if status is changed to completed!
-            $order_data   = $order->get_data();
-            $order_status = $order_data['status'];
-
-            if ($order_status === 'completed') {
-                $this->execute_api_call('invoice/create', $order);
+            // Skip if KigoCloud already created a document for this order.
+            $posId = $order->get_meta('_kigocloud_id_pos');
+            if (!empty($posId)) {
+                return;
             }
-        }
-
-	    /**
-	     * @param $order_id
-	     * @param $old_status
-	     * @param $new_status
-	     *
-	     * @return void
-	     */
-	    public function on_order_status_change($order_id, $old_status, $new_status) {
-		    $order = wc_get_order($order_id);
-
-		    // Skip API call if KigoCloud POS ID already exists
-		    $posId = $order->get_meta('_kigocloud_id_pos');
-		    if (!empty($posId)) {
-			    return;
-		    }
 
 		    // Get payment method and document type
 		    $payment_method = $order->get_payment_method();
@@ -151,8 +104,9 @@ if (!class_exists('Woo_KigoCloud_Request')) {
             }
 
             $invoiceNote = '';
-            if (!empty($order->get_customer_note())){
-                $invoiceNote = $order->get_customer_note() . "\n\r";
+            $customerNote = $order->get_customer_note();
+            if ($customerNote !== '') {
+                $invoiceNote = $customerNote . "\r\n";
             }
 
             $mainBody           = new stdClass();
@@ -244,13 +198,22 @@ if (!class_exists('Woo_KigoCloud_Request')) {
             // Retrieve the custom mapping configuration from plugin settings
             $customMapping = get_option('kigocloud_custom_mapping', '');
 
-            // Convert mapping string to an associative array
-            $mappingRules = [];
+            // Convert mapping string to an associative array.
+            // Skip any pair that does not contain a colon to avoid
+            // PHP undefined-index notices on malformed input.
+            $mappingRules = array();
             if (!empty($customMapping)) {
-                $mappingPairs = explode(',', $customMapping);
-                foreach ($mappingPairs as $pair) {
-                    list($customKey, $wooKey) = explode(':', trim($pair));
-                    $mappingRules[trim($customKey)] = trim($wooKey);
+                foreach (explode(',', $customMapping) as $pair) {
+                    $parts = explode(':', trim($pair), 2);
+                    if (count($parts) !== 2) {
+                        continue;
+                    }
+                    $key = trim($parts[0]);
+                    $val = trim($parts[1]);
+                    if ($key === '' || $val === '') {
+                        continue;
+                    }
+                    $mappingRules[$key] = $val;
                 }
             }
 
@@ -377,18 +340,31 @@ if (!class_exists('Woo_KigoCloud_Request')) {
                 return new \WP_Error($error_code, $error_message);
             }
 
-            $body = json_decode($response['body']);
+            $rawBody = wp_remote_retrieve_body($response);
+            $body    = json_decode($rawBody);
+
+            if (!is_object($body)) {
+                $excerpt = wp_strip_all_tags((string) $rawBody);
+                $excerpt = function_exists('mb_substr') ? mb_substr($excerpt, 0, 200) : substr($excerpt, 0, 200);
+                self::log_call($order->get_id(), $command, false, 'Invalid JSON: ' . $excerpt);
+                return;
+            }
 
             if (!empty($body->pos_number)) {
-                $formattedPosNumber = $body->pos_number . '/' . $body->fina_data_place_short . '/' . $body->fina_data_place_pos;
+                $formattedPosNumber = $body->pos_number
+                    . '/' . (isset($body->fina_data_place_short) ? $body->fina_data_place_short : '')
+                    . '/' . (isset($body->fina_data_place_pos) ? $body->fina_data_place_pos : '');
+                $paymentLabel = isset($body->payment_label) ? $body->payment_label : '';
                 $note = __('KigoCloud %1$s created with document number %2$s and payment type %3$s', 'kigocloud-for-woocommerce');
-                $order->add_order_note(sprintf($note, $documentTypeTitle, $formattedPosNumber, $body->payment_label));
+                $order->add_order_note(sprintf($note, $documentTypeTitle, $formattedPosNumber, $paymentLabel));
 
+                // HPOS-compatible meta storage. update_post_meta would
+                // bypass the HPOS orders table on stores that have
+                // migrated away from CPT order storage.
+                $order->update_meta_data('_kigocloud_id_pos', isset($body->id_pos) ? $body->id_pos : '');
+                $order->update_meta_data('_kigocloud_pos_number', $formattedPosNumber);
+                $order->update_meta_data('_kigocloud_doc_type', $documentTypeTitle);
                 $order->save();
-
-                update_post_meta($order->get_id(), '_kigocloud_id_pos', $body->id_pos);
-                update_post_meta($order->get_id(), '_kigocloud_pos_number', $formattedPosNumber);
-                update_post_meta($order->get_id(), '_kigocloud_doc_type', $documentTypeTitle);
 
                 self::log_call($order->get_id(), $command, true, $documentTypeTitle . ' ' . $formattedPosNumber);
 
@@ -505,79 +481,52 @@ if (!class_exists('Woo_KigoCloud_Request')) {
             if (is_wp_error($response)) {
                 $error_code    = wp_remote_retrieve_response_code($response);
                 $error_message = wp_remote_retrieve_response_message($response);
+                self::log_call($order->get_id(), 'invoice/getAsPdf', false, 'HTTP ' . $error_code . ': ' . $error_message);
                 return new \WP_Error($error_code, $error_message);
             }
 
-            $pdfContent = $response['body'];
+            $pdfContent = wp_remote_retrieve_body($response);
+            if ($pdfContent === '' || strpos($pdfContent, '%PDF') !== 0) {
+                self::log_call($order->get_id(), 'invoice/getAsPdf', false, 'PDF download returned no usable body');
+                return;
+            }
 
-            if (!WP_Filesystem( $credentials ) ) {
-                \request_filesystem_credentials( $url, '', true, false, null );
+            if (!WP_Filesystem($credentials)) {
+                \request_filesystem_credentials($url, '', true, false, null);
                 return true;
             }
 
             $uploadDir = wp_upload_dir();
-            $tmpDir = $uploadDir['basedir'] . '/kigocloud-tmp';
+            $tmpDir    = $uploadDir['basedir'] . '/kigocloud-tmp';
             if (!file_exists($tmpDir)) {
                 wp_mkdir_p($tmpDir);
             }
 
             $attachmentFilePath = $tmpDir . '/' . $pdfFilename . '.pdf';
-            if (file_exists($attachmentFilePath)){
+            if (file_exists($attachmentFilePath)) {
                 $attachmentFilePath = $tmpDir . '/' . $pdfFilename . '_' . wp_rand() . '.pdf';
             }
 
-            WP_Filesystem($credentials);
-            $wp_filesystem->put_contents($attachmentFilePath,$pdfContent,FS_CHMOD_FILE);
+            $wp_filesystem->put_contents($attachmentFilePath, $pdfContent, FS_CHMOD_FILE);
 
-            $filetype = wp_check_filetype($pdfFilename, null);
-            $fileAttr = wp_parse_url($attachmentFilePath);
-            $attachment_id = wp_insert_attachment(
-                array(
-                    'guid'           => $attachmentFilePath,
-                    'post_mime_type' => $filetype['type'],
-                    'post_title'     => $pdfFilename,
-                    'post_content'   => '',
-                    'post_status'    => 'inherit',
-                ),
-                $fileAttr['path'],
-                0
-            );
-
-            $headers = 'MIME-Version: 1.0' . "\r\n";
+            $headers  = 'MIME-Version: 1.0' . "\r\n";
             $headers .= 'Content-type: text/html; charset=UTF-8' . "\r\n";
-            if (!empty($replyTo)){
-                $headers .= 'Reply-to: ' . $replyTo ."\r\n";
+            if (!empty($replyTo)) {
+                $headers .= 'Reply-to: ' . $replyTo . "\r\n";
             }
 
             wp_mail($email, $mailSubject, $mailText, $headers, array($attachmentFilePath));
 
-            $deleted = wp_delete_attachment($attachment_id, true);
-            if ($deleted === false || $deleted === null) {
-                if (!file_exists($attachment_id)) {
-                    return;
-                }
-                unlink($attachment_id);
+            // Delete the temporary PDF straight off disk. The previous
+            // implementation registered the file as a WP Attachment and
+            // then tried to delete by attachment id - but the cleanup
+            // branch called file_exists() / unlink() on the integer id,
+            // which always fails. We never need the Attachment row, so
+            // skip it entirely and just unlink the file.
+            if (file_exists($attachmentFilePath)) {
+                @unlink($attachmentFilePath);
             }
-
-            $this->removeDir($tmpDir);
         }
 
-        /**
-         * @param $tmpDir
-         */
-        private function removeDir($tmpDir)
-        {
-            $it    = new \RecursiveDirectoryIterator($tmpDir, \RecursiveDirectoryIterator::SKIP_DOTS);
-            $files = new \RecursiveIteratorIterator($it, \RecursiveIteratorIterator::CHILD_FIRST);
-
-            foreach ($files as $file) {
-                if ($file->isDir()) {
-                    rmdir($file->getRealPath());
-                } else {
-                    unlink($file->getRealPath());
-                }
-            }
-            rmdir($tmpDir);
-        }
     }
 }
