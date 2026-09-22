@@ -5,7 +5,7 @@ Tags: woocommerce, hrvatska fiskalizacija, croatian fiscalization, fiscalization
 Requires at least: 5.5
 Requires PHP: 7.2
 Tested up to: 6.9
-Stable tag: 2.1.15
+Stable tag: 2.1.16
 WC requires at least: 5.0
 WC tested up to: 9.4
 License: GPLv2 or later
@@ -46,9 +46,13 @@ This plugin is not hosted on the WordPress.org repository. Updates are delivered
 
 == Changelog ==
 
+= 2.1.16 =
+* The API endpoint field is removed from the Connection tab. Pointing the integration at another host would send the API credentials and the order data there, so it no longer belongs on a screen every shop administrator can open. The effective endpoint is shown on the About tab. Support can still override it from code the shop owner controls: the WOO_KIGOCLOUD_API_URL constant in wp-config.php or the kigocloud_api_url filter. A value stored by an earlier version is still honoured.
+* Changelog and source comments for the anchor price are in English.
+
 = 2.1.15 =
-* Sidrena cijena (Odluka Vlade RH, od 1.10.2026.): ispod cijene proizvoda i varijacije može se ispisati cijena koja je vrijedila na referentni dan, kad je KigoCloud pošalje uz proizvod (meta _kigo_anchor_price i _kigo_anchor_price_date).
-* Prikaz se uključuje: KigoCloud, kartica Prices, opcija Anchor price (zadano: ne prikazuje se). Dok nije uključena, i za proizvode bez tih podataka, ispis cijene ostaje nepromijenjen.
+* Anchor price (Croatian Government decision, in force 1 October 2026): the product and variation price HTML can carry a line with the price that applied on the reference day, when KigoCloud sends it with the product (_kigo_anchor_price and _kigo_anchor_price_date meta).
+* The display is opt-in: KigoCloud, tab Prices, option Anchor price (default: do not show). Until it is switched on, and for products without that meta, the price HTML is returned unchanged.
 
 = 2.1.14 =
 * Author header now reads "Symmetria d.o.o. (Dejan Potočić)" with Author URI https://www.symmetria.hr/ (was just "Dejan Potočić"). composer.json lists both Symmetria d.o.o. and Dejan Potocic (Developer).

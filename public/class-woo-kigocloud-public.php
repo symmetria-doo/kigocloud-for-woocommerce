@@ -33,10 +33,11 @@ class Woo_KigoCloud_Public
     }
 
     /**
-     * Sidrena cijena (KigoCloud modul Sidrene cijene, Odluka Vlade RH od 1.10.2026.):
-     * ispod cijene proizvoda ili varijacije ispisuje cijenu koja je vrijedila na
-     * referentni dan. KigoCloud je salje uz proizvod kao meta _kigo_anchor_price
-     * (i _kigo_anchor_price_date); bez tih meta podataka ispis ostaje nepromijenjen.
+     * Anchor price (Croatian Government decision, in force 1 October 2026):
+     * prints the price that applied on the reference day under the product or
+     * variation price. KigoCloud sends it with the product as the
+     * _kigo_anchor_price and _kigo_anchor_price_date meta; without that meta
+     * the price HTML is returned unchanged.
      *
      * @param string     $price_html
      * @param WC_Product $product
@@ -44,7 +45,7 @@ class Woo_KigoCloud_Public
      */
     public function anchor_price_html($price_html, $product)
     {
-        // Prikaz je postavka dodatka: bez nje ispis cijene ostaje netaknut.
+        // Opt-in: without the setting the price HTML is left untouched.
         if ('1' !== (string) get_option('kigocloud_show_anchor_price', '0')) {
             return $price_html;
         }

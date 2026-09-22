@@ -262,8 +262,9 @@ class Woo_KigoCloud_Admin_Page
     private function settings_map()
     {
         return array(
+            // kigocloud_api_url is deliberately absent: the endpoint is not editable
+            // from the admin screen, see Woo_KigoCloud_Request::resolveApiUrl().
             'kigocloud_connection' => array(
-                'kigocloud_api_url',
                 'kigocloud_username',
                 'kigocloud_password',
                 'kigocloud_pin',
@@ -377,15 +378,10 @@ class Woo_KigoCloud_Admin_Page
         ?>
         <div class="kc-card">
             <h2><?php esc_html_e('API credentials', 'kigocloud-for-woocommerce'); ?></h2>
-            <p class="kc-desc"><?php esc_html_e('Endpoint and login used to talk to KigoCloud. Leave the URL blank to use the default https://app.kigo.cloud/hr/api/v1/', 'kigocloud-for-woocommerce'); ?></p>
+            <p class="kc-desc"><?php esc_html_e('Login used to talk to KigoCloud. The endpoint is fixed and shown on the About tab.', 'kigocloud-for-woocommerce'); ?></p>
             <?php $this->open_form('kigocloud_connection'); ?>
             <table class="form-table" role="presentation">
                 <?php
-                $this->text_field('kigocloud_api_url', __('API endpoint', 'kigocloud-for-woocommerce'), array(
-                    'type'        => 'url',
-                    'placeholder' => 'https://app.kigo.cloud/hr/api/v1/',
-                    'description' => __('Override only if you talk to a non-default KigoCloud instance.', 'kigocloud-for-woocommerce'),
-                ));
                 $this->text_field('kigocloud_username', __('API username', 'kigocloud-for-woocommerce'), array(
                     'default' => 'admin_demo',
                 ));

@@ -4,6 +4,12 @@ All notable changes to KigoCloud for WooCommerce are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.16] - 2026-09-22
+
+### Changed
+- The API endpoint field is removed from the Connection tab. Pointing the integration at another host would send the API credentials and the order data there, so it no longer belongs on a screen every shop administrator can open. The effective endpoint stays visible on the About tab, and `Woo_KigoCloud_Request::resolveApiUrl()` now reads, in order: the `WOO_KIGOCLOUD_API_URL` constant, a value stored by an earlier version, and the `kigocloud_api_url` filter.
+- Changelog and source comments for the anchor price are in English.
+
 ## [2.1.15] - 2026-09-22
 
 ### Added

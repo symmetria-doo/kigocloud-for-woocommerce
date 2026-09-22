@@ -16,9 +16,29 @@ if (!class_exists('Woo_KigoCloud_Request')) {
             $this->apiURL = self::resolveApiUrl();
         }
 
+        /**
+         * The endpoint is no longer editable from the admin screen. Pointing the
+         * integration at another host would send the API credentials and the order
+         * data there, so that switch does not belong in a screen every shop admin
+         * can open. Support can still override it, but only from code the shop
+         * owner controls:
+         *
+         *   define( 'WOO_KIGOCLOUD_API_URL', 'https://…/hr/api/v1/' );  // wp-config.php
+         *   add_filter( 'kigocloud_api_url', function () { return '…'; } );
+         *
+         * A value stored by an earlier version is still honoured so shops that talk
+         * to a non-default instance keep working after the update.
+         */
         public static function resolveApiUrl()
         {
-            $configured = trim((string) get_option('kigocloud_api_url', ''));
+            $configured = '';
+            if (defined('WOO_KIGOCLOUD_API_URL')) {
+                $configured = (string) WOO_KIGOCLOUD_API_URL;
+            }
+            if ($configured === '') {
+                $configured = (string) get_option('kigocloud_api_url', '');
+            }
+            $configured = trim((string) apply_filters('kigocloud_api_url', $configured));
             if ($configured !== '') {
                 return rtrim($configured, '/') . '/';
             }
