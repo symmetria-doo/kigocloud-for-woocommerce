@@ -5,7 +5,7 @@ Tags: woocommerce, hrvatska fiskalizacija, croatian fiscalization, fiscalization
 Requires at least: 5.5
 Requires PHP: 7.2
 Tested up to: 6.9
-Stable tag: 2.1.14
+Stable tag: 2.1.15
 WC requires at least: 5.0
 WC tested up to: 9.4
 License: GPLv2 or later
@@ -45,6 +45,10 @@ This plugin is not hosted on the WordPress.org repository. Updates are delivered
 4. WooCommerce -> Settings -> KigoCloud, fill in your API credentials
 
 == Changelog ==
+
+= 2.1.15 =
+* Sidrena cijena (Odluka Vlade RH, od 1.10.2026.): ispod cijene proizvoda i varijacije može se ispisati cijena koja je vrijedila na referentni dan, kad je KigoCloud pošalje uz proizvod (meta _kigo_anchor_price i _kigo_anchor_price_date).
+* Prikaz se uključuje: KigoCloud, kartica Prices, opcija Anchor price (zadano: ne prikazuje se). Dok nije uključena, i za proizvode bez tih podataka, ispis cijene ostaje nepromijenjen.
 
 = 2.1.14 =
 * Author header now reads "Symmetria d.o.o. (Dejan Potočić)" with Author URI https://www.symmetria.hr/ (was just "Dejan Potočić"). composer.json lists both Symmetria d.o.o. and Dejan Potocic (Developer).

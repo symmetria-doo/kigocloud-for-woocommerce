@@ -250,6 +250,7 @@ class Woo_KigoCloud_Admin_Page
         return array(
             'connection' => __('Connection', 'kigocloud-for-woocommerce'),
             'orders'     => __('Orders', 'kigocloud-for-woocommerce'),
+            'prices'     => __('Prices', 'kigocloud-for-woocommerce'),
             'r1'         => __('R1', 'kigocloud-for-woocommerce'),
             'email'      => __('Email', 'kigocloud-for-woocommerce'),
             'mapping'    => __('Mapping', 'kigocloud-for-woocommerce'),
@@ -270,6 +271,9 @@ class Woo_KigoCloud_Admin_Page
             'kigocloud_orders' => array(
                 'kigocloud_shipping_reference',
                 'kigocloud_fill_empty_sku',
+            ),
+            'kigocloud_prices' => array(
+                'kigocloud_show_anchor_price',
             ),
             'kigocloud_r1' => array(
                 'kigocloud_vat_invoices',
@@ -397,6 +401,24 @@ class Woo_KigoCloud_Admin_Page
             </table>
             <?php $this->close_form(); ?>
         </div>
+        <?php
+    }
+
+    private function render_tab_prices()
+    {
+        ?>
+        <h2><?php esc_html_e('Prices', 'kigocloud-for-woocommerce'); ?></h2>
+        <table class="form-table" role="presentation">
+            <?php
+            $this->select_field('kigocloud_show_anchor_price', __('Anchor price', 'kigocloud-for-woocommerce'), array(
+                '0' => __('Do not show', 'kigocloud-for-woocommerce'),
+                '1' => __('Show below the product price', 'kigocloud-for-woocommerce'),
+            ), array(
+                'default'     => '0',
+                'description' => __('Croatian Government decision, in force from 1 October 2026: the price that applied on the reference day is shown next to the retail price. KigoCloud sends it with the product.', 'kigocloud-for-woocommerce'),
+            ));
+            ?>
+        </table>
         <?php
     }
 

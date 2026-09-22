@@ -4,6 +4,12 @@ All notable changes to KigoCloud for WooCommerce are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.15] - 2026-09-22
+
+### Added
+- Anchor price ("sidrena cijena", Croatian Government decision effective 1 October 2026): the product and variation price HTML can carry a line with the price that applied on the reference day, read from the `_kigo_anchor_price` and `_kigo_anchor_price_date` meta that KigoCloud sends with the product (`woocommerce_get_price_html` filter).
+- The display is opt-in: KigoCloud admin, tab **Prices**, option **Anchor price** (default: do not show). Until it is switched on, and for products without that meta, the price HTML is returned unchanged.
+
 ## [2.1.14] - 2026-05-29
 
 ### Changed

@@ -41,7 +41,7 @@ class Woo_KigoCloud {
      *
      * @since 1.0.0
      */
-    const PLUGIN_VERSION = '2.1.14';
+    const PLUGIN_VERSION = '2.1.15';
 
 	/**
 	 * The loader that's responsible for maintaining and registering all hooks that power
@@ -286,6 +286,8 @@ class Woo_KigoCloud {
 
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
+		// Sidrena cijena ispod cijene proizvoda (meta _kigo_anchor_price iz KigoClouda)
+		$this->loader->add_filter( 'woocommerce_get_price_html', $plugin_public, 'anchor_price_html', 20, 2 );
 
 	}
 
