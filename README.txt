@@ -5,7 +5,7 @@ Tags: woocommerce, hrvatska fiskalizacija, croatian fiscalization, fiscalization
 Requires at least: 5.5
 Requires PHP: 7.2
 Tested up to: 6.9
-Stable tag: 2.1.16
+Stable tag: 2.1.17
 WC requires at least: 5.0
 WC tested up to: 9.4
 License: GPLv2 or later
@@ -45,6 +45,12 @@ This plugin is not hosted on the WordPress.org repository. Updates are delivered
 4. WooCommerce -> Settings -> KigoCloud, fill in your API credentials
 
 == Changelog ==
+
+= 2.1.17 =
+* Price list on your own website (Croatian decision on price list publication, in force 1 October 2026). The plugin downloads the price list from KigoCloud once a day and stores it in the uploads folder, so the CSV and XML are served from your own domain: no visitor and no price crawler ever reaches KigoCloud, and a KigoCloud outage does not put you out of compliance.
+* New tab Price list: paste the KigoCloud address, and the plugin shows the two addresses to publish and when the copy was last refreshed. Saving the address fetches it at once.
+* New shortcode [kigo_cjenik] renders the current price list as a table with links to the CSV and the XML. It reads the local copy, so no page view calls KigoCloud.
+* The refresh runs every morning at 7. A copy older than two days is reported in wp-admin instead of ageing silently.
 
 = 2.1.16 =
 * The API endpoint field is removed from the Connection tab. Pointing the integration at another host would send the API credentials and the order data there, so it no longer belongs on a screen every shop administrator can open. The effective endpoint is shown on the About tab. Support can still override it from code the shop owner controls: the WOO_KIGOCLOUD_API_URL constant in wp-config.php or the kigocloud_api_url filter. A value stored by an earlier version is still honoured.

@@ -41,7 +41,7 @@ class Woo_KigoCloud {
      *
      * @since 1.0.0
      */
-    const PLUGIN_VERSION = '2.1.16';
+    const PLUGIN_VERSION = '2.1.17';
 
 	/**
 	 * The loader that's responsible for maintaining and registering all hooks that power
@@ -156,6 +156,12 @@ class Woo_KigoCloud {
 		 * R1 customer fields (classic + block checkout).
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-woo-kigocloud-r1.php';
+
+		/**
+		 * Price list published on the shop's own domain (anchor price decision).
+		 */
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-woo-kigocloud-pricelist.php';
+		Woo_KigoCloud_Pricelist::init();
 
 
 		$this->loader = new Woo_KigoCloud_Loader();

@@ -4,6 +4,14 @@ All notable changes to KigoCloud for WooCommerce are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.17] - 2026-09-22
+
+### Added
+- Price list published on the shop's own domain (Croatian decision on price list publication, NN 101/2026). `Woo_KigoCloud_Pricelist` pulls the CSV and the XML from the configured KigoCloud address once a day (WP-Cron at 07:00, plus a lazy refresh for low traffic sites) and writes them into `wp-content/uploads/kigo-cjenik/`, where the shop web server serves them statically. Conditional requests (`If-Modified-Since`) keep the daily fetch close to free.
+- Admin tab **Price list**: the KigoCloud address, the two published addresses, the last refresh time and the last error. Saving the address fetches immediately.
+- Shortcode `[kigo_cjenik]` renders the local CSV as a table with links to both files. No page view reaches KigoCloud.
+- An admin notice when the published copy is more than two days old, so a stale price list is not missed.
+
 ## [2.1.16] - 2026-09-22
 
 ### Changed

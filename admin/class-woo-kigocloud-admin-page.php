@@ -251,6 +251,7 @@ class Woo_KigoCloud_Admin_Page
             'connection' => __('Connection', 'kigocloud-for-woocommerce'),
             'orders'     => __('Orders', 'kigocloud-for-woocommerce'),
             'prices'     => __('Prices', 'kigocloud-for-woocommerce'),
+            'pricelist'  => __('Price list', 'kigocloud-for-woocommerce'),
             'r1'         => __('R1', 'kigocloud-for-woocommerce'),
             'email'      => __('Email', 'kigocloud-for-woocommerce'),
             'mapping'    => __('Mapping', 'kigocloud-for-woocommerce'),
@@ -275,6 +276,9 @@ class Woo_KigoCloud_Admin_Page
             ),
             'kigocloud_prices' => array(
                 'kigocloud_show_anchor_price',
+            ),
+            'kigocloud_pricelist' => array(
+                Woo_KigoCloud_Pricelist::OPTION_URL,
             ),
             'kigocloud_r1' => array(
                 'kigocloud_vat_invoices',
@@ -415,6 +419,54 @@ class Woo_KigoCloud_Admin_Page
             ));
             ?>
         </table>
+        <?php
+    }
+
+    private function render_tab_pricelist()
+    {
+        $base = Woo_KigoCloud_Pricelist::base_url();
+        $status = Woo_KigoCloud_Pricelist::status();
+        $csv = Woo_KigoCloud_Pricelist::path('csv');
+        ?>
+        <div class="kc-card">
+            <h2><?php esc_html_e('Price list on your own website', 'kigocloud-for-woocommerce'); ?></h2>
+            <p class="kc-desc"><?php esc_html_e('Croatian law requires the price list to be published on your own website. The plugin downloads it from KigoCloud once a day and stores it here, so the files are served from your domain and your visitors never reach KigoCloud.', 'kigocloud-for-woocommerce'); ?></p>
+            <table class="form-table" role="presentation">
+                <?php
+                $this->text_field(Woo_KigoCloud_Pricelist::OPTION_URL, __('KigoCloud address', 'kigocloud-for-woocommerce'), array(
+                    'type'        => 'url',
+                    'placeholder' => 'https://app.kigo.cloud/hr/cjenik/...',
+                    'description' => __('Copy it from KigoCloud: Anchor prices, tab Price list for publication. Save, then use the addresses below on your site.', 'kigocloud-for-woocommerce'),
+                ));
+                ?>
+            </table>
+            <?php if ($base !== ''): ?>
+                <table class="form-table" role="presentation">
+                    <tr>
+                        <th scope="row"><?php esc_html_e('Your addresses', 'kigocloud-for-woocommerce'); ?></th>
+                        <td>
+                            <p><code><?php echo esc_html(Woo_KigoCloud_Pricelist::url('csv')); ?></code></p>
+                            <p><code><?php echo esc_html(Woo_KigoCloud_Pricelist::url('xml')); ?></code></p>
+                            <p class="description"><?php esc_html_e('These are the addresses to publish. Put the price list on a page with the [kigo_cjenik] shortcode, which also links to both files.', 'kigocloud-for-woocommerce'); ?></p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row"><?php esc_html_e('Last refresh', 'kigocloud-for-woocommerce'); ?></th>
+                        <td>
+                            <?php if (file_exists($csv)): ?>
+                                <span class="kc-status-ok"><?php echo esc_html(date_i18n(get_option('date_format') . ' ' . get_option('time_format'), filemtime($csv))); ?></span>
+                            <?php else: ?>
+                                <span class="kc-status-bad"><?php esc_html_e('not downloaded yet', 'kigocloud-for-woocommerce'); ?></span>
+                            <?php endif; ?>
+                            <?php if (!empty($status['message'])): ?>
+                                <p class="description"><?php echo esc_html($status['message']); ?></p>
+                            <?php endif; ?>
+                            <p class="description"><?php esc_html_e('Refreshed automatically every morning at 7. Save the settings to fetch it right away.', 'kigocloud-for-woocommerce'); ?></p>
+                        </td>
+                    </tr>
+                </table>
+            <?php endif; ?>
+        </div>
         <?php
     }
 
