@@ -5,7 +5,7 @@ Tags: woocommerce, hrvatska fiskalizacija, croatian fiscalization, fiscalization
 Requires at least: 5.5
 Requires PHP: 7.2
 Tested up to: 6.9
-Stable tag: 2.1.17
+Stable tag: 2.1.18
 WC requires at least: 5.0
 WC tested up to: 9.4
 License: GPLv2 or later
@@ -45,6 +45,12 @@ This plugin is not hosted on the WordPress.org repository. Updates are delivered
 4. WooCommerce -> Settings -> KigoCloud, fill in your API credentials
 
 == Changelog ==
+
+= 2.1.18 =
+* Files under the prescribed name. The decision on price list publication (NN 101/2026, point VI) says the file names include the outlet's form, address and code, the storage number and the date and time. The plugin now stores each file under the name KigoCloud sends with it, for example Prodajni-salon_Ilica-1-10000-Zagreb_P1_000014_20261001_080000.csv, instead of cjenik.csv.
+* 30 days of price lists on your website (point II: published price lists are kept and available for 30 days). Every day's CSV and XML stay in the folder for 30 days and the [kigo_cjenik] shortcode lists them under the table.
+* The day's price list, not the last 26 hours. A copy that is not from today is refreshed on the next page view, and the morning fetch at 7 gets the day's price list before the 8:00 deadline.
+* The cjenik.csv and cjenik.xml written by 2.1.17 are removed on the first fetch. Link to the page with the [kigo_cjenik] shortcode, which always shows the current files.
 
 = 2.1.17 =
 * Price list on your own website (Croatian decision on price list publication, in force 1 October 2026). The plugin downloads the price list from KigoCloud once a day and stores it in the uploads folder, so the CSV and XML are served from your own domain: no visitor and no price crawler ever reaches KigoCloud, and a KigoCloud outage does not put you out of compliance.

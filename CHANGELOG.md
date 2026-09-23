@@ -4,6 +4,13 @@ All notable changes to KigoCloud for WooCommerce are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.18] - 2026-09-23
+
+### Changed
+- Price list files are stored under the name KigoCloud sends in `Content-Disposition` (form, address and code of the outlet, storage number, date and time), as the decision on price list publication (NN 101/2026, point VI) prescribes. `Woo_KigoCloud_Pricelist::path()` and `url()` return the current file from the `kigocloud_pricelist_current` option; the fixed `cjenik.csv` / `cjenik.xml` of 2.1.17 are removed on the first fetch.
+- Every publication stays in `wp-content/uploads/kigo-cjenik/` for 30 days (point II) and `[kigo_cjenik]` lists them under the table (`Woo_KigoCloud_Pricelist::archive()`).
+- Freshness is the calendar day (site time zone), not 26 hours: `is_current()` drives the lazy refresh, the fetch and the wp-admin notice.
+
 ## [2.1.17] - 2026-09-22
 
 ### Added

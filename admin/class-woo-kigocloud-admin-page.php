@@ -445,15 +445,19 @@ class Woo_KigoCloud_Admin_Page
                     <tr>
                         <th scope="row"><?php esc_html_e('Your addresses', 'kigocloud-for-woocommerce'); ?></th>
                         <td>
-                            <p><code><?php echo esc_html(Woo_KigoCloud_Pricelist::url('csv')); ?></code></p>
-                            <p><code><?php echo esc_html(Woo_KigoCloud_Pricelist::url('xml')); ?></code></p>
-                            <p class="description"><?php esc_html_e('These are the addresses to publish. Put the price list on a page with the [kigo_cjenik] shortcode, which also links to both files.', 'kigocloud-for-woocommerce'); ?></p>
+                            <?php if (Woo_KigoCloud_Pricelist::url('csv') !== ''): ?>
+                                <p><code><?php echo esc_html(Woo_KigoCloud_Pricelist::url('csv')); ?></code></p>
+                                <p><code><?php echo esc_html(Woo_KigoCloud_Pricelist::url('xml')); ?></code></p>
+                            <?php else: ?>
+                                <p><span class="kc-status-bad"><?php esc_html_e('not downloaded yet', 'kigocloud-for-woocommerce'); ?></span></p>
+                            <?php endif; ?>
+                            <p class="description"><?php esc_html_e('The current files, under the name the decision prescribes. Every day brings new files, and each version stays here for 30 days. Publish a page with the [kigo_cjenik] shortcode: it shows the price list and links to the current files and to the last 30 days.', 'kigocloud-for-woocommerce'); ?></p>
                         </td>
                     </tr>
                     <tr>
                         <th scope="row"><?php esc_html_e('Last refresh', 'kigocloud-for-woocommerce'); ?></th>
                         <td>
-                            <?php if (file_exists($csv)): ?>
+                            <?php if ($csv !== '' && file_exists($csv)): ?>
                                 <span class="kc-status-ok"><?php echo esc_html(date_i18n(get_option('date_format') . ' ' . get_option('time_format'), filemtime($csv))); ?></span>
                             <?php else: ?>
                                 <span class="kc-status-bad"><?php esc_html_e('not downloaded yet', 'kigocloud-for-woocommerce'); ?></span>
