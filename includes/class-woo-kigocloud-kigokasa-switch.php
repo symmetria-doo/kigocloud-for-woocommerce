@@ -16,7 +16,10 @@
  *   delete, its data stays) and KigoCloud takes over from the next request.
  *
  * Orders already sent by KigoKasa keep their `_kigokasa_id_pos` meta, which
- * Woo_KigoCloud_Request treats as "already sent".
+ * Woo_KigoCloud_Request treats as "already sent". Once the KigoKasa plugin is
+ * deactivated, WP-Cron copies that meta (document id, number, type and the R1
+ * fields) into the matching KigoCloud keys in batches, because KigoKasa
+ * versions before 1.7.5 delete their order meta when the plugin is deleted.
  *
  * @package Woo_KigoCloud
  */
@@ -28,6 +31,31 @@ class Woo_KigoCloud_KigoKasa_Switch
     const IMPORTED_OPTION = 'kigocloud_kigokasa_imported';
     const SWITCHED_OPTION = 'kigocloud_kigokasa_switched';
     const ACTION = 'kigocloud_switch_from_kigokasa';
+    const META_CRON = 'kigocloud_copy_kigokasa_order_meta';
+    const META_STATE = 'kigocloud_kigokasa_meta_copy';
+    const META_BATCH = 100;
+    const META_NOTICE = 'kigocloud_kigokasa_meta_copied';
+
+    /**
+     * KigoKasa order meta => KigoCloud order meta.
+     */
+    private static $order_meta = array(
+        '_kigokasa_id_pos'                          => '_kigocloud_id_pos',
+        '_kigokasa_pos_number'                      => '_kigocloud_pos_number',
+        '_kigokasa_doc_type'                        => '_kigocloud_doc_type',
+        'woo_kigokasa_api_vat_invoices_checkbox'    => 'kigocloud_vat_invoices_checkbox',
+        'woo_kigokasa_api_vat_invoices_company'     => 'kigocloud_vat_invoices_company',
+        'woo_kigokasa_api_vat_invoices_address'     => 'kigocloud_vat_invoices_address',
+        'woo_kigokasa_api_vat_invoices_city'        => 'kigocloud_vat_invoices_city',
+        'woo_kigokasa_api_vat_invoices_zip'         => 'kigocloud_vat_invoices_zip',
+        'woo_kigokasa_api_vat_invoices_vat_number'  => 'kigocloud_vat_invoices_vat_number',
+    );
+
+    /**
+     * Orders are found by these keys, one pass each: orders with a KigoKasa
+     * document, then orders with KigoKasa R1 details that were never sent.
+     */
+    private static $meta_passes = array('_kigokasa_id_pos', 'woo_kigokasa_api_vat_invoices_company');
 
     /**
      * KigoKasa option => KigoCloud option.
@@ -125,6 +153,116 @@ class Woo_KigoCloud_KigoKasa_Switch
     }
 
     /**
+     * Hooked on `admin_init` (with maybe_import). Installs that never ran the
+     * copy, and whose KigoKasa plugin is not active, run it once; a copy that
+     * lost its cron event is rescheduled.
+     */
+    public static function maybe_copy_order_meta()
+    {
+        $state = get_option(self::META_STATE, null);
+        if ($state === 'done') {
+            return;
+        }
+        if (self::is_kigokasa_active()) {
+            return;
+        }
+        if (!is_array($state)) {
+            self::start_order_meta_copy();
+        } elseif (!wp_next_scheduled(self::META_CRON)) {
+            wp_schedule_single_event(time(), self::META_CRON);
+        }
+    }
+
+    /**
+     * Hooked on `deactivated_plugin`: covers the switch button and a manual
+     * deactivation of the KigoKasa plugin alike.
+     *
+     * @param string $plugin
+     */
+    public static function on_plugin_deactivated($plugin)
+    {
+        if ($plugin === self::KIGOKASA_PLUGIN) {
+            self::start_order_meta_copy();
+        }
+    }
+
+    private static function start_order_meta_copy()
+    {
+        update_option(self::META_STATE, array('pass' => 0, 'page' => 1), false);
+        if (!wp_next_scheduled(self::META_CRON)) {
+            wp_schedule_single_event(time(), self::META_CRON);
+        }
+    }
+
+    /**
+     * WP-Cron handler. Copies batches for up to 20 seconds, then schedules
+     * itself again if orders are left.
+     */
+    public static function run_order_meta_copy()
+    {
+        $state = get_option(self::META_STATE, null);
+        if (!is_array($state) || !function_exists('wc_get_orders')) {
+            return;
+        }
+        $started = time();
+        while (time() - $started < 20) {
+            if (!isset(self::$meta_passes[$state['pass']])) {
+                update_option(self::META_STATE, 'done', false);
+                // Tell the shop the old plugin may go, if it is still installed.
+                if (file_exists(WP_PLUGIN_DIR . '/' . self::KIGOKASA_PLUGIN)) {
+                    update_option(self::META_NOTICE, 1, false);
+                }
+                return;
+            }
+            $orders = wc_get_orders(array(
+                'type'         => 'shop_order',
+                'status'       => array_keys(wc_get_order_statuses()),
+                'meta_key'     => self::$meta_passes[$state['pass']],
+                'meta_compare' => 'EXISTS',
+                'orderby'      => 'ID',
+                'order'        => 'ASC',
+                'limit'        => self::META_BATCH,
+                'paged'        => $state['page'],
+            ));
+            foreach ($orders as $order) {
+                self::copy_order_meta($order);
+            }
+            if (count($orders) < self::META_BATCH) {
+                $state = array('pass' => $state['pass'] + 1, 'page' => 1);
+            } else {
+                $state['page']++;
+            }
+            update_option(self::META_STATE, $state, false);
+        }
+        wp_schedule_single_event(time() + 60, self::META_CRON);
+    }
+
+    /**
+     * Fills only KigoCloud keys that are still empty.
+     *
+     * @param WC_Order $order
+     */
+    private static function copy_order_meta($order)
+    {
+        $changed = false;
+        foreach (self::$order_meta as $from => $to) {
+            $value = $order->get_meta($from, true);
+            if ($value === '' || $value === null || $value === false) {
+                continue;
+            }
+            $current = $order->get_meta($to, true);
+            if ($current !== '' && $current !== null && $current !== false) {
+                continue;
+            }
+            $order->update_meta_data($to, $value);
+            $changed = true;
+        }
+        if ($changed) {
+            $order->save_meta_data();
+        }
+    }
+
+    /**
      * Hooked on `admin_post_kigocloud_switch_from_kigokasa`.
      */
     public static function handle_switch()
@@ -161,6 +299,13 @@ class Woo_KigoCloud_KigoKasa_Switch
                 . esc_html__('The KigoKasa API for WooCommerce plugin is deactivated. Orders are now sent by KigoCloud for WooCommerce.', 'kigocloud-for-woocommerce')
                 . '</p></div>';
             return;
+        }
+
+        if (get_option(self::META_NOTICE)) {
+            delete_option(self::META_NOTICE);
+            echo '<div class="notice notice-success is-dismissible"><p>'
+                . esc_html__('KigoCloud for WooCommerce now keeps its own record of the documents the KigoKasa plugin issued for your orders, so they are never sent again. The KigoKasa API for WooCommerce plugin can be deleted.', 'kigocloud-for-woocommerce')
+                . '</p></div>';
         }
 
         if (!self::is_kigokasa_active()) {

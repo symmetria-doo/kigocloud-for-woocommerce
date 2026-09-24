@@ -41,7 +41,7 @@ class Woo_KigoCloud {
      *
      * @since 1.0.0
      */
-    const PLUGIN_VERSION = '2.1.19';
+    const PLUGIN_VERSION = '2.1.20';
 
 	/**
 	 * The loader that's responsible for maintaining and registering all hooks that power
@@ -274,6 +274,10 @@ class Woo_KigoCloud {
 		add_action( 'admin_init', array( 'Woo_KigoCloud_KigoKasa_Switch', 'maybe_import' ) );
 		add_action( 'admin_notices', array( 'Woo_KigoCloud_KigoKasa_Switch', 'admin_notice' ) );
 		add_action( 'admin_post_' . Woo_KigoCloud_KigoKasa_Switch::ACTION, array( 'Woo_KigoCloud_KigoKasa_Switch', 'handle_switch' ) );
+		// Copy of the KigoKasa order meta once that plugin is off.
+		add_action( 'admin_init', array( 'Woo_KigoCloud_KigoKasa_Switch', 'maybe_copy_order_meta' ) );
+		add_action( 'deactivated_plugin', array( 'Woo_KigoCloud_KigoKasa_Switch', 'on_plugin_deactivated' ) );
+		add_action( Woo_KigoCloud_KigoKasa_Switch::META_CRON, array( 'Woo_KigoCloud_KigoKasa_Switch', 'run_order_meta_copy' ) );
 
 		$this->loader->add_action( 'init', $plugin_migrator, 'check_for_updates' );
 		$this->loader->add_action( 'admin_notices', $plugin_admin, 'show_admin_notice' );

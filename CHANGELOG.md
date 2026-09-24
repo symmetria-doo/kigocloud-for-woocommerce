@@ -4,6 +4,14 @@ All notable changes to KigoCloud for WooCommerce are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.20] - 2026-09-24
+
+### Added
+- `Woo_KigoCloud_KigoKasa_Switch` copies the KigoKasa order meta (`_kigokasa_id_pos`, `_kigokasa_pos_number`, `_kigokasa_doc_type`, `woo_kigokasa_api_vat_invoices_*`) into the matching KigoCloud keys, filling only keys that are still empty. It starts on `deactivated_plugin` for the KigoKasa plugin, and once on `admin_init` for installs whose KigoKasa plugin is not active. WP-Cron (`kigocloud_copy_kigokasa_order_meta`) works through `wc_get_orders()` in batches of 100 for up to 20 seconds per run, in two passes (orders with a KigoKasa document, then orders with KigoKasa R1 details), and reschedules itself until done. Works on HPOS and on post storage. When it finishes and the KigoKasa plugin is still installed, a one-time notice says it can be deleted.
+
+### Why
+- `uninstall.php` of KigoKasa 1.7.3 and 1.7.4 deletes `_kigokasa_*` and `woo_kigokasa_api_vat_invoices_*` order meta. Without a copy, deleting the old plugin would remove the only record that an order already has a fiscalized document. KigoKasa 1.7.5 keeps that meta.
+
 ## [2.1.19] - 2026-09-24
 
 ### Added
