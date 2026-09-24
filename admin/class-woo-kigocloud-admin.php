@@ -133,6 +133,11 @@ class Woo_KigoCloud_Admin
         }
         $pos_number    = $order->get_meta('_kigocloud_pos_number', true);
         $document_type = $order->get_meta('_kigocloud_doc_type', true);
+        if (empty($pos_number)) {
+            // Sent by the KigoKasa plugin before the switch.
+            $pos_number    = $order->get_meta('_kigokasa_pos_number', true);
+            $document_type = $order->get_meta('_kigokasa_doc_type', true);
+        }
 
         if (!empty($pos_number)) {
             echo '<p class="form-field form-field-wide wc-order-pos-number"><strong>'

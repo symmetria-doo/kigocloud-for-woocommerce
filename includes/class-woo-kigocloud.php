@@ -41,7 +41,7 @@ class Woo_KigoCloud {
      *
      * @since 1.0.0
      */
-    const PLUGIN_VERSION = '2.1.17';
+    const PLUGIN_VERSION = '2.1.19';
 
 	/**
 	 * The loader that's responsible for maintaining and registering all hooks that power
@@ -158,6 +158,11 @@ class Woo_KigoCloud {
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-woo-kigocloud-r1.php';
 
 		/**
+		 * Takes over from the older KigoKasa API for WooCommerce plugin.
+		 */
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-woo-kigocloud-kigokasa-switch.php';
+
+		/**
 		 * Price list published on the shop's own domain (anchor price decision).
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-woo-kigocloud-pricelist.php';
@@ -264,6 +269,11 @@ class Woo_KigoCloud {
 
         $this->loader->add_filter( 'wp_mail_from', $plugin_admin, 'change_wp_email_from');
         $this->loader->add_filter( 'wp_mail_from_name', $plugin_admin, 'change_wp_email_from_name');
+
+		// Switch from the KigoKasa plugin: settings import, notice with the switch button.
+		add_action( 'admin_init', array( 'Woo_KigoCloud_KigoKasa_Switch', 'maybe_import' ) );
+		add_action( 'admin_notices', array( 'Woo_KigoCloud_KigoKasa_Switch', 'admin_notice' ) );
+		add_action( 'admin_post_' . Woo_KigoCloud_KigoKasa_Switch::ACTION, array( 'Woo_KigoCloud_KigoKasa_Switch', 'handle_switch' ) );
 
 		$this->loader->add_action( 'init', $plugin_migrator, 'check_for_updates' );
 		$this->loader->add_action( 'admin_notices', $plugin_admin, 'show_admin_notice' );

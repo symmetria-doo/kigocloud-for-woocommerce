@@ -46,5 +46,11 @@ class Woo_KigoCloud_Activator
         // Record current version so Woo_KigoCloud_Migrator can detect
         // future upgrades on subsequent loads.
         update_option('kigocloud_version', Woo_KigoCloud::PLUGIN_VERSION);
+
+        // Settings of the KigoKasa plugin, if this shop used it. It stays
+        // active until the shop clicks the switch button.
+        if (class_exists('Woo_KigoCloud_KigoKasa_Switch')) {
+            Woo_KigoCloud_KigoKasa_Switch::import_settings();
+        }
     }
 }

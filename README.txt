@@ -5,7 +5,7 @@ Tags: woocommerce, hrvatska fiskalizacija, croatian fiscalization, fiscalization
 Requires at least: 5.5
 Requires PHP: 7.2
 Tested up to: 6.9
-Stable tag: 2.1.18
+Stable tag: 2.1.19
 WC requires at least: 5.0
 WC tested up to: 9.4
 License: GPLv2 or later
@@ -45,6 +45,12 @@ This plugin is not hosted on the WordPress.org repository. Updates are delivered
 4. WooCommerce -> Settings -> KigoCloud, fill in your API credentials
 
 == Changelog ==
+
+= 2.1.19 =
+* Switching from the KigoKasa API for WooCommerce plugin. When KigoCloud is activated, it copies the KigoKasa settings (connection, per payment method document types, R1 mode, mail, mapping) as long as KigoCloud has no username of its own yet, and keeps the KigoKasa server as the endpoint for those credentials.
+* While the KigoKasa plugin is active, KigoCloud does not send orders, so no order is sent twice. A notice in wp-admin offers the Switch to KigoCloud button, which deactivates the KigoKasa plugin (its data is kept). From then on KigoCloud sends the orders.
+* Orders already sent by the KigoKasa plugin are recognised and never sent again, their R1 details are used if they are sent now, and the order screen shows their KigoKasa document number.
+* Author shows only Symmetria d.o.o.
 
 = 2.1.18 =
 * Files under the prescribed name. The decision on price list publication (NN 101/2026, point VI) says the file names include the outlet's form, address and code, the storage number and the date and time. The plugin now stores each file under the name KigoCloud sends with it, for example Prodajni-salon_Ilica-1-10000-Zagreb_P1_000014_20261001_080000.csv, instead of cjenik.csv.

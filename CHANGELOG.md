@@ -4,6 +4,20 @@ All notable changes to KigoCloud for WooCommerce are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.19] - 2026-09-24
+
+### Added
+- `Woo_KigoCloud_KigoKasa_Switch`. On activation (and on `admin_init` for installs updated in place) it copies the `woo_kigokasa_api_*` options, including the per-gateway `pos_type`, `payment_type`, `on_status` and `pdf_payment_type`, into the matching `kigocloud_*` options, but only while `kigocloud_username` is empty. The imported credentials keep `https://trgovina.kigoserver.com/hr/api/v1/` as `kigocloud_api_url` unless an endpoint is already set.
+- While `kigokasa-api-for-woocommerce` is active, `Woo_KigoCloud_Request::on_order_status_change()` returns early and an admin notice offers **Switch to KigoCloud** (`admin-post.php?action=kigocloud_switch_from_kigokasa`, nonce and `activate_plugins` capability). The handler deactivates the KigoKasa plugin, without deleting it.
+
+### Fixed
+- The duplicate guard also reads `_kigokasa_id_pos`, so an order the KigoKasa plugin already sent is not sent again after a status change.
+- R1 mode 2 also maps the `woo_kigokasa_api_vat_invoices_*` order meta, and the order screen falls back to `_kigokasa_pos_number` / `_kigokasa_doc_type`.
+- `Woo_KigoCloud::PLUGIN_VERSION` was left at 2.1.17 in 2.1.18.
+
+### Changed
+- `Author` header is `Symmetria d.o.o.` only.
+
 ## [2.1.18] - 2026-09-23
 
 ### Changed

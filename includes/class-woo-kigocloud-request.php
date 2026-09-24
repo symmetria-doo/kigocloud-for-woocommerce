@@ -56,13 +56,22 @@ if (!class_exists('Woo_KigoCloud_Request')) {
          */
         public function on_order_status_change($order_id, $old_status, $new_status)
         {
+            // The KigoKasa plugin keeps sending until the shop switches over.
+            if (Woo_KigoCloud_KigoKasa_Switch::is_kigokasa_active()) {
+                return;
+            }
+
             $order = wc_get_order($order_id);
             if (!$order) {
                 return;
             }
 
-            // Skip if KigoCloud already created a document for this order.
+            // Skip if a document already exists for this order, including one
+            // created by the KigoKasa plugin before this shop switched over.
             $posId = $order->get_meta('_kigocloud_id_pos');
+            if (empty($posId)) {
+                $posId = $order->get_meta('_kigokasa_id_pos');
+            }
             if (!empty($posId)) {
                 return;
             }
@@ -245,6 +254,13 @@ if (!class_exists('Woo_KigoCloud_Request')) {
                 $mappingRules['kigocloud_vat_invoices_city'] = $vatField . '.city';
                 $mappingRules['kigocloud_vat_invoices_zip'] = $vatField . '.postcode';
                 $mappingRules['kigocloud_vat_invoices_vat_number'] = $vat_number_field;
+
+                // R1 data on orders placed while the KigoKasa plugin was active.
+                $mappingRules['woo_kigokasa_api_vat_invoices_company'] = $vatField . '.company';
+                $mappingRules['woo_kigokasa_api_vat_invoices_address'] = $vatField . '.address_1';
+                $mappingRules['woo_kigokasa_api_vat_invoices_city'] = $vatField . '.city';
+                $mappingRules['woo_kigokasa_api_vat_invoices_zip'] = $vatField . '.postcode';
+                $mappingRules['woo_kigokasa_api_vat_invoices_vat_number'] = $vat_number_field;
             }
 
             $meta_data = $orderData['meta_data'];
