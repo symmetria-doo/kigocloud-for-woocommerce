@@ -5,7 +5,7 @@ Tags: woocommerce, hrvatska fiskalizacija, croatian fiscalization, fiscalization
 Requires at least: 5.5
 Requires PHP: 7.2
 Tested up to: 6.9
-Stable tag: 2.1.20
+Stable tag: 2.1.21
 WC requires at least: 5.0
 WC tested up to: 9.4
 License: GPLv2 or later
@@ -45,6 +45,10 @@ This plugin is not hosted on the WordPress.org repository. Updates are delivered
 4. WooCommerce -> Settings -> KigoCloud, fill in your API credentials
 
 == Changelog ==
+
+= 2.1.21 =
+* English for foreign customers. A new option on the Orders tab: when it is on, a customer whose country on the order is not Croatia gets the invoice PDF and the e-mail in English. Customers from Croatia get the same as before. Off by default.
+* Translations are now part of the release, so the e-mail and the order note show the document type (for example Invoice or Račun) instead of pos_type_1.
 
 = 2.1.20 =
 * Once the KigoKasa API for WooCommerce plugin is deactivated, by the Switch to KigoCloud button or by hand, KigoCloud copies the KigoKasa document number, type and id and the R1 company details of every order into its own order fields, in the background and in batches. From then on it no longer depends on the old plugin, so the old plugin can be deleted, and a notice says when the copy is done. Versions before KigoKasa 1.7.5 delete that order data when the plugin is deleted.

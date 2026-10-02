@@ -273,6 +273,7 @@ class Woo_KigoCloud_Admin_Page
             'kigocloud_orders' => array(
                 'kigocloud_shipping_reference',
                 'kigocloud_fill_empty_sku',
+                'kigocloud_english_for_foreign',
             ),
             'kigocloud_prices' => array(
                 'kigocloud_show_anchor_price',
@@ -492,6 +493,13 @@ class Woo_KigoCloud_Admin_Page
                 ), array(
                     'default'     => '0',
                     'description' => __('When enabled, products with missing SKU are sent as sku-<item_id> to avoid KigoCloud lookup failures.', 'kigocloud-for-woocommerce'),
+                ));
+                $this->select_field('kigocloud_english_for_foreign', __('English for foreign customers', 'kigocloud-for-woocommerce'), array(
+                    '0' => __('No', 'kigocloud-for-woocommerce'),
+                    '1' => __('Yes - invoice PDF and email in English', 'kigocloud-for-woocommerce'),
+                ), array(
+                    'default'     => '0',
+                    'description' => __('Applies to customers whose country on the order is not Croatia. Nothing changes for customers from Croatia.', 'kigocloud-for-woocommerce'),
                 ));
                 ?>
             </table>

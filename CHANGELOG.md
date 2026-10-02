@@ -4,6 +4,14 @@ All notable changes to KigoCloud for WooCommerce are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.21] - 2026-10-02
+
+### Added
+- Option `kigocloud_english_for_foreign` (Orders tab, "English for foreign customers", off by default). When it is on and the country on the order is not Croatia, the plugin calls the API under `/en/api/v1/` instead of `/hr/api/v1/` for that order (`invoice/create` and `invoice/getAsPdf`), so KigoCloud returns the invoice PDF in English, and writes the e-mail with the PDF in English (`switch_to_locale('en_US')`). The decision is made only in the plugin; KigoCloud takes the language from the address, as it already does. The KigoKasa switch copies `woo_kigokasa_api_english_for_foreign`.
+
+### Fixed
+- The release zip now contains compiled translations. `languages/*.mo` is ignored by git and the release workflow did not build it, so WordPress loaded no translations for the plugin: the e-mail to the customer and the order note showed `pos_type_1` instead of the document type.
+
 ## [2.1.20] - 2026-09-24
 
 ### Added

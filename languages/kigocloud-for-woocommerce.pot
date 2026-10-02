@@ -366,3 +366,15 @@ msgstr ""
 #: public/class-kigocloud-for-woocommerce-public.php:213
 msgid "Invalid VAT."
 msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:497
+msgid "English for foreign customers"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:499
+msgid "Yes - invoice PDF and email in English"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:502
+msgid "Applies to customers whose country on the order is not Croatia. Nothing changes for customers from Croatia."
+msgstr ""

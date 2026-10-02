@@ -46,6 +46,34 @@ if (!class_exists('Woo_KigoCloud_Request')) {
         }
 
         /**
+         * With the "English for foreign customers" option on, a customer
+         * whose country on the order is not Croatia gets the document and
+         * the e-mail in English. The plugin is the one deciding: it asks
+         * KigoCloud for English by calling the API under /en/ instead of
+         * /hr/, and KigoCloud takes the language from the address.
+         *
+         * @param string $country Two-letter country code from the order.
+         * @return bool
+         */
+        public static function use_english($country)
+        {
+            if ((string) get_option('kigocloud_english_for_foreign', '0') !== '1') {
+                return false;
+            }
+            $country = strtoupper(trim((string) $country));
+            return $country !== '' && $country !== 'HR';
+        }
+
+        /**
+         * @param string $apiUrl
+         * @return string The same endpoint with the language part set to English.
+         */
+        public static function english_api_url($apiUrl)
+        {
+            return str_replace('/hr/api/v1/', '/en/api/v1/', $apiUrl);
+        }
+
+        /**
          * Hooked on `woocommerce_order_status_changed` (4 args, but we
          * pull the order via wc_get_order for HPOS compatibility, so the
          * 4th `$order` arg is intentionally unused).
@@ -330,7 +358,10 @@ if (!class_exists('Woo_KigoCloud_Request')) {
                 $password = md5($password);
             }
 
-            $postURL = esc_url_raw($this->apiURL . $command);
+            $english = self::use_english($country);
+            $apiUrl  = $english ? self::english_api_url($this->apiURL) : $this->apiURL;
+
+            $postURL = esc_url_raw($apiUrl . $command);
             $payload = array(
                 'method'      => 'POST',
                 'timeout'     => 30,
@@ -406,7 +437,14 @@ if (!class_exists('Woo_KigoCloud_Request')) {
 
                 $sendPdf = get_option('kigocloud_pdf_payment_type-' . esc_attr($orderData['payment_method']));
                 if ($sendPdf === '1') {
-                    $this->send_invoice_email($order, $body, sanitize_email($email), $documentTypeTitle, $formattedPosNumber, $fullName);
+                    // The order note above stays in the shop's language, the
+                    // e-mail to a customer outside Croatia goes out in English.
+                    $switched  = $english && $this->switch_to_english();
+                    $mailTitle = $switched ? __('pos_type_' . $documentType, 'kigocloud-for-woocommerce') : $documentTypeTitle;
+                    $this->send_invoice_email($order, $body, sanitize_email($email), $mailTitle, $formattedPosNumber, $fullName, $apiUrl);
+                    if ($switched) {
+                        $this->restore_language();
+                    }
                 }
             } else {
                 $msg = isset($body->error) ? (string) $body->error : (isset($body->message) ? (string) $body->message : __('No document number returned', 'kigocloud-for-woocommerce'));
@@ -440,11 +478,46 @@ if (!class_exists('Woo_KigoCloud_Request')) {
             update_option('kigocloud_recent_logs', $logs, false);
         }
 
+        /**
+         * Switches WordPress and this plugin's strings to English.
+         *
+         * @return bool False when nothing was switched, e.g. the site already runs in English.
+         */
+        private function switch_to_english()
+        {
+            if (!function_exists('switch_to_locale') || !switch_to_locale('en_US')) {
+                return false;
+            }
+            $this->reload_textdomain();
+            return true;
+        }
+
+        private function restore_language()
+        {
+            restore_previous_locale();
+            $this->reload_textdomain();
+        }
+
+        /**
+         * Loads this plugin's strings for the current locale. Since 6.1
+         * switch_to_locale() reloads them by itself; before 6.1 it does not
+         * know the plugin's own languages folder. No unload_textdomain()
+         * here: since 6.7 it would block the reload for the rest of the
+         * request.
+         */
+        private function reload_textdomain()
+        {
+            load_plugin_textdomain('kigocloud-for-woocommerce', false, dirname(dirname(plugin_basename(__FILE__))) . '/languages/');
+        }
+
         public function add_pdf_attachment($attachments, $email_id, $email_object){
             return $attachments;
         }
 
-        public function send_invoice_email($order, $body, $email, $documentTypeTitle, $formattedPosNumber, $fullName){
+        /**
+         * @param string|null $apiUrl Endpoint used for the order; English for a customer outside Croatia.
+         */
+        public function send_invoice_email($order, $body, $email, $documentTypeTitle, $formattedPosNumber, $fullName, $apiUrl = null){
             global $wp_filesystem;
 
             if ( empty( $wp_filesystem ) ) {
@@ -487,7 +560,7 @@ if (!class_exists('Woo_KigoCloud_Request')) {
                 $password = get_option('kigocloud_password');
             }
 
-            $postURL = esc_url_raw($this->apiURL . 'invoice/getAsPdf/' . $body->id_pos);
+            $postURL = esc_url_raw(($apiUrl ? $apiUrl : $this->apiURL) . 'invoice/getAsPdf/' . $body->id_pos);
             $payload = array(
                 'method'      => 'GET',
                 'timeout'     => 30,

@@ -69,6 +69,7 @@ class Woo_KigoCloud_KigoKasa_Switch
         'woo_kigokasa_api_email_from'                 => 'kigocloud_email_from',
         'woo_kigokasa_api_reply_to'                   => 'kigocloud_reply_to',
         'woo_kigokasa_api_fill_empty_sku'             => 'kigocloud_fill_empty_sku',
+        'woo_kigokasa_api_english_for_foreign'        => 'kigocloud_english_for_foreign',
         'woo_kigokasa_api_skip_status_order_created'  => 'kigocloud_skip_status_order_created',
         'woo_kigokasa_api_vat_invoices'               => 'kigocloud_vat_invoices',
         'woo_kigokasa_api_show_anchor_price'          => 'kigocloud_show_anchor_price',
