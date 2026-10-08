@@ -5,7 +5,7 @@ Tags: woocommerce, hrvatska fiskalizacija, croatian fiscalization, fiscalization
 Requires at least: 5.5
 Requires PHP: 7.2
 Tested up to: 6.9
-Stable tag: 2.1.21
+Stable tag: 2.1.22
 WC requires at least: 5.0
 WC tested up to: 9.4
 License: GPLv2 or later
@@ -45,6 +45,13 @@ This plugin is not hosted on the WordPress.org repository. Updates are delivered
 4. WooCommerce -> Settings -> KigoCloud, fill in your API credentials
 
 == Changelog ==
+
+= 2.1.22 =
+* Fix: two status changes arriving together can no longer create two documents for one order.
+* Fix: an order whose first attempt timed out is linked to the document KigoCloud already created.
+* Fix: SKU lookup accepts SKUs with a dot, a space and other characters.
+* Fix: an order with a product deleted in the meantime is sent instead of stopping with an error.
+* Change: a buyer with an OIB but without a company name is sent as a private person.
 
 = 2.1.21 =
 * English for foreign customers. A new option on the Orders tab: when it is on, a customer whose country on the order is not Croatia gets the invoice PDF and the e-mail in English. Customers from Croatia get the same as before. Off by default.

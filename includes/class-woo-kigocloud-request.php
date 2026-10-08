@@ -142,9 +142,40 @@ if (!class_exists('Woo_KigoCloud_Request')) {
 
 		    // Execute the API call if the conditions are met
 		    if ($shouldCallApi) {
-			    $this->execute_api_call('invoice/create', $order);
+			    $this->send_once($order);
 		    }
 	    }
+
+        /**
+         * Sends the order while holding a database lock, so two status changes
+         * arriving together (payment callback and the customer's return) cannot
+         * both create a document.
+         *
+         * @param WC_Order $order
+         */
+        private function send_once($order)
+        {
+            global $wpdb;
+
+            $lock   = 'kigocloud_order_' . $order->get_id();
+            $locked = $wpdb->get_var($wpdb->prepare('SELECT GET_LOCK(%s, 0)', $lock));
+            if ($locked !== null && (int) $locked === 0) {
+                return; // another request is sending this order right now
+            }
+            // NULL means the database could not give a lock at all: send as before rather than not at all.
+
+            try {
+                // The other request may have finished between the check above and the lock.
+                $order->read_meta_data(true);
+                if (empty($order->get_meta('_kigocloud_id_pos')) && empty($order->get_meta('_kigokasa_id_pos'))) {
+                    $this->execute_api_call('invoice/create', $order);
+                }
+            } finally {
+                if ((int) $locked === 1) {
+                    $wpdb->query($wpdb->prepare('SELECT RELEASE_LOCK(%s)', $lock));
+                }
+            }
+        }
 
         /**
          * @param string   $command
@@ -180,7 +211,7 @@ if (!class_exists('Woo_KigoCloud_Request')) {
                 $itemName = $itemValue->get_name();
                 $itemData = $itemValue->get_data();
                 $product  = $itemValue->get_product();
-                $itemSku  = $product->get_sku();
+                $itemSku  = $product ? $product->get_sku() : ''; // the product may be deleted since the order
 
                 // Manually calculate tax rate (tax can be only rounded number without decimals and 5, 13, 25 are only allowed)
                 $taxRate = $itemValue->get_total_tax() > 0 ? round(($itemValue->get_total_tax() / $itemValue->get_total()) * 100) : 0;
@@ -348,7 +379,7 @@ if (!class_exists('Woo_KigoCloud_Request')) {
             $client->phone          = $phone;
             $client->contact_person = $fullName;
             $client->country_iso    = $country; // 2-letter country code
-	        $client->client_vat_type = $vat_number ? 0 : 1; // 0 - B2B with VAT number, 1 - B2C with or without VAT number
+	        $client->client_vat_type = ($vat_number && $company) ? 0 : 1; // 0 - company (VAT number and company name), 1 - private person, with or without VAT number
 
             $mainBody->client = $client;
 
@@ -401,9 +432,9 @@ if (!class_exists('Woo_KigoCloud_Request')) {
             }
 
             if (is_wp_error($response)) {
-                $error_code    = wp_remote_retrieve_response_code($response);
-                $error_message = wp_remote_retrieve_response_message($response);
-                self::log_call($order->get_id(), $command, false, 'HTTP ' . $error_code . ': ' . $error_message);
+                $error_code    = $response->get_error_code();
+                $error_message = $response->get_error_message();
+                self::log_call($order->get_id(), $command, false, $error_code . ': ' . $error_message);
                 return new \WP_Error($error_code, $error_message);
             }
 
@@ -415,6 +446,11 @@ if (!class_exists('Woo_KigoCloud_Request')) {
                 $excerpt = function_exists('mb_substr') ? mb_substr($excerpt, 0, 200) : substr($excerpt, 0, 200);
                 self::log_call($order->get_id(), $command, false, 'Invalid JSON: ' . $excerpt);
                 return;
+            }
+
+            if (empty($body->pos_number) && isset($body->data->existing) && is_object($body->data->existing) && !empty($body->data->existing->pos_number)) {
+                // KigoCloud already has a document for this order: link it instead of leaving the order without one.
+                $body = $body->data->existing;
             }
 
             if (!empty($body->pos_number)) {
@@ -447,8 +483,8 @@ if (!class_exists('Woo_KigoCloud_Request')) {
                     }
                 }
             } else {
-                $msg = isset($body->error) ? (string) $body->error : (isset($body->message) ? (string) $body->message : __('No document number returned', 'kigocloud-for-woocommerce'));
-                self::log_call($order->get_id(), $command, false, $msg);
+                $msg = isset($body->error) ? $body->error : (isset($body->message) ? $body->message : __('No document number returned', 'kigocloud-for-woocommerce'));
+                self::log_call($order->get_id(), $command, false, is_scalar($msg) ? (string) $msg : wp_json_encode($msg));
             }
         }
 

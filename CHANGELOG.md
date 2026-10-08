@@ -4,6 +4,19 @@ All notable changes to KigoCloud for WooCommerce are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.22] - 2026-10-08
+
+### Fixed
+- `Woo_KigoCloud_Request::send_once()` takes a MySQL advisory lock (`GET_LOCK('kigocloud_order_<id>', 0)`) around the send and re-reads the order meta under it. Two `woocommerce_order_status_changed` calls arriving together (payment callback and the customer's return) both passed the "no document yet" check and could both post the order.
+- An order whose first attempt timed out after KigoCloud had created the document stayed without `_kigocloud_id_pos` for good, because every later attempt was answered with "Internal number ... already exists". KigoCloud now returns that document in `data.existing` and the plugin links the order to it.
+- SKU lookup routes accept any SKU (`(?P<sku>.+)`, value passed through `rawurldecode`). `[\w-]+` answered `rest_no_route` for a SKU with a dot, a space or a diacritic, so KigoCloud could not match such products.
+- `execute_api_call()` no longer calls `get_sku()` on `false` when a product was deleted after the order was placed (fatal error on PHP 8, the status change died and no document was sent).
+- A network error is logged with its `WP_Error` code and message; it used to read "HTTP : ".
+- An error message that arrives as a list or an object is logged as JSON instead of failing on the string cast.
+
+### Changed
+- `client.client_vat_type` is 0 (company) only when the buyer gave both a VAT number and a company name. A private person who enters an OIB is sent as 1 and still gets the OIB on the document.
+
 ## [2.1.21] - 2026-10-02
 
 ### Added

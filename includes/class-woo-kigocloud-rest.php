@@ -28,7 +28,7 @@ class Woo_KigoCloud_Rest
      * @return void
      */
     public function register_sku_endpoint() {
-        register_rest_route('wc/v3/kigocloud', '/products/variations/sku/(?P<sku>[\w-]+)', [
+        register_rest_route('wc/v3/kigocloud', '/products/variations/sku/(?P<sku>.+)', [
             'methods' => 'GET',
             'callback' => [$this, 'get_variation_by_sku'],
             'permission_callback' => function () {
@@ -44,7 +44,7 @@ class Woo_KigoCloud_Rest
     public function get_variation_by_sku($data)
     {
         global $wpdb;
-        $sku = sanitize_text_field($data['sku']);
+        $sku = sanitize_text_field(rawurldecode($data['sku']));
 
         // Query to find a variation with the matching SKU
         $query = $wpdb->prepare("SELECT p.ID as variation_id, p.post_parent as product_id
@@ -72,7 +72,7 @@ class Woo_KigoCloud_Rest
 	 * @return void
 	 */
 	public function register_product_sku_endpoint() {
-		register_rest_route('wc/v3/kigocloud', '/products/sku/(?P<sku>[\w-]+)', [
+		register_rest_route('wc/v3/kigocloud', '/products/sku/(?P<sku>.+)', [
 			'methods' => 'GET',
 			'callback' => [$this, 'get_product_by_sku'],
 			'permission_callback' => function () {
@@ -88,7 +88,7 @@ class Woo_KigoCloud_Rest
 	 */
 	public function get_product_by_sku( $data ) {
 		global $wpdb;
-		$sku = sanitize_text_field( $data['sku'] );
+		$sku = sanitize_text_field( rawurldecode( $data['sku'] ) );
 
 		// Combined query: check in product and product_variation post types
 		$query = $wpdb->prepare( "
