@@ -379,7 +379,7 @@ if (!class_exists('Woo_KigoCloud_Request')) {
             $client->phone          = $phone;
             $client->contact_person = $fullName;
             $client->country_iso    = $country; // 2-letter country code
-	        $client->client_vat_type = ($vat_number && $company) ? 0 : 1; // 0 - company (VAT number and company name), 1 - private person, with or without VAT number
+	        $client->client_vat_type = $vat_number ? 0 : 1; // 0 - B2B with VAT number, 1 - B2C with or without VAT number
 
             $mainBody->client = $client;
 

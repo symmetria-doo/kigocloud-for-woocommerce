@@ -4,6 +4,11 @@ All notable changes to KigoCloud for WooCommerce are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.23] - 2026-10-08
+
+### Fixed
+- `client.client_vat_type` is 0 whenever the buyer gave a VAT number, as before 2.1.22. In 2.1.22 it also required a company name; with R1 mode "OIB / VAT field only" the checkout has no company field, so every buyer with an OIB was sent as a private person and KigoCloud did not print the R1 label on the invoice.
+
 ## [2.1.22] - 2026-10-08
 
 ### Fixed
@@ -15,7 +20,7 @@ and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - An error message that arrives as a list or an object is logged as JSON instead of failing on the string cast.
 
 ### Changed
-- `client.client_vat_type` is 0 (company) only when the buyer gave both a VAT number and a company name. A private person who enters an OIB is sent as 1 and still gets the OIB on the document.
+- `client.client_vat_type` was 0 (company) only with both a VAT number and a company name. Taken back in 2.1.23.
 
 ## [2.1.21] - 2026-10-02
 

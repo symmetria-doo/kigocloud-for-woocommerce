@@ -5,7 +5,7 @@ Tags: woocommerce, hrvatska fiskalizacija, croatian fiscalization, fiscalization
 Requires at least: 5.5
 Requires PHP: 7.2
 Tested up to: 6.9
-Stable tag: 2.1.22
+Stable tag: 2.1.23
 WC requires at least: 5.0
 WC tested up to: 9.4
 License: GPLv2 or later
@@ -45,6 +45,9 @@ This plugin is not hosted on the WordPress.org repository. Updates are delivered
 4. WooCommerce -> Settings -> KigoCloud, fill in your API credentials
 
 == Changelog ==
+
+= 2.1.23 =
+* Fix: a buyer who enters an OIB is sent as a company again, as before 2.1.22, so the invoice keeps the R1 label.
 
 = 2.1.22 =
 * Fix: two status changes arriving together can no longer create two documents for one order.
