@@ -5,7 +5,7 @@ Tags: woocommerce, hrvatska fiskalizacija, croatian fiscalization, fiscalization
 Requires at least: 5.5
 Requires PHP: 7.2
 Tested up to: 6.9
-Stable tag: 2.1.25
+Stable tag: 2.1.26
 WC requires at least: 5.0
 WC tested up to: 9.4
 License: GPLv2 or later
@@ -45,6 +45,10 @@ This plugin is not hosted on the WordPress.org repository. Updates are delivered
 4. WooCommerce -> Settings -> KigoCloud, fill in your API credentials
 
 == Changelog ==
+
+= 2.1.26 =
+* Fix: the connection test on the R1 tab sends a test R1 offer. Until now it issued a real invoice in KigoCloud.
+* Fix: "Fill empty SKU" builds the SKU from the product, so the same product no longer becomes a new item in KigoCloud with every order.
 
 = 2.1.25 =
 * Croatian: the R1 fields and messages on the checkout are translated (OIB field, company fields, validation messages).

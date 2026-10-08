@@ -230,7 +230,10 @@ if (!class_exists('Woo_KigoCloud_Request')) {
                 }
 
 				if (empty($itemSku) && $fillMissingSKU == 1) {
-					$itemSku = 'sku-' . $itemValue->get_id();
+					// from the product (or its variation), so the same product gets the same SKU on every order;
+					// the order line id is used only when the line has no product at all
+					$skuSource = $itemValue->get_variation_id() ? $itemValue->get_variation_id() : $itemValue->get_product_id();
+					$itemSku = 'sku-' . ($skuSource ? $skuSource : $itemValue->get_id());
 				}
 
                 $item            = new stdClass();

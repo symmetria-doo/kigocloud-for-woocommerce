@@ -647,13 +647,13 @@ class Woo_KigoCloud_Admin_Page
         <div class="kc-card">
             <h2><?php esc_html_e('Test KigoCloud connection', 'kigocloud-for-woocommerce'); ?></h2>
             <p class="kc-desc">
-                <?php esc_html_e('Sends a one-shot synthetic R1 invoice to KigoCloud using the saved API credentials and a dummy OIB. No real order is created. Shows the raw KigoCloud response so you can verify credentials, network and endpoint before going live.', 'kigocloud-for-woocommerce'); ?>
+                <?php esc_html_e('Sends a test R1 offer to KigoCloud using the saved API credentials and a sample OIB. No order is created and no invoice is issued; the offer appears among the offers in KigoCloud. Shows the KigoCloud response so you can verify credentials, network and endpoint before going live.', 'kigocloud-for-woocommerce'); ?>
             </p>
             <p>
                 <button type="button" class="button button-secondary" id="kigocloud-test-push"
                         data-nonce="<?php echo esc_attr(wp_create_nonce('kigocloud_test_push')); ?>"
-                        data-running-label="<?php esc_attr_e('Sending test invoice to KigoCloud...', 'kigocloud-for-woocommerce'); ?>">
-                    <?php esc_html_e('Send test R1 invoice', 'kigocloud-for-woocommerce'); ?>
+                        data-running-label="<?php esc_attr_e('Sending test offer to KigoCloud...', 'kigocloud-for-woocommerce'); ?>">
+                    <?php esc_html_e('Send test R1 offer', 'kigocloud-for-woocommerce'); ?>
                 </button>
             </p>
             <div id="kigocloud-test-push-result" class="kc-test-result" style="display:none;"></div>
@@ -841,7 +841,7 @@ class Woo_KigoCloud_Admin_Page
     }
 
     /**
-     * AJAX handler for the "Send test R1 invoice" button. Builds a
+     * AJAX handler for the "Send test R1 offer" button. Builds a
      * minimal synthetic payload and pushes it to the configured
      * KigoCloud endpoint using the saved credentials. Returns a
      * human-readable summary suitable for inline display.
@@ -871,7 +871,7 @@ class Woo_KigoCloud_Admin_Page
 
         $body = new stdClass();
         $body->pin             = get_option('kigocloud_pin', '1');
-        $body->pos_type        = 1; // Invoice
+        $body->pos_type        = 2; // Offer: a test must never issue (and fiscalise) an invoice
         $body->payment         = 'T'; // Transaction account
         $body->note            = 'KigoCloud admin test push at ' . current_time('mysql');
         $body->internal_number = 'test-' . wp_rand(1000, 9999);
@@ -929,7 +929,7 @@ class Woo_KigoCloud_Admin_Page
         if ($code >= 200 && $code < 300 && is_object($json) && !empty($json->pos_number)) {
             $msg = sprintf(
                 /* translators: 1: doc number, 2: place short, 3: pos number */
-                __('OK. KigoCloud accepted the test invoice: %1$s/%2$s/%3$s', 'kigocloud-for-woocommerce'),
+                __('OK. KigoCloud accepted the test offer: %1$s/%2$s/%3$s', 'kigocloud-for-woocommerce'),
                 $json->pos_number,
                 isset($json->fina_data_place_short) ? $json->fina_data_place_short : '',
                 isset($json->fina_data_place_pos) ? $json->fina_data_place_pos : ''

@@ -4,6 +4,12 @@ All notable changes to KigoCloud for WooCommerce are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.26] - 2026-10-09
+
+### Fixed
+- The "Test KigoCloud connection" button sent `pos_type` 1, so every click issued a real (and, with fiscalisation on, fiscalised) invoice in the shop owner's KigoCloud account. It now sends `pos_type` 2, an R1 offer; the button reads "Send test R1 offer".
+- "Fill empty SKU" sent `sku-<order line id>`, a different value on every order, so KigoCloud created a new item each time. It now sends `sku-<variation id or product id>`; the order line id is used only for a line without a product.
+
 ## [2.1.25] - 2026-10-09
 
 ### Changed
