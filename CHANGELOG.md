@@ -4,6 +4,12 @@ All notable changes to KigoCloud for WooCommerce are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.24] - 2026-10-08
+
+### Fixed
+- Trigger "Order Creation" fired only on `pending -> on-hold` and `pending -> processing`. An order that reached a paid status by another route (`failed -> processing` after a second payment attempt, `checkout-draft -> processing` on block checkout, `pending -> completed` for virtual products) never got a document. It now fires the first time the order enters `on-hold`, `processing` or `completed` from any status outside that set; a move inside the set (`processing -> completed`) does not send, so orders that were already open before the plugin was installed are left alone.
+- With taxes disabled in WooCommerce (`wc_tax_enabled()` false) every line was sent with `vat_percent` 0 and the document was created without VAT. `vat_percent` is now left out in that case, for products, fees and shipping, and KigoCloud uses the tax rate of the item.
+
 ## [2.1.23] - 2026-10-08
 
 ### Fixed

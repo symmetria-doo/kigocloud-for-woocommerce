@@ -5,7 +5,7 @@ Tags: woocommerce, hrvatska fiskalizacija, croatian fiscalization, fiscalization
 Requires at least: 5.5
 Requires PHP: 7.2
 Tested up to: 6.9
-Stable tag: 2.1.23
+Stable tag: 2.1.24
 WC requires at least: 5.0
 WC tested up to: 9.4
 License: GPLv2 or later
@@ -45,6 +45,10 @@ This plugin is not hosted on the WordPress.org repository. Updates are delivered
 4. WooCommerce -> Settings -> KigoCloud, fill in your API credentials
 
 == Changelog ==
+
+= 2.1.24 =
+* Fix: with the trigger "Order Creation" the document is also created when the order reaches a paid status by another route (a failed payment paid on the second try, a block checkout draft, an order completed at once).
+* Fix: with taxes switched off in WooCommerce no tax rate is sent, so the document uses the tax rate of the item in KigoCloud instead of 0 %.
 
 = 2.1.23 =
 * Fix: a buyer who enters an OIB is sent as a company again, as before 2.1.22, so the invoice keeps the R1 label.

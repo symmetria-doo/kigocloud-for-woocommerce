@@ -130,11 +130,11 @@ if (!class_exists('Woo_KigoCloud_Request')) {
 		    // Determine if API call should be made based on status changes and settings
 		    $shouldCallApi = false;
 		    if ($callApi == 0) {
-			    // API call for "Order Creation" on specific transitions
-			    $shouldCallApi = (
-				    ($old_status === 'pending' && $new_status === 'on-hold') ||
-				    ($old_status === 'pending' && $new_status === 'processing')
-			    );
+			    // API call for "Order Creation": the first time the order enters one of these statuses,
+			    // whatever it was before (a failed payment paid on the second try, a block checkout draft,
+			    // a virtual order that goes straight to completed). Moving between them does not send again.
+			    $orderedStatuses = array('on-hold', 'processing', 'completed');
+			    $shouldCallApi = in_array($new_status, $orderedStatuses, true) && !in_array($old_status, $orderedStatuses, true);
 		    } elseif ($callApi == 1) {
 			    // API call for "Order Completed"
 			    $shouldCallApi = ($new_status === 'completed' && $old_status !== $new_status);
@@ -206,6 +206,10 @@ if (!class_exists('Woo_KigoCloud_Request')) {
 
 			$fillMissingSKU = get_option('kigocloud_fill_empty_sku', 0);
 
+            // With taxes switched off in WooCommerce the order carries no tax at all, which says nothing
+            // about the real rate: then no rate is sent and the document uses the rate of the item itself.
+            $sendVatPercent = wc_tax_enabled();
+
             $items = array();
             foreach (array_unique($order->get_items()) as $itemKey => $itemValue) { // this includes any coupons or discounts
                 $itemName = $itemValue->get_name();
@@ -234,7 +238,9 @@ if (!class_exists('Woo_KigoCloud_Request')) {
                 $item->quantity  = $quantity;
                 $item->price     = $currentPrice;
                 $item->item_name    = $itemName; // set name and tax rate for those items that not exist in kigocloud or not found by reference/sku
-                $item->vat_percent  = $taxRate;
+                if ($sendVatPercent) {
+                    $item->vat_percent = $taxRate;
+                }
                 // $item->discount_percent = 0.00; TODO add option for this
 
                 $items[] = $item;
@@ -251,7 +257,9 @@ if (!class_exists('Woo_KigoCloud_Request')) {
                 $item->reference        = 'fee-' . sanitize_title($fee_name);
                 $item->item_name        = $fee_name;
                 $item->price            = (float)$fee_total + (float)$fee_tax;
-                $item->vat_percent      = $fee->get_total_tax() > 0 ? round(($fee->get_total_tax() / $fee->get_total()) * 100) : 0;
+                if ($sendVatPercent) {
+                    $item->vat_percent  = $fee->get_total_tax() > 0 ? round(($fee->get_total_tax() / $fee->get_total()) * 100) : 0;
+                }
                 $item->discount_percent = 0.00; // This could be done without discount_percent set, because fees are Services not Articles.
                 $item->quantity         = 1;
                 $items[]                = $item;
@@ -265,7 +273,9 @@ if (!class_exists('Woo_KigoCloud_Request')) {
                 $item->reference        = empty($shippingItemReference) ? 'shipping' : $shippingItemReference;
                 $item->item_name        = __('Dostava', 'kigocloud-for-woocommerce');
                 $item->price            = $totalShipping;
-                $item->vat_percent      = $order->get_shipping_tax() > 0 ? round(($order->get_shipping_tax() / $order->get_shipping_total()) * 100) : 0.00;
+                if ($sendVatPercent) {
+                    $item->vat_percent  = $order->get_shipping_tax() > 0 ? round(($order->get_shipping_tax() / $order->get_shipping_total()) * 100) : 0.00;
+                }
                 $item->discount_percent = 0.00; // This could be done without discount_percent set, because shipping should be Service not Article.
                 $item->quantity         = 1; //always one
                 $item->item_type        = 2; // service
