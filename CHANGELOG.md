@@ -4,6 +4,11 @@ All notable changes to KigoCloud for WooCommerce are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.27] - 2026-10-09
+
+### Fixed
+- R1 mode "Show full R1 block" on the classic checkout saves the company fields even when the buyer leaves the R1 checkbox off, as empty strings. The field mapping then copied those empty values over `billing.company`, `billing.address_1`, `billing.city` and `billing.postcode`, so the document was created without the buyer's address. Empty source values are now skipped, for the built-in R1 fields and for custom mapping rules alike.
+
 ## [2.1.26] - 2026-10-09
 
 ### Fixed

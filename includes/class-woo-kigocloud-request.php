@@ -342,7 +342,10 @@ if (!class_exists('Woo_KigoCloud_Request')) {
                     $vat_number = ( isset( $data['value'] ) && $data['value'] !== '' ) ? $data['value'] : '';
                 }
                 // Iterate through meta_data and apply mapping if applicable
-                if (!empty($data['key']) && isset($mappingRules[$data['key']])) {
+                // An empty source field is skipped: with the full R1 block on the classic checkout the hidden
+                // company fields are saved empty when the buyer does not ask for R1, and they must not
+                // wipe the buyer's own address.
+                if (!empty($data['key']) && isset($mappingRules[$data['key']]) && isset($data['value']) && $data['value'] !== '') {
                     $wooKey = $mappingRules[$data['key']];
 
                     // Check if the WooCommerce key is a nested key like "billing.company" or "shipping.address_1"
