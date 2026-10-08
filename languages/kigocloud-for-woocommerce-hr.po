@@ -394,6 +394,60 @@ msgstr "Da - PDF računa i e-mail na engleskom"
 msgid "Applies to customers whose country on the order is not Croatia. Nothing changes for customers from Croatia."
 msgstr "Vrijedi za kupce kojima država na narudžbi nije Hrvatska. Za kupce iz Hrvatske ništa se ne mijenja."
 
+#: includes/class-woo-kigocloud-r1.php
+msgid "OIB / VAT number"
+msgstr "OIB / PDV broj (za R1 račun)"
+
+#: includes/class-woo-kigocloud-r1.php
+msgid "Company name (for invoice)"
+msgstr "Naziv tvrtke (za račun)"
+
+#: includes/class-woo-kigocloud-r1.php
+msgid "OIB must be 11 digits and pass the checksum."
+msgstr "OIB mora imati 11 znamenki i ispravnu kontrolnu znamenku."
+
+#: includes/class-woo-kigocloud-r1.php
+msgid "R1 invoice"
+msgstr "R1 račun"
+
+#: includes/class-woo-kigocloud-r1.php
+msgid "Do you need an R1 invoice (B2B)?"
+msgstr "Trebate li R1 račun (za tvrtku ili obrt)?"
+
+#: includes/class-woo-kigocloud-r1.php
+msgctxt "placeholder"
+msgid "Enter company name"
+msgstr "Upišite naziv tvrtke"
+
+#: includes/class-woo-kigocloud-r1.php
+msgctxt "placeholder"
+msgid "Street and number"
+msgstr "Ulica i kućni broj"
+
+#: includes/class-woo-kigocloud-r1.php
+msgid "Postcode"
+msgstr "Poštanski broj"
+
+#: includes/class-woo-kigocloud-r1.php
+msgid "Company name is mandatory for R1 invoices."
+msgstr "Za R1 račun obavezan je naziv tvrtke."
+
+#: includes/class-woo-kigocloud-r1.php
+msgid "Company address is mandatory for R1 invoices."
+msgstr "Za R1 račun obavezna je adresa tvrtke."
+
+#: includes/class-woo-kigocloud-r1.php
+msgid "Company city is mandatory for R1 invoices."
+msgstr "Za R1 račun obavezan je grad tvrtke."
+
+#: includes/class-woo-kigocloud-r1.php
+msgid "Company postcode is mandatory for R1 invoices."
+msgstr "Za R1 račun obavezan je poštanski broj tvrtke."
+
+#: includes/class-woo-kigocloud-r1.php
+msgid "Invalid OIB. Must be 11 digits and pass the checksum."
+msgstr "OIB nije ispravan. Mora imati 11 znamenki i ispravnu kontrolnu znamenku."
+
 #~ msgid "Document number"
 #~ msgstr "Broj dokumenta"
 

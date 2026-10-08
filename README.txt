@@ -5,7 +5,7 @@ Tags: woocommerce, hrvatska fiskalizacija, croatian fiscalization, fiscalization
 Requires at least: 5.5
 Requires PHP: 7.2
 Tested up to: 6.9
-Stable tag: 2.1.24
+Stable tag: 2.1.25
 WC requires at least: 5.0
 WC tested up to: 9.4
 License: GPLv2 or later
@@ -45,6 +45,9 @@ This plugin is not hosted on the WordPress.org repository. Updates are delivered
 4. WooCommerce -> Settings -> KigoCloud, fill in your API credentials
 
 == Changelog ==
+
+= 2.1.25 =
+* Croatian: the R1 fields and messages on the checkout are translated (OIB field, company fields, validation messages).
 
 = 2.1.24 =
 * Fix: with the trigger "Order Creation" the document is also created when the order reaches a paid status by another route (a failed payment paid on the second try, a block checkout draft, an order completed at once).

@@ -4,6 +4,11 @@ All notable changes to KigoCloud for WooCommerce are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.25] - 2026-10-09
+
+### Changed
+- Croatian translation: 13 checkout strings of the R1 class (`includes/class-woo-kigocloud-r1.php`) were missing from `languages/kigocloud-for-woocommerce-hr.po` and showed in English. The VAT field is now labelled "OIB / PDV broj (za R1 račun)". No code change.
+
 ## [2.1.24] - 2026-10-08
 
 ### Fixed
