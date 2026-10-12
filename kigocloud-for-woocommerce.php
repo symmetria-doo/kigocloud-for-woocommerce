@@ -15,7 +15,7 @@
  * Requires PHP:      7.2
  * Requires Plugins:  woocommerce
  * WC requires at least: 5.0
- * WC tested up to:   9.4
+ * WC tested up to:   11.2
  * Author:            Symmetria d.o.o.
  * Author URI:        https://www.symmetria.hr/
  * License:           GPL-2.0+
