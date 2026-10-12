@@ -494,12 +494,13 @@ class Woo_KigoCloud_Admin_Page
                     'default'     => '0',
                     'description' => __('When enabled, products with missing SKU are sent as sku-<item_id> to avoid KigoCloud lookup failures.', 'kigocloud-for-woocommerce'),
                 ));
-                $this->select_field('kigocloud_english_for_foreign', __('English for foreign customers', 'kigocloud-for-woocommerce'), array(
+                $this->select_field('kigocloud_english_for_foreign', __('Language for foreign customers', 'kigocloud-for-woocommerce'), array(
                     '0' => __('No', 'kigocloud-for-woocommerce'),
-                    '1' => __('Yes - invoice PDF and email in English', 'kigocloud-for-woocommerce'),
+                    '1' => __('English', 'kigocloud-for-woocommerce'),
+                    '2' => __('By country - German for Germany, Austria, Switzerland and Liechtenstein, English for the rest', 'kigocloud-for-woocommerce'),
                 ), array(
                     'default'     => '0',
-                    'description' => __('Applies to customers whose country on the order is not Croatia. Nothing changes for customers from Croatia.', 'kigocloud-for-woocommerce'),
+                    'description' => __('Customers whose country on the order is not Croatia get the invoice PDF and the e-mail in that language. Nothing changes for customers from Croatia.', 'kigocloud-for-woocommerce'),
                 ));
                 ?>
             </table>

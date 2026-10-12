@@ -4,6 +4,16 @@ All notable changes to KigoCloud for WooCommerce are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.28] - 2026-10-12
+
+### Added
+- Option `kigocloud_english_for_foreign` (Orders tab) is now "Language for foreign customers" and has a third value, 2 = by country: a customer whose country on the order is Germany, Austria, Switzerland or Liechtenstein gets the invoice PDF and the e-mail in German (the API is called under `/de/api/v1/`), every other customer outside Croatia in English. Values 0 (off) and 1 (English) work as before.
+- `languages/kigocloud-for-woocommerce-de_DE.po` with the document type, the e-mail to the customer, the order note and the shipping line in German.
+- The note on the document ("Web Order #...") and the name of the shipping line follow the document's language, so an English or German invoice no longer carries them in the shop's language. `en_US` now translates the shipping line ("Shipping").
+
+### Changed
+- The e-mail to a foreign customer reads its strings straight from the plugin's own translation file (`Woo_KigoCloud_Request::language_translations()`) instead of `switch_to_locale()`, which works only for a language installed on the site: a shop in Croatian seldom has German installed. `use_english()`, `english_api_url()`, `switch_to_english()`, `restore_language()` and `reload_textdomain()` are replaced by `document_language()`, `language_api_url()`, `language_translations()` and `mail_text()`.
+
 ## [2.1.27] - 2026-10-09
 
 ### Fixed

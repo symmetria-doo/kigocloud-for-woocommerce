@@ -368,13 +368,17 @@ msgid "Invalid VAT."
 msgstr ""
 
 #: admin/class-woo-kigocloud-admin-page.php:497
-msgid "English for foreign customers"
+msgid "Language for foreign customers"
 msgstr ""
 
 #: admin/class-woo-kigocloud-admin-page.php:499
-msgid "Yes - invoice PDF and email in English"
+msgid "English"
 msgstr ""
 
-#: admin/class-woo-kigocloud-admin-page.php:502
-msgid "Applies to customers whose country on the order is not Croatia. Nothing changes for customers from Croatia."
+#: admin/class-woo-kigocloud-admin-page.php:500
+msgid "By country - German for Germany, Austria, Switzerland and Liechtenstein, English for the rest"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:503
+msgid "Customers whose country on the order is not Croatia get the invoice PDF and the e-mail in that language. Nothing changes for customers from Croatia."
 msgstr ""

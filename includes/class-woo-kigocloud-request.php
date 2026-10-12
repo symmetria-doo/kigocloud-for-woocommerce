@@ -45,32 +45,48 @@ if (!class_exists('Woo_KigoCloud_Request')) {
             return self::DEFAULT_API_URL;
         }
 
+        /** Countries whose customers get German with the "by country" setting. */
+        const GERMAN_COUNTRIES = array('DE', 'AT', 'CH', 'LI');
+
+        /** Locale of the plugin's own translation file for each document language. */
+        const MAIL_LOCALES = array('en' => 'en_US', 'de' => 'de_DE');
+
         /**
-         * With the "English for foreign customers" option on, a customer
-         * whose country on the order is not Croatia gets the document and
-         * the e-mail in English. The plugin is the one deciding: it asks
-         * KigoCloud for English by calling the API under /en/ instead of
-         * /hr/, and KigoCloud takes the language from the address.
+         * Language of the document and the e-mail for a customer, by the
+         * "Language for foreign customers" option (kigocloud_english_for_foreign:
+         * 0 = off, 1 = English, 2 = by country). A customer from Croatia, or
+         * one without a country on the order, always gets Croatian. The plugin
+         * is the one deciding: it asks KigoCloud for the language by calling
+         * the API under /en/ or /de/ instead of /hr/, and KigoCloud takes the
+         * language from the address.
          *
          * @param string $country Two-letter country code from the order.
-         * @return bool
+         * @return string 'hr', 'en' or 'de'
          */
-        public static function use_english($country)
+        public static function document_language($country)
         {
-            if ((string) get_option('kigocloud_english_for_foreign', '0') !== '1') {
-                return false;
-            }
+            $mode    = (string) get_option('kigocloud_english_for_foreign', '0');
             $country = strtoupper(trim((string) $country));
-            return $country !== '' && $country !== 'HR';
+            if (($mode !== '1' && $mode !== '2') || $country === '' || $country === 'HR') {
+                return 'hr';
+            }
+            if ($mode === '2' && in_array($country, self::GERMAN_COUNTRIES, true)) {
+                return 'de';
+            }
+            return 'en';
         }
 
         /**
          * @param string $apiUrl
-         * @return string The same endpoint with the language part set to English.
+         * @param string $language 'hr', 'en' or 'de'
+         * @return string The same endpoint with the language part set to $language.
          */
-        public static function english_api_url($apiUrl)
+        public static function language_api_url($apiUrl, $language)
         {
-            return str_replace('/hr/api/v1/', '/en/api/v1/', $apiUrl);
+            if ($language === 'hr') {
+                return $apiUrl;
+            }
+            return str_replace('/hr/api/v1/', '/' . $language . '/api/v1/', $apiUrl);
         }
 
         /**
@@ -273,6 +289,7 @@ if (!class_exists('Woo_KigoCloud_Request')) {
             $totalShipping         = $order->get_shipping_total() + $order->get_shipping_tax(); // total price is base + tax
             if ((float)$totalShipping > 0) {
                 $item                   = new stdClass();
+                $shippingItem           = $item;
                 $item->reference        = empty($shippingItemReference) ? 'shipping' : $shippingItemReference;
                 $item->item_name        = __('Dostava', 'kigocloud-for-woocommerce');
                 $item->price            = $totalShipping;
@@ -405,8 +422,17 @@ if (!class_exists('Woo_KigoCloud_Request')) {
                 $password = md5($password);
             }
 
-            $english = self::use_english($country);
-            $apiUrl  = $english ? self::english_api_url($this->apiURL) : $this->apiURL;
+            $language = self::document_language($country);
+            $apiUrl   = self::language_api_url($this->apiURL, $language);
+
+            // The plugin's own texts on the document follow the document's language.
+            $translations = self::language_translations($language);
+            if ($translations) {
+                $mainBody->note = $invoiceNote . $translations->translate('Web Order #') . $order->get_order_number();
+                if (isset($shippingItem)) {
+                    $shippingItem->item_name = $translations->translate('Dostava');
+                }
+            }
 
             $postURL = esc_url_raw($apiUrl . $command);
             $payload = array(
@@ -490,13 +516,9 @@ if (!class_exists('Woo_KigoCloud_Request')) {
                 $sendPdf = get_option('kigocloud_pdf_payment_type-' . esc_attr($orderData['payment_method']));
                 if ($sendPdf === '1') {
                     // The order note above stays in the shop's language, the
-                    // e-mail to a customer outside Croatia goes out in English.
-                    $switched  = $english && $this->switch_to_english();
-                    $mailTitle = $switched ? __('pos_type_' . $documentType, 'kigocloud-for-woocommerce') : $documentTypeTitle;
-                    $this->send_invoice_email($order, $body, sanitize_email($email), $mailTitle, $formattedPosNumber, $fullName, $apiUrl);
-                    if ($switched) {
-                        $this->restore_language();
-                    }
+                    // e-mail to a foreign customer goes out in the document's language.
+                    $mailTitle = $translations ? $translations->translate('pos_type_' . $documentType) : $documentTypeTitle;
+                    $this->send_invoice_email($order, $body, sanitize_email($email), $mailTitle, $formattedPosNumber, $fullName, $apiUrl, $translations);
                 }
             } else {
                 $msg = isset($body->error) ? $body->error : (isset($body->message) ? $body->message : __('No document number returned', 'kigocloud-for-woocommerce'));
@@ -531,35 +553,42 @@ if (!class_exists('Woo_KigoCloud_Request')) {
         }
 
         /**
-         * Switches WordPress and this plugin's strings to English.
+         * The plugin's own translation file for the texts a foreign customer
+         * gets (the note and the shipping line on the document, the e-mail),
+         * read directly. switch_to_locale() works only for a
+         * language installed on the site, and a shop in Croatian seldom
+         * has German installed.
          *
-         * @return bool False when nothing was switched, e.g. the site already runs in English.
+         * @param string $language 'hr', 'en' or 'de'
+         * @return MO|null Null for the shop's own language, or when the file is missing.
          */
-        private function switch_to_english()
+        private static function language_translations($language)
         {
-            if (!function_exists('switch_to_locale') || !switch_to_locale('en_US')) {
-                return false;
+            $locales = self::MAIL_LOCALES;
+            if (!isset($locales[$language])) {
+                return null;
             }
-            $this->reload_textdomain();
-            return true;
-        }
-
-        private function restore_language()
-        {
-            restore_previous_locale();
-            $this->reload_textdomain();
+            $file = dirname(__DIR__) . '/languages/kigocloud-for-woocommerce-' . $locales[$language] . '.mo';
+            if (!is_readable($file)) {
+                return null;
+            }
+            require_once ABSPATH . WPINC . '/pomo/mo.php';
+            $translations = new MO();
+            return $translations->import_from_file($file) ? $translations : null;
         }
 
         /**
-         * Loads this plugin's strings for the current locale. Since 6.1
-         * switch_to_locale() reloads them by itself; before 6.1 it does not
-         * know the plugin's own languages folder. No unload_textdomain()
-         * here: since 6.7 it would block the reload for the rest of the
-         * request.
+         * @param string  $text         One of this plugin's e-mail strings, as in the .pot file.
+         * @param MO|null $translations From language_translations(); null = the shop's language.
+         * @return string
          */
-        private function reload_textdomain()
+        private static function mail_text($text, $translations)
         {
-            load_plugin_textdomain('kigocloud-for-woocommerce', false, dirname(dirname(plugin_basename(__FILE__))) . '/languages/');
+            if ($translations) {
+                return $translations->translate($text);
+            }
+            // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText
+            return __($text, 'kigocloud-for-woocommerce');
         }
 
         public function add_pdf_attachment($attachments, $email_id, $email_object){
@@ -567,9 +596,10 @@ if (!class_exists('Woo_KigoCloud_Request')) {
         }
 
         /**
-         * @param string|null $apiUrl Endpoint used for the order; English for a customer outside Croatia.
+         * @param string|null $apiUrl           Endpoint used for the order, in the document's language.
+         * @param MO|null     $translations E-mail strings in the document's language; null = the shop's language.
          */
-        public function send_invoice_email($order, $body, $email, $documentTypeTitle, $formattedPosNumber, $fullName, $apiUrl = null){
+        public function send_invoice_email($order, $body, $email, $documentTypeTitle, $formattedPosNumber, $fullName, $apiUrl = null, $translations = null){
             global $wp_filesystem;
 
             if ( empty( $wp_filesystem ) ) {
@@ -586,7 +616,7 @@ if (!class_exists('Woo_KigoCloud_Request')) {
                 return;
             }
 
-            $mailSubject =  sprintf(__('%1$s sending you %2$s no. %3$s', 'kigocloud-for-woocommerce'), get_bloginfo('name'), $documentTypeTitle, $formattedPosNumber);
+            $mailSubject =  sprintf(self::mail_text('%1$s sending you %2$s no. %3$s', $translations), get_bloginfo('name'), $documentTypeTitle, $formattedPosNumber);
             $mailText =
                 /**
                  * translators: %1$s: Username
@@ -594,9 +624,9 @@ if (!class_exists('Woo_KigoCloud_Request')) {
                  * translators: %3$s: Document Number
                  */
                 sprintf(
-                    __(
+                    self::mail_text(
                         'Hi %1$s,<br /><br />Thank you for your order.<br /><br />Your %2$s with number <b>%3$s</b> is in the attachment.<br /><br />We look forward to fulfilling your order soon.',
-                        'kigocloud-for-woocommerce'
+                        $translations
                     ),
                     $fullName,
                     $documentTypeTitle,

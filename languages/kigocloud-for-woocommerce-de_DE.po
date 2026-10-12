@@ -1,0 +1,47 @@
+# Copyright (C) 2026 Symmetria d.o.o.
+# This file is distributed under the same license as the KigoCloud for WooCommerce plugin.
+msgid ""
+msgstr ""
+"Project-Id-Version: KigoCloud for WooCommerce
+"
+"Language: de_DE
+"
+"MIME-Version: 1.0
+"
+"Content-Type: text/plain; charset=UTF-8
+"
+"Content-Transfer-Encoding: 8bit
+"
+"Plural-Forms: nplurals=2; plural=(n != 1);
+"
+"X-Domain: kigocloud-for-woocommerce
+"
+
+msgid "pos_type_0"
+msgstr "Deaktiviert"
+
+msgid "pos_type_1"
+msgstr "Rechnung"
+
+msgid "pos_type_2"
+msgstr "Angebot"
+
+msgid "Web Order #"
+msgstr "Web-Bestellung #"
+
+msgid "Dostava"
+msgstr "Versand"
+
+#, php-format
+msgid "%1$s sending you %2$s no. %3$s"
+msgstr "%1$s sendet Ihnen %2$s Nr. %3$s"
+
+#, php-format
+msgid ""
+"Hi %1$s,<br /><br />Thank you for your order.<br /><br />Your %2$s with "
+"number <b>%3$s</b> is in the attachment.<br /><br />We look forward to "
+"fulfilling your order soon."
+msgstr ""
+"Guten Tag %1$s,<br /><br />vielen Dank für Ihre Bestellung.<br /><br />Im "
+"Anhang finden Sie: %2$s Nr. <b>%3$s</b>.<br /><br />Wir freuen uns darauf, "
+"Ihre Bestellung bald auszuführen."

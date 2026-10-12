@@ -383,16 +383,20 @@ msgid "Invalid VAT."
 msgstr "Neispravan OIB"
 
 #: admin/class-woo-kigocloud-admin-page.php:497
-msgid "English for foreign customers"
-msgstr "Engleski za strane kupce"
+msgid "Language for foreign customers"
+msgstr "Jezik za strane kupce"
 
 #: admin/class-woo-kigocloud-admin-page.php:499
-msgid "Yes - invoice PDF and email in English"
-msgstr "Da - PDF računa i e-mail na engleskom"
+msgid "English"
+msgstr "Engleski"
 
-#: admin/class-woo-kigocloud-admin-page.php:502
-msgid "Applies to customers whose country on the order is not Croatia. Nothing changes for customers from Croatia."
-msgstr "Vrijedi za kupce kojima država na narudžbi nije Hrvatska. Za kupce iz Hrvatske ništa se ne mijenja."
+#: admin/class-woo-kigocloud-admin-page.php:500
+msgid "By country - German for Germany, Austria, Switzerland and Liechtenstein, English for the rest"
+msgstr "Prema državi - njemački za Njemačku, Austriju, Švicarsku i Lihtenštajn, engleski za ostale"
+
+#: admin/class-woo-kigocloud-admin-page.php:503
+msgid "Customers whose country on the order is not Croatia get the invoice PDF and the e-mail in that language. Nothing changes for customers from Croatia."
+msgstr "Kupci kojima država na narudžbi nije Hrvatska dobivaju PDF računa i e-mail na tom jeziku. Za kupce iz Hrvatske ništa se ne mijenja."
 
 #: includes/class-woo-kigocloud-r1.php
 msgid "OIB / VAT number"

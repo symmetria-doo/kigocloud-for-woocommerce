@@ -298,7 +298,7 @@ msgstr ""
 
 #: includes/class-kigocloud-for-woocommerce-request.php:207
 msgid "Dostava"
-msgstr ""
+msgstr "Shipping"
 
 #: includes/class-kigocloud-for-woocommerce-request.php:359
 #, php-format
