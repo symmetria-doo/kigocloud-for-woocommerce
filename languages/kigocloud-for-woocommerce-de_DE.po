@@ -2,20 +2,13 @@
 # This file is distributed under the same license as the KigoCloud for WooCommerce plugin.
 msgid ""
 msgstr ""
-"Project-Id-Version: KigoCloud for WooCommerce
-"
-"Language: de_DE
-"
-"MIME-Version: 1.0
-"
-"Content-Type: text/plain; charset=UTF-8
-"
-"Content-Transfer-Encoding: 8bit
-"
-"Plural-Forms: nplurals=2; plural=(n != 1);
-"
-"X-Domain: kigocloud-for-woocommerce
-"
+"Project-Id-Version: KigoCloud for WooCommerce\n"
+"Language: de_DE\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Domain: kigocloud-for-woocommerce\n"
 
 msgid "pos_type_0"
 msgstr "Deaktiviert"
