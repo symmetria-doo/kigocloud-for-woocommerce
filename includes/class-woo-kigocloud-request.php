@@ -217,6 +217,10 @@ if (!class_exists('Woo_KigoCloud_Request')) {
             $mainBody->pin      = get_option('kigocloud_pin');
             $mainBody->pos_type = $documentType;
             $mainBody->payment  = get_option('kigocloud_payment_type' . '-' . esc_attr($orderData['payment_method']));
+            // Cheque was offered until 2.1.28, but KigoCloud rejects it: a gateway still saved with it goes as Other
+            if ($mainBody->payment === 'C') {
+                $mainBody->payment = 'O';
+            }
             $mainBody->note     = $invoiceNote . __('Web Order #', 'kigocloud-for-woocommerce') . $order->get_order_number();
             $mainBody->internal_number = 'web' . $order->get_order_number();
 

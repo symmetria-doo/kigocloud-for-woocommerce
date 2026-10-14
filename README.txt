@@ -5,7 +5,7 @@ Tags: woocommerce, hrvatska fiskalizacija, croatian fiscalization, fiscalization
 Requires at least: 5.5
 Requires PHP: 7.2
 Tested up to: 7.1
-Stable tag: 2.1.28
+Stable tag: 2.1.29
 WC requires at least: 5.0
 WC tested up to: 11.2
 License: GPLv2 or later
@@ -45,6 +45,10 @@ This plugin is not hosted on the WordPress.org repository. Updates are delivered
 4. WooCommerce -> Settings -> KigoCloud, fill in your API credentials
 
 == Changelog ==
+
+= 2.1.29 =
+* Fix: Cheque is no longer offered as a payment type, because KigoCloud does not accept it and every order with it was refused. A gateway that still has Cheque saved sends its orders as Other.
+* Tested up to WordPress 7.1 and WooCommerce 11.2.
 
 = 2.1.28 =
 * German for foreign customers. The option on the Orders tab is now called Language for foreign customers and has a new choice: by country. With it a customer from Germany, Austria, Switzerland or Liechtenstein gets the invoice PDF and the e-mail in German, and every other customer outside Croatia in English. Shops that already use English keep it until they change the setting.

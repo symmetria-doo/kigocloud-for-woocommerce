@@ -551,6 +551,9 @@ class Woo_KigoCloud_Admin_Page
                     $gid = esc_attr($gw->id);
                     $pos_type      = (string) get_option('kigocloud_pos_type-' . $gid, '0');
                     $payment_type  = (string) get_option('kigocloud_payment_type-' . $gid, 'T');
+                    if ($payment_type === 'C') { // Cheque is no longer offered, the order is sent as Other
+                        $payment_type = 'O';
+                    }
                     $on_status     = (string) get_option('kigocloud_on_status-' . $gid, '1');
                     $pdf           = (string) get_option('kigocloud_pdf_payment_type-' . $gid, '0');
                 ?>
@@ -568,7 +571,6 @@ class Woo_KigoCloud_Admin_Page
                             <option value="T"<?php selected($payment_type, 'T'); ?>><?php esc_html_e('Transaction account', 'kigocloud-for-woocommerce'); ?></option>
                             <option value="K"<?php selected($payment_type, 'K'); ?>><?php esc_html_e('Card', 'kigocloud-for-woocommerce'); ?></option>
                             <option value="G"<?php selected($payment_type, 'G'); ?>><?php esc_html_e('Cash', 'kigocloud-for-woocommerce'); ?></option>
-                            <option value="C"<?php selected($payment_type, 'C'); ?>><?php esc_html_e('Cheque', 'kigocloud-for-woocommerce'); ?></option>
                             <option value="O"<?php selected($payment_type, 'O'); ?>><?php esc_html_e('Other', 'kigocloud-for-woocommerce'); ?></option>
                         </select>
                     </td>

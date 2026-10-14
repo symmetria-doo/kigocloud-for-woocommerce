@@ -4,6 +4,14 @@ All notable changes to KigoCloud for WooCommerce are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.29] - 2026-10-14
+
+### Fixed
+- The payment type list on the Orders tab no longer offers Cheque (`C`). The KigoCloud API accepts only `T`, `G`, `K` and `O`, so an order from a gateway mapped to Cheque was refused with "Payment mode is not in the list." A gateway that still has `C` saved is shown as Other and its orders are sent with `O`.
+
+### Changed
+- Tested up to WordPress 7.1 and WooCommerce 11.2.
+
 ## [2.1.28] - 2026-10-12
 
 ### Added
