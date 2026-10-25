@@ -559,7 +559,7 @@ class Woo_KigoCloud_Admin_Page
                     '1' => __('Yes - use product ID', 'kigocloud-for-woocommerce'),
                 ), array(
                     'default'     => '0',
-                    'description' => __('When enabled, products with missing SKU are sent as sku-<item_id> to avoid KigoCloud lookup failures.', 'kigocloud-for-woocommerce'),
+                    'description' => __('When enabled, products with missing SKU are sent as sku- followed by the item ID, to avoid KigoCloud lookup failures.', 'kigocloud-for-woocommerce'),
                 ));
                 $this->select_field('kigocloud_english_for_foreign', __('Language for foreign customers', 'kigocloud-for-woocommerce'), array(
                     '0' => __('No', 'kigocloud-for-woocommerce'),

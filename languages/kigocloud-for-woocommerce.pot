@@ -235,7 +235,7 @@ msgid "Yes - use product ID"
 msgstr ""
 
 #: admin/class-woo-kigocloud-admin-page.php:558
-msgid "When enabled, products with missing SKU are sent as sku-<item_id> to avoid KigoCloud lookup failures."
+msgid "When enabled, products with missing SKU are sent as sku- followed by the item ID, to avoid KigoCloud lookup failures."
 msgstr ""
 
 #: admin/class-woo-kigocloud-admin-page.php:560
