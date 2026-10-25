@@ -2,7 +2,7 @@
 /**
  * Runs one-shot data migrations when the plugin version stored in the
  * database lags behind the code version. Not to be confused with the
- * GitHub Releases auto-updater (handled by plugin-update-checker in
+ * GitHub Releases auto-updater (handled by the updater library in
  * the main plugin file).
  *
  * Renamed from Woo_KigoCloud_Updater in 2.0.0 to make the responsibility
@@ -10,6 +10,10 @@
  *
  * @package Woo_KigoCloud
  */
+
+if (!defined('ABSPATH')) {
+    exit;
+}
 
 class Woo_KigoCloud_Migrator
 {

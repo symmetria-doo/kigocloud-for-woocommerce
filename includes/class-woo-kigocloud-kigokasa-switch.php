@@ -24,6 +24,10 @@
  * @package Woo_KigoCloud
  */
 
+if (!defined('ABSPATH')) {
+    exit;
+}
+
 class Woo_KigoCloud_KigoKasa_Switch
 {
     const KIGOKASA_PLUGIN = 'kigokasa-api-for-woocommerce/kigokasa-api-for-woocommerce.php';
@@ -218,7 +222,7 @@ class Woo_KigoCloud_KigoKasa_Switch
             $orders = wc_get_orders(array(
                 'type'         => 'shop_order',
                 'status'       => array_keys(wc_get_order_statuses()),
-                'meta_key'     => self::$meta_passes[$state['pass']],
+                'meta_key'     => self::$meta_passes[$state['pass']], // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- one-off background copy in batches of 100.
                 'meta_compare' => 'EXISTS',
                 'orderby'      => 'ID',
                 'order'        => 'ASC',

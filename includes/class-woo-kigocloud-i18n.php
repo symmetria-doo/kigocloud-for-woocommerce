@@ -13,6 +13,10 @@
  * @subpackage Woo_KigoCloud/includes
  */
 
+if (!defined('ABSPATH')) {
+    exit;
+}
+
 /**
  * Define the internationalization functionality.
  *

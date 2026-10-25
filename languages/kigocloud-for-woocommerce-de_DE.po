@@ -38,3 +38,10 @@ msgstr ""
 "Guten Tag %1$s,<br /><br />vielen Dank für Ihre Bestellung.<br /><br />Im "
 "Anhang finden Sie: %2$s Nr. <b>%3$s</b>.<br /><br />Wir freuen uns darauf, "
 "Ihre Bestellung bald auszuführen."
+
+msgid "Invoice"
+msgstr "Rechnung"
+
+msgid "Offer"
+msgstr "Angebot"
+

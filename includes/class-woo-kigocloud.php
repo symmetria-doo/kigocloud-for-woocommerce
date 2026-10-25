@@ -13,6 +13,10 @@
  * @subpackage Woo_KigoCloud/includes
  */
 
+if (!defined('ABSPATH')) {
+    exit;
+}
+
 /**
  * The core plugin class.
  *
@@ -41,7 +45,7 @@ class Woo_KigoCloud {
      *
      * @since 1.0.0
      */
-    const PLUGIN_VERSION = '2.1.28';
+    const PLUGIN_VERSION = '2.1.30';
 
 	/**
 	 * The loader that's responsible for maintaining and registering all hooks that power
@@ -148,7 +152,7 @@ class Woo_KigoCloud {
 
 		/**
 		 * Runs data migrations on version bump. Not the auto-updater
-		 * (that lives in the main plugin file via plugin-update-checker).
+		 * (that lives in the main plugin file).
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-woo-kigocloud-migrator.php';
 

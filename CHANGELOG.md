@@ -4,6 +4,23 @@ All notable changes to KigoCloud for WooCommerce are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.30] - 2026-10-25
+
+### Added
+- wordpress.org build: `bin/build-wporg.sh` builds the plugin without the GitHub updater (no `vendor/`, no `Update URI` header, the updater bootstrap between the `wporg-strip` markers removed) and checks that the header, the define, `Woo_KigoCloud::PLUGIN_VERSION` and the readme `Stable tag` carry the same version. Workflow `.github/workflows/wporg.yml` builds it on every `v*` tag and commits it to the wordpress.org SVN only when the repository variable `WPORG_DEPLOY` is `true` (secrets `SVN_USERNAME`, `SVN_PASSWORD`).
+- Connection tab: "Try with the demo account" fills in the public demo login (admin_demo, PIN 1) in the form, with a warning that the demo is public; nothing is saved or sent until Save.
+- readme.txt in the wordpress.org format, with the External services section.
+
+### Changed
+- The API username and password start empty (they defaulted to admin_demo in the form). `Woo_KigoCloud_Request::has_credentials()`: no order is sent and the R1 test button refuses until both are saved.
+- HTTPS calls to KigoCloud verify the certificate (`sslverify => false` removed). The WP_DEBUG `error_log` of the request and response, which carried the API login, is removed.
+- Every setting has a sanitize callback; the price list files are written and moved with `WP_Filesystem_Direct` and read with `SplFileObject`; `wp_delete_file()` instead of `unlink()`; every PHP file stops on direct access.
+- Document type in the order note and the e-mail comes from the `Invoice` / `Offer` strings (`document_type_title()`) instead of the dynamic `pos_type_N` msgid; German translations for both added.
+- Plugin URI points to https://www.kigo.cloud/fiskalizacija-web-trgovine/, the About tab links the website and shows the GitHub releases only in the GitHub build. `README.txt` renamed to `readme.txt`.
+
+### Fixed
+- `Woo_KigoCloud::PLUGIN_VERSION` was left at 2.1.28 in 2.1.29, so the admin page and `kigocloud_version` showed 2.1.28.
+
 ## [2.1.29] - 2026-10-14
 
 ### Fixed

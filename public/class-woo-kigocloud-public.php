@@ -8,6 +8,10 @@
  * @package Woo_KigoCloud
  */
 
+if (!defined('ABSPATH')) {
+    exit;
+}
+
 class Woo_KigoCloud_Public
 {
     /** @var string */

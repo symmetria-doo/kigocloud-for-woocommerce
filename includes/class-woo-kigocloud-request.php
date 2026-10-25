@@ -4,6 +4,11 @@
  * @since     24.2.2020.
  * @copyright Symmetria d.o.o. Zagreb 2020
  */
+
+if (!defined('ABSPATH')) {
+    exit;
+}
+
 if (!class_exists('Woo_KigoCloud_Request')) {
     class Woo_KigoCloud_Request
     {
@@ -43,6 +48,33 @@ if (!class_exists('Woo_KigoCloud_Request')) {
                 return rtrim($configured, '/') . '/';
             }
             return self::DEFAULT_API_URL;
+        }
+
+        /**
+         * @return bool True once the shop has entered an API username and password.
+         */
+        public static function has_credentials()
+        {
+            return trim((string) get_option('kigocloud_username', '')) !== ''
+                && (string) get_option('kigocloud_password', '') !== '';
+        }
+
+        /**
+         * Name of the document type, as in the order note and the e-mail.
+         *
+         * @param string  $documentType '1' invoice, '2' offer
+         * @param MO|null $translations From language_translations(); null = the shop's language.
+         * @return string
+         */
+        public static function document_type_title($documentType, $translations = null)
+        {
+            $text = ((string) $documentType === '2') ? 'Offer' : 'Invoice';
+            if ($translations) {
+                return $translations->translate($text);
+            }
+            return ($text === 'Offer')
+                ? __('Offer', 'kigocloud-for-woocommerce')
+                : __('Invoice', 'kigocloud-for-woocommerce');
         }
 
         /** Countries whose customers get German with the "by country" setting. */
@@ -102,6 +134,11 @@ if (!class_exists('Woo_KigoCloud_Request')) {
         {
             // The KigoKasa plugin keeps sending until the shop switches over.
             if (Woo_KigoCloud_KigoKasa_Switch::is_kigokasa_active()) {
+                return;
+            }
+
+            // Nothing is sent to KigoCloud until the shop has entered an API login.
+            if (!self::has_credentials()) {
                 return;
             }
 
@@ -174,6 +211,7 @@ if (!class_exists('Woo_KigoCloud_Request')) {
             global $wpdb;
 
             $lock   = 'kigocloud_order_' . $order->get_id();
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery -- a MySQL named lock, nothing to cache.
             $locked = $wpdb->get_var($wpdb->prepare('SELECT GET_LOCK(%s, 0)', $lock));
             if ($locked !== null && (int) $locked === 0) {
                 return; // another request is sending this order right now
@@ -188,6 +226,7 @@ if (!class_exists('Woo_KigoCloud_Request')) {
                 }
             } finally {
                 if ((int) $locked === 1) {
+                    // phpcs:ignore WordPress.DB.DirectDatabaseQuery -- releases the lock taken above.
                     $wpdb->query($wpdb->prepare('SELECT RELEASE_LOCK(%s)', $lock));
                 }
             }
@@ -202,10 +241,11 @@ if (!class_exists('Woo_KigoCloud_Request')) {
         {
             $orderData         = $order->get_data();
             $documentType      = get_option('kigocloud_pos_type' . '-' . esc_attr($orderData['payment_method']));
-            $documentTypeTitle = __('pos_type_' . $documentType, 'kigocloud-for-woocommerce');
             if ($documentType === '0') { // Disabled
                 return;
             }
+
+            $documentTypeTitle = self::document_type_title($documentType);
 
             $invoiceNote = '';
             $customerNote = $order->get_customer_note();
@@ -445,7 +485,6 @@ if (!class_exists('Woo_KigoCloud_Request')) {
                 'redirection' => 0,
                 'blocking'    => true,
                 'httpversion' => '1.0',
-                'sslverify'   => false,
                 'data_format' => 'body',
                 'headers'     => array(
                     // KigoCloud server reads literal header names via
@@ -461,21 +500,10 @@ if (!class_exists('Woo_KigoCloud_Request')) {
                     'Charset'         => 'utf-8',
                     'Accept'          => 'application/json',
                 ),
-                'body'        => json_encode($mainBody),
+                'body'        => wp_json_encode($mainBody),
             );
 
-            if (defined('WP_DEBUG') && WP_DEBUG === true) {
-                // phpcs:disable WordPress.PHP.DevelopmentFunctions
-                error_log(print_r($payload, true));
-                // phpcs:enable
-            }
-
             $response = wp_remote_post($postURL, $payload);
-            if (defined('WP_DEBUG') && WP_DEBUG === true) {
-                // phpcs:disable WordPress.PHP.DevelopmentFunctions
-                error_log(print_r($response, true));
-                // phpcs:enable
-            }
 
             if (is_wp_error($response)) {
                 $error_code    = $response->get_error_code();
@@ -504,6 +532,7 @@ if (!class_exists('Woo_KigoCloud_Request')) {
                     . '/' . (isset($body->fina_data_place_short) ? $body->fina_data_place_short : '')
                     . '/' . (isset($body->fina_data_place_pos) ? $body->fina_data_place_pos : '');
                 $paymentLabel = isset($body->payment_label) ? $body->payment_label : '';
+                /* translators: 1: document type (Invoice or Offer), 2: document number, 3: payment type */
                 $note = __('KigoCloud %1$s created with document number %2$s and payment type %3$s', 'kigocloud-for-woocommerce');
                 $order->add_order_note(sprintf($note, $documentTypeTitle, $formattedPosNumber, $paymentLabel));
 
@@ -521,7 +550,7 @@ if (!class_exists('Woo_KigoCloud_Request')) {
                 if ($sendPdf === '1') {
                     // The order note above stays in the shop's language, the
                     // e-mail to a foreign customer goes out in the document's language.
-                    $mailTitle = $translations ? $translations->translate('pos_type_' . $documentType) : $documentTypeTitle;
+                    $mailTitle = self::document_type_title($documentType, $translations);
                     $this->send_invoice_email($order, $body, sanitize_email($email), $mailTitle, $formattedPosNumber, $fullName, $apiUrl, $translations);
                 }
             } else {
@@ -653,25 +682,13 @@ if (!class_exists('Woo_KigoCloud_Request')) {
                 'redirection' => 0,
                 'blocking'    => true,
                 'httpversion' => '1.0',
-                'sslverify'   => false,
                 'headers'     => array(
                     'HTTP_X_USERNAME' => $username,
                     'HTTP_X_PASSWORD' => $password,
                 ),
             );
 
-            if (defined('WP_DEBUG') && WP_DEBUG === true) {
-                // phpcs:disable WordPress.PHP.DevelopmentFunctions
-                error_log(print_r($payload, true));
-                // phpcs:enable
-            }
-
             $response = wp_remote_post($postURL, $payload);
-            if (defined('WP_DEBUG') && WP_DEBUG === true) {
-                // phpcs:disable WordPress.PHP.DevelopmentFunctions
-                error_log(print_r($response, true));
-                // phpcs:enable
-            }
 
             if (is_wp_error($response)) {
                 $error_code    = wp_remote_retrieve_response_code($response);
@@ -718,9 +735,7 @@ if (!class_exists('Woo_KigoCloud_Request')) {
             // branch called file_exists() / unlink() on the integer id,
             // which always fails. We never need the Attachment row, so
             // skip it entirely and just unlink the file.
-            if (file_exists($attachmentFilePath)) {
-                @unlink($attachmentFilePath);
-            }
+            wp_delete_file($attachmentFilePath);
         }
 
     }

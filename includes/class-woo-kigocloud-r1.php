@@ -15,6 +15,10 @@
  * @since   2.0.0
  */
 
+if (!defined('ABSPATH')) {
+    exit;
+}
+
 class Woo_KigoCloud_R1
 {
     const FIELD_R1_TOGGLE     = 'kigocloud/r1-invoice';
@@ -357,6 +361,7 @@ class Woo_KigoCloud_R1
      */
     public function classic_validate_full()
     {
+        // phpcs:disable WordPress.Security.NonceVerification.Missing -- WooCommerce verified the checkout nonce before woocommerce_checkout_process.
         if (empty($_POST['kigocloud_vat_invoices_checkbox'])) {
             return;
         }
@@ -372,7 +377,8 @@ class Woo_KigoCloud_R1
         if (empty($_POST['kigocloud_vat_invoices_zip'])) {
             wc_add_notice(__('Company postcode is mandatory for R1 invoices.', 'kigocloud-for-woocommerce'), 'error');
         }
-        $vat = isset($_POST['kigocloud_vat_invoices_vat_number']) ? (string) $_POST['kigocloud_vat_invoices_vat_number'] : '';
+        $vat = isset($_POST['kigocloud_vat_invoices_vat_number']) ? sanitize_text_field(wp_unslash($_POST['kigocloud_vat_invoices_vat_number'])) : '';
+        // phpcs:enable WordPress.Security.NonceVerification.Missing
         if (!self::is_valid_oib($vat)) {
             wc_add_notice(__('Invalid OIB. Must be 11 digits and pass the checksum.', 'kigocloud-for-woocommerce'), 'error');
         }
@@ -395,11 +401,13 @@ class Woo_KigoCloud_R1
             'kigocloud_vat_invoices_zip',
             'kigocloud_vat_invoices_vat_number',
         );
+        // phpcs:disable WordPress.Security.NonceVerification.Missing -- WooCommerce verified the checkout nonce before saving the order.
         foreach ($keys as $key) {
             if (isset($_POST[$key])) {
-                $order->update_meta_data($key, sanitize_text_field((string) $_POST[$key]));
+                $order->update_meta_data($key, sanitize_text_field(wp_unslash($_POST[$key])));
             }
         }
+        // phpcs:enable WordPress.Security.NonceVerification.Missing
         $order->save();
     }
 

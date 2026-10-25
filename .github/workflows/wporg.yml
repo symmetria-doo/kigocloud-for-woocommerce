@@ -1,0 +1,63 @@
+name: wordpress.org
+
+# Builds the wordpress.org variant (bin/build-wporg.sh: no self-updater, no
+# Update URI header) and, once the plugin is approved on wordpress.org,
+# commits it to the plugin's SVN repository.
+#
+# The GitHub release (release.yml) runs on the same tags and is not affected.
+#
+# Deploy is off until the repository variable WPORG_DEPLOY is set to "true"
+# (Settings > Secrets and variables > Actions > Variables) and the secrets
+# SVN_USERNAME and SVN_PASSWORD hold the wordpress.org login (the SVN password
+# from the wordpress.org profile, Account & Security). Until then every tag
+# only builds the zip and keeps it as a workflow artifact.
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  wporg:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install build tools
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq gettext rsync zip subversion
+
+      - name: Build wordpress.org variant
+        id: build
+        run: |
+          set -euo pipefail
+          bin/build-wporg.sh build
+          VERSION="$(sed -n 's/^ \* Version:[[:space:]]*//p' kigocloud-for-woocommerce.php | tr -d '\r')"
+          if [ "${GITHUB_REF_TYPE}" = "tag" ] && [ "${GITHUB_REF_NAME#v}" != "${VERSION}" ]; then
+            echo "Tag ${GITHUB_REF_NAME} does not match plugin version ${VERSION}." >&2
+            exit 1
+          fi
+          echo "version=${VERSION}" >> "${GITHUB_OUTPUT}"
+
+      - name: Keep the zip
+        uses: actions/upload-artifact@v4
+        with:
+          name: kigocloud-for-woocommerce-wporg-${{ steps.build.outputs.version }}
+          path: build/kigocloud-for-woocommerce.zip
+
+      - name: Deploy to wordpress.org SVN
+        if: github.ref_type == 'tag' && vars.WPORG_DEPLOY == 'true'
+        uses: 10up/action-wordpress-plugin-deploy@stable
+        env:
+          SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+          SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
+          SLUG: kigocloud-for-woocommerce
+          VERSION: ${{ steps.build.outputs.version }}
+          BUILD_DIR: build/kigocloud-for-woocommerce
+          ASSETS_DIR: .wordpress-org

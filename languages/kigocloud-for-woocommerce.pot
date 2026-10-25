@@ -1,384 +1,955 @@
-# Copyright (C) 2020 Symmetria d.o.o.
-# This file is distributed under the same license as the Woo KigoCloud Integration plugin.
-#, fuzzy
+# Copyright (C) 2026 Symmetria d.o.o.
+# This file is distributed under the GPL-2.0-or-later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Woo KigoCloud Integration\n"
-"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/woo-kigocloud-"
-"api\n"
-"POT-Creation-Date: 2025-02-02 22:37+0100\n"
-"PO-Revision-Date: 2024-09-24 18:27+0200\n"
-"Last-Translator: \n"
-"Language-Team: \n"
-"Language: en\n"
+"Project-Id-Version: KigoCloud for WooCommerce 2.1.30\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/kigocloud-for-woocommerce\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 3.5\n"
+"POT-Creation-Date: 2026-10-25T05:59:40+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: kigocloud-for-woocommerce\n"
-"X-Poedit-KeywordsList: __\n"
-"X-Poedit-Basepath: ..\n"
-"X-Poedit-SearchPath-0: .\n"
 
-#: admin/class-kigocloud-for-woocommerce-admin.php:168
+#. Plugin Name of the plugin
+#: kigocloud-for-woocommerce.php
+#: admin/class-woo-kigocloud-admin-page.php:236
+msgid "KigoCloud for WooCommerce"
+msgstr ""
+
+#. Plugin URI of the plugin
+#: kigocloud-for-woocommerce.php
+msgid "https://www.kigo.cloud/fiskalizacija-web-trgovine/"
+msgstr ""
+
+#. Description of the plugin
+#: kigocloud-for-woocommerce.php
+msgid "Croatian fiscalization for WooCommerce: every order becomes a fiscalized invoice in Kigo.Cloud, with R1 invoices, the invoice PDF for the customer and stock sync."
+msgstr ""
+
+#. Author of the plugin
+#: kigocloud-for-woocommerce.php
+msgid "Symmetria d.o.o."
+msgstr ""
+
+#. Author URI of the plugin
+#: kigocloud-for-woocommerce.php
+msgid "https://www.symmetria.hr/"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:25
+#: admin/class-woo-kigocloud-admin-page.php:26
 msgid "KigoCloud"
 msgstr ""
 
-#: admin/class-kigocloud-for-woocommerce-admin.php:188
-msgid "pos_type_0"
+#: admin/class-woo-kigocloud-admin-page.php:242
+msgid "Settings saved."
 msgstr ""
 
-#: admin/class-kigocloud-for-woocommerce-admin.php:189
-msgid "pos_type_1"
+#: admin/class-woo-kigocloud-admin-page.php:274
+msgid "Save all settings"
 msgstr ""
 
-#: admin/class-kigocloud-for-woocommerce-admin.php:190
-msgid "pos_type_2"
+#: admin/class-woo-kigocloud-admin-page.php:275
+msgid "One Save covers every tab."
 msgstr ""
 
-#: admin/class-kigocloud-for-woocommerce-admin.php:209
-msgid "Document type"
+#: admin/class-woo-kigocloud-admin-page.php:287
+msgid "Connection"
 msgstr ""
 
-#: admin/class-kigocloud-for-woocommerce-admin.php:214
-msgid "Disabled"
+#: admin/class-woo-kigocloud-admin-page.php:288
+msgid "Orders"
 msgstr ""
 
-#: admin/class-kigocloud-for-woocommerce-admin.php:215
-msgid "Invoice"
+#: admin/class-woo-kigocloud-admin-page.php:289
+#: admin/class-woo-kigocloud-admin-page.php:474
+msgid "Prices"
 msgstr ""
 
-#: admin/class-kigocloud-for-woocommerce-admin.php:216
-msgid "Offer"
+#: admin/class-woo-kigocloud-admin-page.php:290
+msgid "Price list"
 msgstr ""
 
-#: admin/class-kigocloud-for-woocommerce-admin.php:223
-msgid "Payment type"
+#: admin/class-woo-kigocloud-admin-page.php:291
+msgid "R1"
 msgstr ""
 
-#: admin/class-kigocloud-for-woocommerce-admin.php:228
-msgid "Transaction account"
+#: admin/class-woo-kigocloud-admin-page.php:292
+msgid "Email"
 msgstr ""
 
-#: admin/class-kigocloud-for-woocommerce-admin.php:229
-msgid "Card"
+#: admin/class-woo-kigocloud-admin-page.php:293
+msgid "Mapping"
 msgstr ""
 
-#: admin/class-kigocloud-for-woocommerce-admin.php:230
-msgid "Cash"
+#: admin/class-woo-kigocloud-admin-page.php:294
+msgid "Logs"
 msgstr ""
 
-#: admin/class-kigocloud-for-woocommerce-admin.php:231
-msgid "Cheque"
+#: admin/class-woo-kigocloud-admin-page.php:295
+#: admin/class-woo-kigocloud-admin-page.php:1137
+msgid "About"
 msgstr ""
 
-#: admin/class-kigocloud-for-woocommerce-admin.php:232
-msgid "Other"
+#: admin/class-woo-kigocloud-admin-page.php:421
+msgid "API credentials"
 msgstr ""
 
-#: admin/class-kigocloud-for-woocommerce-admin.php:238
-msgid "On status"
+#: admin/class-woo-kigocloud-admin-page.php:422
+msgid "Login used to talk to KigoCloud. The endpoint is fixed and shown on the About tab."
 msgstr ""
 
-#: admin/class-kigocloud-for-woocommerce-admin.php:243
-msgid "Order Creation"
+#: admin/class-woo-kigocloud-admin-page.php:423
+msgid "Nothing is sent to KigoCloud until a username and a password are saved here and a payment method has a document type on the Orders tab."
 msgstr ""
 
-#: admin/class-kigocloud-for-woocommerce-admin.php:244
-msgid "Order Completed"
+#: admin/class-woo-kigocloud-admin-page.php:427
+msgid "API username"
 msgstr ""
 
-#: admin/class-kigocloud-for-woocommerce-admin.php:250
-msgid "Send Email with document PDF"
+#. translators: %s: link to the Kigo.Cloud website
+#: admin/class-woo-kigocloud-admin-page.php:430
+#, php-format
+msgid "No account yet? See %s."
 msgstr ""
 
-#: admin/class-kigocloud-for-woocommerce-admin.php:255
-msgid "No"
+#: admin/class-woo-kigocloud-admin-page.php:434
+msgid "API password"
 msgstr ""
 
-#: admin/class-kigocloud-for-woocommerce-admin.php:256
-#: public/class-kigocloud-for-woocommerce-public.php:139
-msgid "Yes"
-msgstr ""
-
-#: admin/class-kigocloud-for-woocommerce-admin.php:270
-msgid "API account"
-msgstr ""
-
-#: admin/class-kigocloud-for-woocommerce-admin.php:275
-msgid "API Username"
-msgstr ""
-
-#: admin/class-kigocloud-for-woocommerce-admin.php:279
-msgid "Enter API username here"
-msgstr ""
-
-#: admin/class-kigocloud-for-woocommerce-admin.php:285
-msgid "API Password"
-msgstr ""
-
-#: admin/class-kigocloud-for-woocommerce-admin.php:289
-msgid "Enter API password here"
-msgstr ""
-
-#: admin/class-kigocloud-for-woocommerce-admin.php:303
-msgid "Misc"
-msgstr ""
-
-#: admin/class-kigocloud-for-woocommerce-admin.php:308
+#: admin/class-woo-kigocloud-admin-page.php:437
 msgid "Employee PIN"
 msgstr ""
 
-#: admin/class-kigocloud-for-woocommerce-admin.php:312
-msgid "Enter API employee PIN here"
+#: admin/class-woo-kigocloud-admin-page.php:439
+msgid "KigoCloud employee PIN used when creating documents."
 msgstr ""
 
-#: admin/class-kigocloud-for-woocommerce-admin.php:318
-msgid "Shipping Reference Number"
+#: admin/class-woo-kigocloud-admin-page.php:446
+msgid "Try it with the demo account"
 msgstr ""
 
-#: admin/class-kigocloud-for-woocommerce-admin.php:322
-msgid "Enter Shipping Reference Number here"
+#: admin/class-woo-kigocloud-admin-page.php:447
+msgid "The public Kigo.Cloud demo account shows the whole flow before you have your own account: the order becomes an invoice with a ZKI and a JIR, signed with a test certificate, so it is not a real fiscalized invoice."
 msgstr ""
 
-#: admin/class-kigocloud-for-woocommerce-admin.php:330
-msgid "E-mail settings"
+#: admin/class-woo-kigocloud-admin-page.php:448
+msgid "Anyone can log in to the demo account, so everything sent there, including the name, address and e-mail of the customer, is visible to others. Use it only with test orders and switch to your own account before taking real orders."
 msgstr ""
 
-#: admin/class-kigocloud-for-woocommerce-admin.php:332
-msgid "This change is global."
+#: admin/class-woo-kigocloud-admin-page.php:452
+msgid "Try with the demo account"
 msgstr ""
 
-#: admin/class-kigocloud-for-woocommerce-admin.php:335
+#: admin/class-woo-kigocloud-admin-page.php:455
+msgid "Demo login filled in. Click Save all settings to use it."
+msgstr ""
+
+#. translators: %s: link to the Kigo.Cloud login page
+#: admin/class-woo-kigocloud-admin-page.php:462
+#, php-format
+msgid "The documents can be seen in the demo at %s (username and password admin_demo)."
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:477
+msgid "Anchor price"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:478
+msgid "Do not show"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:479
+msgid "Show below the product price"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:482
+msgid "Croatian Government decision, in force from 1 October 2026: the price that applied on the reference day is shown next to the retail price. KigoCloud sends it with the product."
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:496
+msgid "Price list on your own website"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:497
+msgid "Croatian law requires the price list to be published on your own website. The plugin downloads it from KigoCloud once a day and stores it here, so the files are served from your domain and your visitors never reach KigoCloud."
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:500
+msgid "KigoCloud address"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:503
+msgid "Copy it from KigoCloud: Anchor prices, tab Price list for publication. Save, then use the addresses below on your site."
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:510
+msgid "Your addresses"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:516
+#: admin/class-woo-kigocloud-admin-page.php:527
+msgid "not downloaded yet"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:518
+msgid "The current files, under the name the decision prescribes. Every day brings new files, and each version stays here for 30 days. Publish a page with the [kigo_cjenik] shortcode: it shows the price list and links to the current files and to the last 30 days."
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:522
+msgid "Last refresh"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:532
+msgid "Refreshed automatically every morning at 7. Save the settings to fetch it right away."
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:545
+msgid "Order options"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:549
+msgid "Shipping reference"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:551
+msgid "KigoCloud item reference used for the shipping line. Leave blank for \"shipping\"."
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:553
+msgid "Fill empty SKU"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:554
+#: admin/class-woo-kigocloud-admin-page.php:561
+#: admin/class-woo-kigocloud-admin-page.php:648
+msgid "No"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:555
+msgid "Yes - use product ID"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:558
+msgid "When enabled, products with missing SKU are sent as sku-<item_id> to avoid KigoCloud lookup failures."
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:560
+msgid "Language for foreign customers"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:562
+msgid "English"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:563
+msgid "By country - German for Germany, Austria, Switzerland and Liechtenstein, English for the rest"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:566
+msgid "Customers whose country on the order is not Croatia get the invoice PDF and the e-mail in that language. Nothing changes for customers from Croatia."
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:574
+msgid "Payment gateways"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:576
+msgid "For each enabled gateway, choose the document type, payment method, and the order status that triggers the KigoCloud API call."
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:586
+msgid "WooCommerce is not active."
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:596
+msgid "No payment gateways are currently enabled in WooCommerce."
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:605
+msgid "Gateway"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:606
+msgid "Document type"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:607
+msgid "Payment method"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:608
+msgid "Trigger on"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:609
+msgid "Send PDF"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:627
+msgid "Disabled"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:628
+#: includes/class-woo-kigocloud-request.php:72
+msgid "Invoice"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:629
+#: includes/class-woo-kigocloud-request.php:71
+msgid "Offer"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:634
+msgid "Transaction account"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:635
+msgid "Card"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:636
+msgid "Cash"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:637
+msgid "Other"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:642
+msgid "Order created"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:643
+msgid "Order completed"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:649
+#: admin/class-woo-kigocloud-admin-page.php:802
+#: admin/class-woo-kigocloud-admin.php:108
+#: includes/class-woo-kigocloud-r1.php:311
+msgid "Yes"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:657
+msgid "Save gateways"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:666
+msgid "R1 customer fields"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:668
+msgid "Adds company fields to the checkout for B2B invoicing: company name, address, OIB. Works on both classic and block checkout."
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:671
+msgid "Block checkout support:"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:673
+msgid "Active (WC 8.6+)"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:675
+msgid "Requires WC 8.6+"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:681
+msgid "Mode"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:682
+#: admin/class-woo-kigocloud-admin-page.php:796
+msgid "Off"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:683
+msgid "Show OIB / VAT field only"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:684
+msgid "Show full R1 block (company, address, city, postcode, OIB)"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:687
+msgid "Force billing company required"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:688
+msgid "No (use WooCommerce default)"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:689
+msgid "Yes (make billing.company a required field)"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:692
+msgid "When R1 mode 2 is on, customers must enter a company name. Enabling this option marks the standard WooCommerce billing.company field as required so the block checkout enforces it everywhere."
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:700
+msgid "Preview - what the customer will see"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:702
+msgid "Live preview of the R1 fields that appear on the checkout based on the current mode. Asterisk marks required fields."
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:708
+msgid "Block checkout diagnostics"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:709
+msgid "Live status of the Additional Checkout Fields integration for the WooCommerce block checkout. If the R1 fields are missing from the checkout, the row that is red below points to the cause."
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:714
+msgid "Test KigoCloud connection"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:716
+msgid "Sends a test R1 offer to KigoCloud using the saved API credentials and a sample OIB. No order is created and no invoice is issued; the offer appears among the offers in KigoCloud. Shows the KigoCloud response so you can verify credentials, network and endpoint before going live."
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:721
+msgid "Sending test offer to KigoCloud..."
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:722
+msgid "Send test R1 offer"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:770
+msgid "WordPress version"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:773
+msgid "Block checkout works best on WP 6.4+. Older WP may render Gutenberg blocks unreliably."
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:776
+msgid "PHP version"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:779
+msgid "Plugin requires PHP 7.2 minimum."
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:782
+msgid "WooCommerce version"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:784
+#: admin/class-woo-kigocloud-admin-page.php:1167
+msgid "not detected"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:785
+msgid "Additional Checkout Fields API was officially shipped in WooCommerce 8.9. On 8.6-8.8 the function exists but may not render fields reliably; upgrading WC is the fix."
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:788
+msgid "Field API function available"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:790
+msgid "missing"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:791
+msgid "If missing, WooCommerce is too old to register checkout fields via PHP; upgrade WC."
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:794
+msgid "R1 mode"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:796
+msgid "OIB only"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:796
+msgid "Full R1 block"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:797
+msgid "When set to Off the plugin registers nothing on the checkout."
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:800
+msgid "Checkout page uses block"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:802
+msgid "No (classic [woocommerce_checkout] shortcode)"
+msgstr ""
+
+#. translators: %s: link to edit the checkout page
+#: admin/class-woo-kigocloud-admin-page.php:805
+#, php-format
+msgid "Block checkout fields only appear if the Checkout page actually contains the WooCommerce checkout block. <a href=\"%s\">Edit checkout page</a>."
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:806
+msgid "Block checkout fields only appear if the Checkout page actually contains the WooCommerce checkout block."
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:809
+msgid "Hook fired this request"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:811
+msgid "Yes, register_block_fields() was called"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:811
+msgid "No - woocommerce_init never reached our handler"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:812
+msgid "If No, another plugin or fatal error is preventing woocommerce_init from running through to our handler. Check the WP debug.log."
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:815
+msgid "Registration status"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:817
+msgid "not yet attempted"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:818
+msgid "\"ok\" means WC accepted both field registrations. Any other value points to the rejection reason."
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:825
+msgid "Check"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:826
+#: admin/class-woo-kigocloud-admin-page.php:1079
+msgid "Result"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:845
+msgid "Field IDs registered"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:854
+msgid "Blocks on checkout page"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:858
+msgid "No Gutenberg blocks detected on the checkout page. The page is likely using the classic [woocommerce_checkout] shortcode."
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:868
+msgid "The page has blocks but none of them is woocommerce/checkout. Additional Checkout Fields are rendered only by the canonical checkout block - swap the current block for woocommerce/checkout."
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:882
+msgid "R1 mode is off. No extra fields are added to the checkout."
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:887
+msgid "On the checkout, inside the billing address block:"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:891
+#: includes/class-woo-kigocloud-r1.php:124
+msgid "Company name (for invoice)"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:897
+#: includes/class-woo-kigocloud-r1.php:115
+#: includes/class-woo-kigocloud-r1.php:285
+#: includes/class-woo-kigocloud-r1.php:348
+msgid "OIB / VAT number"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:903
+msgid "The standard WooCommerce billing address (address, city, postcode, country) is shown above these fields and is used as the company address."
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:919
+msgid "Permission denied."
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:925
+msgid "Enter the API username and password on the Connection tab and save them first."
+msgstr ""
+
+#. translators: %s: error message
+#: admin/class-woo-kigocloud-admin-page.php:983
+#, php-format
+msgid "Network error: %s"
+msgstr ""
+
+#. translators: 1: doc number, 2: place short, 3: pos number
+#: admin/class-woo-kigocloud-admin-page.php:995
+#, php-format
+msgid "OK. KigoCloud accepted the test offer: %1$s/%2$s/%3$s"
+msgstr ""
+
+#. translators: 1: http status, 2: response body
+#: admin/class-woo-kigocloud-admin-page.php:1012
+#, php-format
+msgid "KigoCloud returned HTTP %1$d. %2$s"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:1024
+msgid "Outgoing mail"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:1025
+msgid "Overrides the From and Reply-To headers on outgoing WordPress mail. Global, not just KigoCloud emails."
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:1029
 msgid "From name"
 msgstr ""
 
-#: admin/class-kigocloud-for-woocommerce-admin.php:339
-msgid "Enter 'From' Name field here"
+#: admin/class-woo-kigocloud-admin-page.php:1030
+msgid "From email"
 msgstr ""
 
-#: admin/class-kigocloud-for-woocommerce-admin.php:345
-msgid "From e-mail"
+#: admin/class-woo-kigocloud-admin-page.php:1031
+msgid "Reply-To email"
 msgstr ""
 
-#: admin/class-kigocloud-for-woocommerce-admin.php:349
-msgid "Enter 'From' E-mail here"
+#: admin/class-woo-kigocloud-admin-page.php:1043
+msgid "Custom meta mapping"
 msgstr ""
 
-#: admin/class-kigocloud-for-woocommerce-admin.php:355
-msgid "Reply-To E-mail"
+#: admin/class-woo-kigocloud-admin-page.php:1045
+msgid "Override billing data with values from other order meta keys. Useful when another plugin already stores R1 data under its own meta names."
 msgstr ""
 
-#: admin/class-kigocloud-for-woocommerce-admin.php:359
-msgid "Enter 'Reply-To' E-mail here"
+#: admin/class-woo-kigocloud-admin-page.php:1047
+msgid "Format: source_meta:target.field, comma-separated."
 msgstr ""
 
-#: admin/class-kigocloud-for-woocommerce-admin.php:371
-msgid "Order Statuses"
+#: admin/class-woo-kigocloud-admin-page.php:1052
+msgid "Mapping rules"
 msgstr ""
 
-#: admin/class-kigocloud-for-woocommerce-admin.php:373
-msgid ""
-"Before any Kigo API call, plugin will check if call has already been made "
-"for same order"
+#: admin/class-woo-kigocloud-admin-page.php:1054
+msgid "Example: r1_oib_tvrtke:_billing_vat_number, r1_ime_tvrtke:billing.company, r1_adresa_tvrtke:billing.address_1"
 msgstr ""
 
-#: admin/class-kigocloud-for-woocommerce-admin.php:376
-msgid "Skip create Kigo document on Order Status Created"
+#: admin/class-woo-kigocloud-admin-page.php:1068
+msgid "Recent API calls"
 msgstr ""
 
-#: admin/class-kigocloud-for-woocommerce-admin.php:383
-msgid "No, create Kigo document on Order Created status"
+#: admin/class-woo-kigocloud-admin-page.php:1069
+msgid "Last 50 KigoCloud API calls. Useful for debugging order push failures."
 msgstr ""
 
-#: admin/class-kigocloud-for-woocommerce-admin.php:384
-msgid "Yes, skip this order status"
+#: admin/class-woo-kigocloud-admin-page.php:1071
+msgid "No API calls have been logged yet. Once an order triggers KigoCloud, recent attempts will show up here."
 msgstr ""
 
-#: admin/class-kigocloud-for-woocommerce-admin.php:389
-msgid "Skip create Kigo document on Order Status Completed"
+#: admin/class-woo-kigocloud-admin-page.php:1076
+msgid "When"
 msgstr ""
 
-#: admin/class-kigocloud-for-woocommerce-admin.php:396
-msgid "No, create Kigo document on Order Completed status"
+#: admin/class-woo-kigocloud-admin-page.php:1077
+msgid "Order"
 msgstr ""
 
-#: admin/class-kigocloud-for-woocommerce-admin.php:397
-msgid "Yes, skip skip this order status"
+#: admin/class-woo-kigocloud-admin-page.php:1078
+msgid "Endpoint"
 msgstr ""
 
-#: admin/class-kigocloud-for-woocommerce-admin.php:410
-#: public/class-kigocloud-for-woocommerce-public.php:134
-msgid "VAT Invoice"
+#: admin/class-woo-kigocloud-admin-page.php:1099
+msgid "OK"
 msgstr ""
 
-#: admin/class-kigocloud-for-woocommerce-admin.php:412
-msgid ""
-"Enable VAT Invoice fields on Checkout form: Company Name, Company Adress, "
-"Company VAT"
+#: admin/class-woo-kigocloud-admin-page.php:1099
+msgid "Error"
 msgstr ""
 
-#: admin/class-kigocloud-for-woocommerce-admin.php:415
-msgid "Checkout fields"
+#: admin/class-woo-kigocloud-admin-page.php:1109
+msgid "Clear logs"
 msgstr ""
 
-#: admin/class-kigocloud-for-woocommerce-admin.php:422
-msgid "Do not show VAT Invoice fields on Checkout"
+#: admin/class-woo-kigocloud-admin-page.php:1140
+msgid "Version"
 msgstr ""
 
-#: admin/class-kigocloud-for-woocommerce-admin.php:423
-msgid "Show VAT field only"
+#: admin/class-woo-kigocloud-admin-page.php:1144
+msgid "Source"
 msgstr ""
 
-#: admin/class-kigocloud-for-woocommerce-admin.php:424
-msgid "Show All VAT Invoice fields on Checkout"
+#: admin/class-woo-kigocloud-admin-page.php:1149
+msgid "Releases"
 msgstr ""
 
-#: admin/class-kigocloud-for-woocommerce-admin.php:437
-#: admin/class-kigocloud-for-woocommerce-admin.php:442
-msgid "Custom mapping"
+#: admin/class-woo-kigocloud-admin-page.php:1154
+msgid "Website"
 msgstr ""
 
-#: admin/class-kigocloud-for-woocommerce-admin.php:439
-msgid ""
-"Use this option to override default billing information with custom data "
-"from order meta data using format: source_meta:target.data, source_meta1:"
-"target.data1"
+#: admin/class-woo-kigocloud-admin-page.php:1158
+msgid "Changelog"
 msgstr ""
 
-#: admin/class-kigocloud-for-woocommerce-admin.php:446
-msgid ""
-"Example: r1_oib_tvrtke:_billing_vat_number, r1_ime_tvrtke:billing.company, "
-"r1_adresa_tvrtke:billing.address_1"
+#: admin/class-woo-kigocloud-admin-page.php:1162
+msgid "API endpoint"
 msgstr ""
 
-#: admin/class-kigocloud-for-woocommerce-admin.php:470
+#: admin/class-woo-kigocloud-admin-page.php:1166
+msgid "WooCommerce"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:1170
+msgid "PHP"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin-page.php:1174
+msgid "WordPress"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin.php:46
+msgid "Settings"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin.php:66
+msgid "GitHub"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin.php:100
 msgid "Shipping VAT number"
 msgstr ""
 
-#: admin/class-kigocloud-for-woocommerce-admin.php:478
+#: admin/class-woo-kigocloud-admin.php:103
 msgid "Billing VAT number"
 msgstr ""
 
-#: admin/class-kigocloud-for-woocommerce-admin.php:486
-msgid "Is VAT Invoice"
+#: admin/class-woo-kigocloud-admin.php:108
+#: includes/class-woo-kigocloud-r1.php:303
+msgid "R1 invoice"
 msgstr ""
 
-#: admin/class-kigocloud-for-woocommerce-admin.php:490
-msgid "Company Name"
+#: admin/class-woo-kigocloud-admin.php:112
+msgid "Company"
 msgstr ""
 
-#: admin/class-kigocloud-for-woocommerce-admin.php:494
-msgid "Company Address"
+#: admin/class-woo-kigocloud-admin.php:113
+#: includes/class-woo-kigocloud-r1.php:326
+msgid "Company address"
 msgstr ""
 
-#: admin/class-kigocloud-for-woocommerce-admin.php:498
-msgid "Company City"
+#: admin/class-woo-kigocloud-admin.php:114
+msgid "Company city"
 msgstr ""
 
-#: admin/class-kigocloud-for-woocommerce-admin.php:502
-msgid "Company ZIP"
+#: admin/class-woo-kigocloud-admin.php:115
+msgid "Company postcode"
 msgstr ""
 
-#: admin/class-kigocloud-for-woocommerce-admin.php:507
-msgid "Company VAT number"
+#: admin/class-woo-kigocloud-admin.php:116
+msgid "Company VAT"
 msgstr ""
 
-#: admin/class-kigocloud-for-woocommerce-admin.php:521
+#: admin/class-woo-kigocloud-admin.php:144
 msgid "KigoCloud document"
 msgstr ""
 
-#: includes/class-kigocloud-for-woocommerce-request.php:137
-msgid "pos_type_"
+#: admin/class-woo-kigocloud-admin.php:170
+msgid "KigoCloud for WooCommerce has been updated to version"
 msgstr ""
 
-#: includes/class-kigocloud-for-woocommerce-request.php:151
+#: admin/class-woo-kigocloud-admin.php:171
+msgid "Please review and save your settings to ensure everything works correctly."
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin.php:172
+msgid "Review and save settings"
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin.php:211
+msgid "KigoCloud R1 fields require WooCommerce 8.6 or newer for the block checkout."
+msgstr ""
+
+#: admin/class-woo-kigocloud-admin.php:213
+msgid "You are using the block checkout on an older WooCommerce version that does not support custom checkout fields. Either upgrade WooCommerce or switch the checkout page back to the [woocommerce_checkout] shortcode."
+msgstr ""
+
+#: includes/class-woo-kigocloud-activator.php:30
+msgid "You do not have proper authorization to activate a plugin."
+msgstr ""
+
+#. translators: %s: link to the WooCommerce plugin page
+#: includes/class-woo-kigocloud-activator.php:39
+#, php-format
+msgid "This plugin requires %s to be active."
+msgstr ""
+
+#: includes/class-woo-kigocloud-kigokasa-switch.php:272
+msgid "You do not have permission to change plugins."
+msgstr ""
+
+#: includes/class-woo-kigocloud-kigokasa-switch.php:300
+msgid "The KigoKasa API for WooCommerce plugin is deactivated. Orders are now sent by KigoCloud for WooCommerce."
+msgstr ""
+
+#: includes/class-woo-kigocloud-kigokasa-switch.php:308
+msgid "KigoCloud for WooCommerce now keeps its own record of the documents the KigoKasa plugin issued for your orders, so they are never sent again. The KigoKasa API for WooCommerce plugin can be deleted."
+msgstr ""
+
+#: includes/class-woo-kigocloud-kigokasa-switch.php:319
+msgid "KigoCloud for WooCommerce is waiting to take over."
+msgstr ""
+
+#: includes/class-woo-kigocloud-kigokasa-switch.php:322
+msgid "The settings were copied from the KigoKasa API for WooCommerce plugin."
+msgstr ""
+
+#: includes/class-woo-kigocloud-kigokasa-switch.php:324
+msgid "Until you switch, orders are still sent by the KigoKasa plugin, so no order is sent twice. When you click Switch to KigoCloud, the KigoKasa plugin is deactivated (its data stays) and KigoCloud sends the orders from then on."
+msgstr ""
+
+#: includes/class-woo-kigocloud-kigokasa-switch.php:326
+msgid "Switch to KigoCloud"
+msgstr ""
+
+#: includes/class-woo-kigocloud-kigokasa-switch.php:328
+msgid "Review settings first"
+msgstr ""
+
+#: includes/class-woo-kigocloud-pricelist.php:237
+msgid "The KigoCloud price list address is not set."
+msgstr ""
+
+#: includes/class-woo-kigocloud-pricelist.php:240
+#: includes/class-woo-kigocloud-pricelist.php:295
+msgid "The price list is already up to date."
+msgstr ""
+
+#: includes/class-woo-kigocloud-pricelist.php:245
+msgid "The price list folder could not be created."
+msgstr ""
+
+#. translators: %d: HTTP status code
+#: includes/class-woo-kigocloud-pricelist.php:268
+#, php-format
+msgid "KigoCloud answered with status %d. Check the address and your plan."
+msgstr ""
+
+#: includes/class-woo-kigocloud-pricelist.php:274
+msgid "KigoCloud returned an empty price list."
+msgstr ""
+
+#: includes/class-woo-kigocloud-pricelist.php:278
+msgid "KigoCloud did not send the prescribed file name. Update KigoCloud or contact support."
+msgstr ""
+
+#: includes/class-woo-kigocloud-pricelist.php:284
+msgid "The price list could not be saved in the uploads folder."
+msgstr ""
+
+#: includes/class-woo-kigocloud-pricelist.php:294
+msgid "The price list has been refreshed."
+msgstr ""
+
+#: includes/class-woo-kigocloud-pricelist.php:427
+msgid "The published price list is not from today."
+msgstr ""
+
+#: includes/class-woo-kigocloud-pricelist.php:447
+#: includes/class-woo-kigocloud-pricelist.php:452
+msgid "The price list is not available yet."
+msgstr ""
+
+#. translators: %s: date and time
+#: includes/class-woo-kigocloud-pricelist.php:470
+#, php-format
+msgid "Updated: %s"
+msgstr ""
+
+#: includes/class-woo-kigocloud-pricelist.php:500
+msgid "Published price lists (last 30 days)"
+msgstr ""
+
+#: includes/class-woo-kigocloud-r1.php:177
+msgid "OIB must be 11 digits and pass the checksum."
+msgstr ""
+
+#: includes/class-woo-kigocloud-r1.php:286
+#: includes/class-woo-kigocloud-r1.php:350
+msgctxt "placeholder"
+msgid "12345678901"
+msgstr ""
+
+#: includes/class-woo-kigocloud-r1.php:305
+msgid "Do you need an R1 invoice (B2B)?"
+msgstr ""
+
+#: includes/class-woo-kigocloud-r1.php:318
+msgid "Company name"
+msgstr ""
+
+#: includes/class-woo-kigocloud-r1.php:320
+msgctxt "placeholder"
+msgid "Enter company name"
+msgstr ""
+
+#: includes/class-woo-kigocloud-r1.php:328
+msgctxt "placeholder"
+msgid "Street and number"
+msgstr ""
+
+#: includes/class-woo-kigocloud-r1.php:334
+msgid "City"
+msgstr ""
+
+#: includes/class-woo-kigocloud-r1.php:341
+msgid "Postcode"
+msgstr ""
+
+#: includes/class-woo-kigocloud-r1.php:365
+msgid "Company name is mandatory for R1 invoices."
+msgstr ""
+
+#: includes/class-woo-kigocloud-r1.php:368
+msgid "Company address is mandatory for R1 invoices."
+msgstr ""
+
+#: includes/class-woo-kigocloud-r1.php:371
+msgid "Company city is mandatory for R1 invoices."
+msgstr ""
+
+#: includes/class-woo-kigocloud-r1.php:374
+msgid "Company postcode is mandatory for R1 invoices."
+msgstr ""
+
+#: includes/class-woo-kigocloud-r1.php:379
+msgid "Invalid OIB. Must be 11 digits and pass the checksum."
+msgstr ""
+
+#: includes/class-woo-kigocloud-request.php:259
 msgid "Web Order #"
 msgstr ""
 
-#: includes/class-kigocloud-for-woocommerce-request.php:207
+#: includes/class-woo-kigocloud-request.php:333
 msgid "Dostava"
 msgstr ""
 
-#: includes/class-kigocloud-for-woocommerce-request.php:359
+#. translators: 1: document type (Invoice or Offer), 2: document number, 3: payment type
+#: includes/class-woo-kigocloud-request.php:531
 #, php-format
 msgid "KigoCloud %1$s created with document number %2$s and payment type %3$s"
 msgstr ""
 
-#: includes/class-kigocloud-for-woocommerce-request.php:406
-#, php-format
-msgid "%1$s sending you %2$s no. %3$s"
+#: includes/class-woo-kigocloud-request.php:552
+msgid "No document number returned"
 msgstr ""
 
-#: includes/class-kigocloud-for-woocommerce-request.php:415
-#, php-format
-msgid ""
-"Hi %1$s,<br /><br />Thank you for your order.<br /><br />Your %2$s with "
-"number <b>%3$s</b> is in the attachment.<br /><br />We look forward to "
-"fulfilling your order soon."
-msgstr ""
-
-#: public/class-kigocloud-for-woocommerce-public.php:134
-msgid "Do you need VAT Invoice?"
-msgstr ""
-
-#: public/class-kigocloud-for-woocommerce-public.php:146
-msgid "Company name"
-msgstr ""
-
-#: public/class-kigocloud-for-woocommerce-public.php:154
-msgid "Company address"
-msgstr ""
-
-#: public/class-kigocloud-for-woocommerce-public.php:162
-msgid "City"
-msgstr ""
-
-#: public/class-kigocloud-for-woocommerce-public.php:170
-msgid "Zip code"
-msgstr ""
-
-#: public/class-kigocloud-for-woocommerce-public.php:178
-msgid "VAT number"
-msgstr ""
-
-#: public/class-kigocloud-for-woocommerce-public.php:193
-msgid "Company name is mandatory"
-msgstr ""
-
-#: public/class-kigocloud-for-woocommerce-public.php:197
-msgid "Company address is mandatory"
-msgstr ""
-
-#: public/class-kigocloud-for-woocommerce-public.php:201
-msgid "Company city is mandatory"
-msgstr ""
-
-#: public/class-kigocloud-for-woocommerce-public.php:205
-msgid "Company zip is mandatory"
-msgstr ""
-
-#: public/class-kigocloud-for-woocommerce-public.php:209
-msgid "Company VAT has to have 11 characters"
-msgstr ""
-
-#: public/class-kigocloud-for-woocommerce-public.php:213
-msgid "Invalid VAT."
-msgstr ""
-
-#: admin/class-woo-kigocloud-admin-page.php:497
-msgid "Language for foreign customers"
-msgstr ""
-
-#: admin/class-woo-kigocloud-admin-page.php:499
-msgid "English"
-msgstr ""
-
-#: admin/class-woo-kigocloud-admin-page.php:500
-msgid "By country - German for Germany, Austria, Switzerland and Liechtenstein, English for the rest"
-msgstr ""
-
-#: admin/class-woo-kigocloud-admin-page.php:503
-msgid "Customers whose country on the order is not Croatia get the invoice PDF and the e-mail in that language. Nothing changes for customers from Croatia."
+#: public/class-woo-kigocloud-public.php:59
+msgid "Sidrena cijena"
 msgstr ""

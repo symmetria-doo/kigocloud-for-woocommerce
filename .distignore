@@ -1,0 +1,23 @@
+# Files left out of the wordpress.org build (bin/build-wporg.sh).
+# The GitHub release (.github/workflows/release.yml) has its own list
+# and keeps vendor/plugin-update-checker.
+.git
+.github
+.wordpress-org
+.distignore
+.gitignore
+.gitattributes
+.idea
+.vscode
+/bin
+/build
+node_modules
+/vendor
+composer.json
+composer.lock
+CONTRIBUTING.md
+README.md
+*.zip
+*.tar.gz
+.DS_Store
+Thumbs.db

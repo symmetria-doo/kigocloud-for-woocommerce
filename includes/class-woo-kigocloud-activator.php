@@ -11,6 +11,10 @@
  * @package Woo_KigoCloud
  */
 
+if (!defined('ABSPATH')) {
+    exit;
+}
+
 class Woo_KigoCloud_Activator
 {
     public static function activate()

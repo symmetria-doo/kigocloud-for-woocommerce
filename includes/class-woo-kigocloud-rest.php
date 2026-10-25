@@ -13,6 +13,10 @@
  * @subpackage Woo_KigoCloud/includes
  */
 
+if (!defined('ABSPATH')) {
+    exit;
+}
+
 /**
  * The core plugin class.
  *
@@ -47,15 +51,14 @@ class Woo_KigoCloud_Rest
         $sku = sanitize_text_field(rawurldecode($data['sku']));
 
         // Query to find a variation with the matching SKU
-        $query = $wpdb->prepare("SELECT p.ID as variation_id, p.post_parent as product_id
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery -- exact SKU lookup for the KigoCloud sync, always fresh.
+        $result = $wpdb->get_row($wpdb->prepare("SELECT p.ID as variation_id, p.post_parent as product_id
             FROM {$wpdb->posts} p
             JOIN {$wpdb->postmeta} pm ON p.ID = pm.post_id
             WHERE p.post_type = 'product_variation' 
             AND pm.meta_key = '_sku' 
             AND pm.meta_value = %s
-            LIMIT 1", $sku);
-
-        $result = $wpdb->get_row($query);
+            LIMIT 1", $sku));
 
         if ($result) {
             return [
@@ -91,16 +94,15 @@ class Woo_KigoCloud_Rest
 		$sku = sanitize_text_field( rawurldecode( $data['sku'] ) );
 
 		// Combined query: check in product and product_variation post types
-		$query = $wpdb->prepare( "
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- exact SKU lookup for the KigoCloud sync, always fresh.
+		$result = $wpdb->get_row( $wpdb->prepare( "
 	        SELECT p.ID, p.post_type, p.post_parent
 	        FROM {$wpdb->posts} p
 	        JOIN {$wpdb->postmeta} pm ON p.ID = pm.post_id
 	        WHERE p.post_type IN ('product', 'product_variation')
 	        AND pm.meta_key = '_sku'
 	        AND pm.meta_value = %s
-	        LIMIT 1", $sku );
-
-		$result = $wpdb->get_row( $query );
+	        LIMIT 1", $sku ) );
 
 		if ( $result ) {
 			$response = [

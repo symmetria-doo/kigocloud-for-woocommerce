@@ -21,6 +21,8 @@ if (!current_user_can('activate_plugins')) {
 
 global $wpdb;
 
+// phpcs:disable WordPress.DB.DirectDatabaseQuery -- one-off cleanup of this plugin's own rows on uninstall.
+
 // All options.
 $wpdb->query(
     "DELETE FROM {$wpdb->options} WHERE option_name LIKE 'kigocloud_%'"
@@ -39,10 +41,9 @@ $wpdb->query(
 );
 
 // HPOS order meta (WC 8.0+ orders_meta table).
-$orders_meta = $wpdb->prefix . 'wc_orders_meta';
-$exists = $wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $orders_meta));
-if ($exists === $orders_meta) {
+$kigocloud_orders_meta = $wpdb->prefix . 'wc_orders_meta';
+if ($wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $kigocloud_orders_meta)) === $kigocloud_orders_meta) {
     $wpdb->query(
-        "DELETE FROM {$orders_meta} WHERE meta_key LIKE '_kigocloud_%' OR meta_key LIKE 'kigocloud_vat_invoices_%'"
+        "DELETE FROM {$wpdb->prefix}wc_orders_meta WHERE meta_key LIKE '_kigocloud_%' OR meta_key LIKE 'kigocloud_vat_invoices_%'"
     );
 }

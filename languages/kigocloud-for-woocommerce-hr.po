@@ -452,6 +452,74 @@ msgstr "Za R1 račun obavezan je poštanski broj tvrtke."
 msgid "Invalid OIB. Must be 11 digits and pass the checksum."
 msgstr "OIB nije ispravan. Mora imati 11 znamenki i ispravnu kontrolnu znamenku."
 
+msgid "Nothing is sent to KigoCloud until a username and a password are saved here and a payment method has a document type on the Orders tab."
+msgstr "Ništa se ne šalje u KigoCloud dok ovdje ne spremite korisničko ime i lozinku i dok neki način plaćanja nema vrstu dokumenta na kartici Narudžbe."
+
+#, php-format
+msgid "No account yet? See %s."
+msgstr "Još nemate račun? Pogledajte %s."
+
+msgid "Try it with the demo account"
+msgstr "Isprobajte s demo računom"
+
+msgid "The public Kigo.Cloud demo account shows the whole flow before you have your own account: the order becomes an invoice with a ZKI and a JIR, signed with a test certificate, so it is not a real fiscalized invoice."
+msgstr "Javni demo račun Kigo.Clouda pokazuje cijeli tijek prije nego otvorite svoj račun: narudžba postaje račun sa ZKI-jem i JIR-om, potpisan testnim certifikatom, pa to nije pravi fiskalizirani račun."
+
+msgid "Anyone can log in to the demo account, so everything sent there, including the name, address and e-mail of the customer, is visible to others. Use it only with test orders and switch to your own account before taking real orders."
+msgstr "U demo račun može se prijaviti bilo tko, pa je sve što se onamo pošalje, uključujući ime, adresu i e-poštu kupca, vidljivo drugima. Koristite ga samo s probnim narudžbama i prijeđite na svoj račun prije pravih narudžbi."
+
+msgid "Try with the demo account"
+msgstr "Isprobaj s demo računom"
+
+msgid "Demo login filled in. Click Save all settings to use it."
+msgstr "Demo prijava je upisana. Kliknite Spremi sve postavke da je upotrijebite."
+
+#, php-format
+msgid "The documents can be seen in the demo at %s (username and password admin_demo)."
+msgstr "Dokumente možete vidjeti u demu na %s (korisničko ime i lozinka admin_demo)."
+
+msgid "Enter the API username and password on the Connection tab and save them first."
+msgstr "Najprije upišite API korisničko ime i lozinku na kartici Veza i spremite ih."
+
+msgid "The price list could not be saved in the uploads folder."
+msgstr "Cjenik nije moguće spremiti u mapu uploads."
+
+msgid "Website"
+msgstr "Web stranica"
+
+msgid "API credentials"
+msgstr "API pristup"
+
+msgid "API username"
+msgstr "API korisničko ime"
+
+msgid "API password"
+msgstr "API lozinka"
+
+msgid "Login used to talk to KigoCloud. The endpoint is fixed and shown on the About tab."
+msgstr "Prijava kojom dodatak razgovara s KigoCloudom. Adresa API-ja je zadana i vidi se na kartici O dodatku."
+
+msgid "KigoCloud employee PIN used when creating documents."
+msgstr "PIN djelatnika u KigoCloudu s kojim se izrađuju dokumenti."
+
+msgid "Connection"
+msgstr "Veza"
+
+msgid "Orders"
+msgstr "Narudžbe"
+
+msgid "About"
+msgstr "O dodatku"
+
+msgid "Save all settings"
+msgstr "Spremi sve postavke"
+
+msgid "Settings saved."
+msgstr "Postavke su spremljene."
+
+msgid "One Save covers every tab."
+msgstr "Jedno spremanje vrijedi za sve kartice."
+
 #~ msgid "Document number"
 #~ msgstr "Broj dokumenta"
 

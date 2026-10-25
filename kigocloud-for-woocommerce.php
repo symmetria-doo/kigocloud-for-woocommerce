@@ -8,9 +8,9 @@
  *
  * @wordpress-plugin
  * Plugin Name:       KigoCloud for WooCommerce
- * Plugin URI:        https://github.com/symmetria-doo/kigocloud-for-woocommerce
- * Description:       Sends WooCommerce orders to KigoCloud (R1 invoices, fiscalization, inventory). Supports both classic and block checkout for R1 customer fields.
- * Version:           2.1.29
+ * Plugin URI:        https://www.kigo.cloud/fiskalizacija-web-trgovine/
+ * Description:       Croatian fiscalization for WooCommerce: every order becomes a fiscalized invoice in Kigo.Cloud, with R1 invoices, the invoice PDF for the customer and stock sync.
+ * Version:           2.1.30
  * Requires at least: 5.5
  * Requires PHP:      7.2
  * Requires Plugins:  woocommerce
@@ -18,8 +18,8 @@
  * WC tested up to:   11.2
  * Author:            Symmetria d.o.o.
  * Author URI:        https://www.symmetria.hr/
- * License:           GPL-2.0+
- * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
+ * License:           GPL-2.0-or-later
+ * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:       kigocloud-for-woocommerce
  * Domain Path:       /languages
  * Update URI:        https://github.com/symmetria-doo/kigocloud-for-woocommerce
@@ -29,7 +29,7 @@ if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
-define( 'WOO_KIGOCLOUD_PLUGIN_NAME_VERSION', '2.1.29' );
+define( 'WOO_KIGOCLOUD_PLUGIN_NAME_VERSION', '2.1.30' );
 define( 'WOO_KIGOCLOUD_PLUGIN_FILE', __FILE__ );
 define( 'WOO_KIGOCLOUD_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'WOO_KIGOCLOUD_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
@@ -56,7 +56,11 @@ add_action( 'before_woocommerce_init', function () {
 	}
 } );
 
-// Auto-update against GitHub Releases.
+// wporg-strip-start
+// Auto-update against GitHub Releases. The wordpress.org build (bin/build-wporg.sh)
+// removes everything between the wporg-strip markers together with the updater
+// library in vendor/, because wordpress.org delivers the updates there.
+define( 'WOO_KIGOCLOUD_GITHUB_UPDATES', true );
 $kigocloud_puc_bootstrap = WOO_KIGOCLOUD_PLUGIN_DIR . 'vendor/plugin-update-checker/plugin-update-checker.php';
 if ( file_exists( $kigocloud_puc_bootstrap ) ) {
 	require_once $kigocloud_puc_bootstrap;
@@ -88,6 +92,7 @@ if ( file_exists( $kigocloud_puc_bootstrap ) ) {
 		}
 	}
 }
+// wporg-strip-end
 
 require WOO_KIGOCLOUD_PLUGIN_DIR . 'includes/class-woo-kigocloud.php';
 

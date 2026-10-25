@@ -47,6 +47,10 @@ jobs:
             --exclude='.idea' \
             --exclude='node_modules' \
             --exclude='.gitignore' \
+            --exclude='.distignore' \
+            --exclude='.wordpress-org' \
+            --exclude='/bin' \
+            --exclude='/build' \
             --exclude='composer.lock' \
             --exclude='CONTRIBUTING.md' \
             --exclude='*.zip' \

@@ -22,12 +22,12 @@ This plugin uses GitHub Releases as the update source. Yahnis Elsts' [plugin-upd
 
 For each release:
 
-1. Bump version in three places (must match):
+1. Bump version in four places (must match; `bin/build-wporg.sh` checks it):
    - `kigocloud-for-woocommerce.php` plugin header `Version:`
    - `kigocloud-for-woocommerce.php` `WOO_KIGOCLOUD_PLUGIN_NAME_VERSION` define
    - `includes/class-woo-kigocloud.php` `Woo_KigoCloud::PLUGIN_VERSION`
-   - `README.txt` `Stable tag:`
-2. Add a changelog entry to `README.txt` and `README.md`.
+   - `readme.txt` `Stable tag:`
+2. Add a changelog entry to `readme.txt` and `CHANGELOG.md`.
 3. Commit and push to `main`.
 4. Tag:
    ```bash
@@ -49,6 +49,16 @@ For each release:
    ```
    Without `gh`, do this through the GitHub UI: Releases -> Draft a new release.
 7. WordPress sites with this plugin installed will detect the new release at the next update check (within 12 hours by default, or instantly when an admin clicks Check for updates on the Plugins page).
+
+## wordpress.org
+
+The same tag also runs `.github/workflows/wporg.yml`, which builds the wordpress.org variant with `bin/build-wporg.sh` (no updater, no `Update URI`, no `vendor/`) and keeps the zip as a workflow artifact. Once the repository variable `WPORG_DEPLOY` is `true` and the secrets `SVN_USERNAME` / `SVN_PASSWORD` are set, it also commits the build to `https://plugins.svn.wordpress.org/kigocloud-for-woocommerce/` (trunk + tag) together with the banner, icon and screenshots in `.wordpress-org/`.
+
+To build locally you need bash, rsync, zip and gettext:
+
+```bash
+bin/build-wporg.sh
+```
 
 ## Versioning
 

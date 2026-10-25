@@ -64,6 +64,22 @@
         show(slug);
     });
 
+    // "Try with the demo account" only fills in the form. Nothing is sent
+    // anywhere until the admin saves, exactly as with a login typed by hand.
+    var demoBtn = document.getElementById('kigocloud-use-demo');
+    if (demoBtn) {
+        demoBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            var fields = { kigocloud_username: 'username', kigocloud_password: 'password', kigocloud_pin: 'pin' };
+            for (var id in fields) {
+                var input = document.getElementById(id);
+                if (input) { input.value = demoBtn.getAttribute('data-' + fields[id]) || ''; }
+            }
+            var hint = document.getElementById('kigocloud-use-demo-hint');
+            if (hint) { hint.style.display = ''; }
+        });
+    }
+
     // Test-push button wiring (the button lives inside the R1 pane which
     // is always present in the DOM, so a single bind is enough).
     var btn = document.getElementById('kigocloud-test-push');

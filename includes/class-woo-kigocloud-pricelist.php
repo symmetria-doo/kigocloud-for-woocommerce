@@ -278,8 +278,11 @@ class Woo_KigoCloud_Pricelist
                 return self::store_status('error', __('KigoCloud did not send the prescribed file name. Update KigoCloud or contact support.', 'kigocloud-for-woocommerce'));
             }
             $target = trailingslashit($dir) . $name;
-            file_put_contents($target . '.tmp', $body);
-            rename($target . '.tmp', $target);
+            // Written aside and moved into place, so a visitor never gets half a file.
+            $fs = self::filesystem();
+            if (!$fs->put_contents($target . '.tmp', $body, FS_CHMOD_FILE) || !$fs->move($target . '.tmp', $target, true)) {
+                return self::store_status('error', __('The price list could not be saved in the uploads folder.', 'kigocloud-for-woocommerce'));
+            }
             $current[$format] = $name;
             $fetched++;
         }
@@ -307,9 +310,23 @@ class Woo_KigoCloud_Pricelist
             }
             $legacy = in_array(basename($file), array('cjenik.csv', 'cjenik.xml'), true);
             if ($legacy || filemtime($file) < $limit) {
-                unlink($file);
+                wp_delete_file($file);
             }
         }
+    }
+
+    /**
+     * Direct file access for the plugin's own folder in uploads, which PHP can
+     * always write to. Also used from WP-Cron, where no FTP credentials can be asked.
+     *
+     * @return WP_Filesystem_Direct
+     */
+    private static function filesystem()
+    {
+        require_once ABSPATH . 'wp-admin/includes/class-wp-filesystem-base.php';
+        require_once ABSPATH . 'wp-admin/includes/class-wp-filesystem-direct.php';
+
+        return new WP_Filesystem_Direct(null);
     }
 
     /**
@@ -429,13 +446,17 @@ class Woo_KigoCloud_Pricelist
         if ($path === '' || !file_exists($path)) {
             return '<p>' . esc_html__('The price list is not available yet.', 'kigocloud-for-woocommerce') . '</p>';
         }
-        $handle = fopen($path, 'r');
-        if ($handle === false) {
+        try {
+            $csv = new SplFileObject($path, 'r');
+        } catch (Exception $e) {
             return '<p>' . esc_html__('The price list is not available yet.', 'kigocloud-for-woocommerce') . '</p>';
         }
+        $csv->setFlags(SplFileObject::READ_CSV | SplFileObject::SKIP_EMPTY | SplFileObject::READ_AHEAD);
+        $csv->setCsvControl(';', '"', '\\');
 
         $limit = max(0, (int) $atts['limit']);
-        $header = fgetcsv($handle, 0, ';');
+        $header = $csv->current();
+        $csv->next();
         if (is_array($header)) {
             // The first column may carry a UTF-8 BOM written for spreadsheet apps.
             $header[0] = preg_replace('/^\xEF\xBB\xBF/', '', $header[0]);
@@ -456,7 +477,11 @@ class Woo_KigoCloud_Pricelist
         }
         $out .= '</tr></thead><tbody>';
         $rows = 0;
-        while (($row = fgetcsv($handle, 0, ';')) !== false) {
+        for (; $csv->valid(); $csv->next()) {
+            $row = $csv->current();
+            if (!is_array($row) || $row === array(null)) {
+                continue;
+            }
             $out .= '<tr>';
             foreach ($row as $cell) {
                 $out .= '<td>' . esc_html((string) $cell) . '</td>';
@@ -467,7 +492,7 @@ class Woo_KigoCloud_Pricelist
                 break;
             }
         }
-        fclose($handle);
+        $csv = null;
         $out .= '</tbody></table>';
 
         $archive = self::archive();

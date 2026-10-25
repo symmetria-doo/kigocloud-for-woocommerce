@@ -13,6 +13,10 @@
  * @since   2.0.0
  */
 
+if (!defined('ABSPATH')) {
+    exit;
+}
+
 class Woo_KigoCloud_Admin_Page
 {
     const PAGE_SLUG  = 'kigocloud';
@@ -38,9 +42,12 @@ class Woo_KigoCloud_Admin_Page
         // admin page is a single form with one Save button and one
         // POST to options.php that saves every option in one shot.
         $opts_by_group = $this->settings_map();
+        $sanitizers    = $this->sanitizers();
         foreach ($opts_by_group as $opts) {
             foreach ($opts as $opt) {
-                register_setting('kigocloud_settings', $opt);
+                register_setting('kigocloud_settings', $opt, array(
+                    'sanitize_callback' => isset($sanitizers[$opt]) ? $sanitizers[$opt] : 'sanitize_text_field',
+                ));
             }
         }
 
@@ -51,10 +58,42 @@ class Woo_KigoCloud_Admin_Page
                 }
                 $gid = esc_attr($gateway->id);
                 foreach (array('pos_type', 'payment_type', 'on_status', 'pdf_payment_type') as $stem) {
-                    register_setting('kigocloud_settings', 'kigocloud_' . $stem . '-' . $gid);
+                    register_setting('kigocloud_settings', 'kigocloud_' . $stem . '-' . $gid, array(
+                        'sanitize_callback' => 'sanitize_text_field',
+                    ));
                 }
             }
         }
+    }
+
+    /**
+     * Options that need more than sanitize_text_field.
+     *
+     * @return array option name => callback
+     */
+    private function sanitizers()
+    {
+        return array(
+            // Kept as typed: a password may contain characters sanitize_text_field would strip.
+            'kigocloud_password'                => array(__CLASS__, 'sanitize_password'),
+            'kigocloud_email_from'              => 'sanitize_email',
+            'kigocloud_reply_to'                => 'sanitize_email',
+            'kigocloud_custom_mapping'          => 'sanitize_textarea_field',
+            Woo_KigoCloud_Pricelist::OPTION_URL => 'esc_url_raw',
+        );
+    }
+
+    /**
+     * @param mixed $value
+     * @return string
+     */
+    public static function sanitize_password($value)
+    {
+        if (!is_scalar($value)) {
+            return '';
+        }
+        // Control characters and line breaks cannot be part of a password typed into a single-line field.
+        return trim(preg_replace('/[\x00-\x1F\x7F]/', '', (string) $value));
     }
 
     public function enqueue_admin_css($hook)
@@ -186,13 +225,15 @@ class Woo_KigoCloud_Admin_Page
             return;
         }
         $tabs = $this->tabs();
-        $current = isset($_GET['tab']) ? sanitize_key((string) $_GET['tab']) : 'connection';
+        // phpcs:disable WordPress.Security.NonceVerification.Recommended -- only picks the visible tab and the saved notice.
+        $current = isset($_GET['tab']) ? sanitize_key(wp_unslash($_GET['tab'])) : 'connection';
         if (!isset($tabs[$current])) {
             $current = 'connection';
         }
 
         // settings-updated message (options.php redirects with ?settings-updated=true)
-        $settings_saved = isset($_GET['settings-updated']) && $_GET['settings-updated'] === 'true';
+        $settings_saved = isset($_GET['settings-updated']) && sanitize_key(wp_unslash($_GET['settings-updated'])) === 'true';
+        // phpcs:enable WordPress.Security.NonceVerification.Recommended
         ?>
         <div class="wrap kigocloud-admin">
             <h1>
@@ -226,9 +267,8 @@ class Woo_KigoCloud_Admin_Page
                         if (!method_exists($this, $method)) {
                             continue;
                         }
-                        $hidden = ($slug === $current) ? '' : 'style="display:none;"';
                     ?>
-                        <div class="kigocloud-tab-pane" data-tab="<?php echo esc_attr($slug); ?>" <?php echo $hidden; ?>>
+                        <div class="kigocloud-tab-pane" data-tab="<?php echo esc_attr($slug); ?>"<?php echo ($slug === $current) ? '' : ' style="display:none;"'; ?>>
                             <?php $this->{$method}(); ?>
                         </div>
                     <?php endforeach; ?>
@@ -384,15 +424,19 @@ class Woo_KigoCloud_Admin_Page
         <div class="kc-card">
             <h2><?php esc_html_e('API credentials', 'kigocloud-for-woocommerce'); ?></h2>
             <p class="kc-desc"><?php esc_html_e('Login used to talk to KigoCloud. The endpoint is fixed and shown on the About tab.', 'kigocloud-for-woocommerce'); ?></p>
+            <p class="kc-desc"><?php esc_html_e('Nothing is sent to KigoCloud until a username and a password are saved here and a payment method has a document type on the Orders tab.', 'kigocloud-for-woocommerce'); ?></p>
             <?php $this->open_form('kigocloud_connection'); ?>
             <table class="form-table" role="presentation">
                 <?php
                 $this->text_field('kigocloud_username', __('API username', 'kigocloud-for-woocommerce'), array(
-                    'default' => 'admin_demo',
+                    'description' => sprintf(
+                        /* translators: %s: link to the Kigo.Cloud website */
+                        __('No account yet? See %s.', 'kigocloud-for-woocommerce'),
+                        '<a href="https://www.kigo.cloud/fiskalizacija-web-trgovine/" target="_blank" rel="noopener">www.kigo.cloud</a>'
+                    ),
                 ));
                 $this->text_field('kigocloud_password', __('API password', 'kigocloud-for-woocommerce'), array(
-                    'type'    => 'password',
-                    'default' => 'admin_demo',
+                    'type' => 'password',
                 ));
                 $this->text_field('kigocloud_pin', __('Employee PIN', 'kigocloud-for-woocommerce'), array(
                     'default'     => '1',
@@ -401,6 +445,29 @@ class Woo_KigoCloud_Admin_Page
                 ?>
             </table>
             <?php $this->close_form(); ?>
+        </div>
+        <div class="kc-card">
+            <h2><?php esc_html_e('Try it with the demo account', 'kigocloud-for-woocommerce'); ?></h2>
+            <p class="kc-desc"><?php esc_html_e('The public Kigo.Cloud demo account shows the whole flow before you have your own account: the order becomes an invoice with a ZKI and a JIR, signed with a test certificate, so it is not a real fiscalized invoice.', 'kigocloud-for-woocommerce'); ?></p>
+            <p class="kc-desc"><strong><?php esc_html_e('Anyone can log in to the demo account, so everything sent there, including the name, address and e-mail of the customer, is visible to others. Use it only with test orders and switch to your own account before taking real orders.', 'kigocloud-for-woocommerce'); ?></strong></p>
+            <p>
+                <button type="button" class="button button-secondary" id="kigocloud-use-demo"
+                        data-username="admin_demo" data-password="admin_demo" data-pin="1">
+                    <?php esc_html_e('Try with the demo account', 'kigocloud-for-woocommerce'); ?>
+                </button>
+                <span id="kigocloud-use-demo-hint" style="display:none;">
+                    <?php esc_html_e('Demo login filled in. Click Save all settings to use it.', 'kigocloud-for-woocommerce'); ?>
+                </span>
+            </p>
+            <p class="description">
+                <?php
+                printf(
+                    /* translators: %s: link to the Kigo.Cloud login page */
+                    esc_html__('The documents can be seen in the demo at %s (username and password admin_demo).', 'kigocloud-for-woocommerce'),
+                    '<a href="https://app.kigo.cloud/hr/site/login" target="_blank" rel="noopener">app.kigo.cloud</a>'
+                );
+                ?>
+            </p>
         </div>
         <?php
     }
@@ -560,14 +627,14 @@ class Woo_KigoCloud_Admin_Page
                 <tr>
                     <td><strong><?php echo esc_html($gw->title); ?></strong><br><small><code><?php echo esc_html($gid); ?></code></small></td>
                     <td>
-                        <select name="kigocloud_pos_type-<?php echo $gid; ?>">
+                        <select name="kigocloud_pos_type-<?php echo esc_attr($gid); ?>">
                             <option value="0"<?php selected($pos_type, '0'); ?>><?php esc_html_e('Disabled', 'kigocloud-for-woocommerce'); ?></option>
                             <option value="1"<?php selected($pos_type, '1'); ?>><?php esc_html_e('Invoice', 'kigocloud-for-woocommerce'); ?></option>
                             <option value="2"<?php selected($pos_type, '2'); ?>><?php esc_html_e('Offer', 'kigocloud-for-woocommerce'); ?></option>
                         </select>
                     </td>
                     <td>
-                        <select name="kigocloud_payment_type-<?php echo $gid; ?>">
+                        <select name="kigocloud_payment_type-<?php echo esc_attr($gid); ?>">
                             <option value="T"<?php selected($payment_type, 'T'); ?>><?php esc_html_e('Transaction account', 'kigocloud-for-woocommerce'); ?></option>
                             <option value="K"<?php selected($payment_type, 'K'); ?>><?php esc_html_e('Card', 'kigocloud-for-woocommerce'); ?></option>
                             <option value="G"<?php selected($payment_type, 'G'); ?>><?php esc_html_e('Cash', 'kigocloud-for-woocommerce'); ?></option>
@@ -575,13 +642,13 @@ class Woo_KigoCloud_Admin_Page
                         </select>
                     </td>
                     <td>
-                        <select name="kigocloud_on_status-<?php echo $gid; ?>">
+                        <select name="kigocloud_on_status-<?php echo esc_attr($gid); ?>">
                             <option value="0"<?php selected($on_status, '0'); ?>><?php esc_html_e('Order created', 'kigocloud-for-woocommerce'); ?></option>
                             <option value="1"<?php selected($on_status, '1'); ?>><?php esc_html_e('Order completed', 'kigocloud-for-woocommerce'); ?></option>
                         </select>
                     </td>
                     <td>
-                        <select name="kigocloud_pdf_payment_type-<?php echo $gid; ?>">
+                        <select name="kigocloud_pdf_payment_type-<?php echo esc_attr($gid); ?>">
                             <option value="0"<?php selected($pdf, '0'); ?>><?php esc_html_e('No', 'kigocloud-for-woocommerce'); ?></option>
                             <option value="1"<?php selected($pdf, '1'); ?>><?php esc_html_e('Yes', 'kigocloud-for-woocommerce'); ?></option>
                         </select>
@@ -738,6 +805,7 @@ class Woo_KigoCloud_Admin_Page
                 'ok'      => $checkout_uses_block,
                 'value'   => $checkout_uses_block ? __('Yes', 'kigocloud-for-woocommerce') : __('No (classic [woocommerce_checkout] shortcode)', 'kigocloud-for-woocommerce'),
                 'hint'    => $checkout_edit_link
+                    /* translators: %s: link to edit the checkout page */
                     ? sprintf(__('Block checkout fields only appear if the Checkout page actually contains the WooCommerce checkout block. <a href="%s">Edit checkout page</a>.', 'kigocloud-for-woocommerce'), esc_url($checkout_edit_link))
                     : __('Block checkout fields only appear if the Checkout page actually contains the WooCommerce checkout block.', 'kigocloud-for-woocommerce'),
             ),
@@ -856,15 +924,12 @@ class Woo_KigoCloud_Admin_Page
         }
         check_ajax_referer('kigocloud_test_push', 'nonce');
 
-        $username = (string) get_option('kigocloud_username', 'admin_demo');
-        $password = (string) get_option('kigocloud_password', 'admin_demo');
-
-        // Empty options on a fresh install means the admin has not yet
-        // hit Save All. Fall back to the same defaults the form shows
-        // so the test still goes through (and surfaces real credential
-        // errors from KigoCloud) instead of bailing locally.
-        if ($username === '') { $username = 'admin_demo'; }
-        if ($password === '') { $password = 'admin_demo'; }
+        // Nothing goes out before the shop has entered a login.
+        if (!Woo_KigoCloud_Request::has_credentials()) {
+            wp_send_json_error(array('message' => __('Enter the API username and password on the Connection tab and save them first.', 'kigocloud-for-woocommerce')));
+        }
+        $username = (string) get_option('kigocloud_username', '');
+        $password = (string) get_option('kigocloud_password', '');
 
         if ($username !== 'admin_demo') {
             $password = md5($password);
@@ -905,7 +970,6 @@ class Woo_KigoCloud_Admin_Page
             'timeout'     => 20,
             'redirection' => 0,
             'blocking'    => true,
-            'sslverify'   => false,
             'data_format' => 'body',
             'headers'     => array(
                 'HTTP_X_USERNAME' => $username,
@@ -1084,9 +1148,15 @@ class Woo_KigoCloud_Admin_Page
                     <th><?php esc_html_e('Source', 'kigocloud-for-woocommerce'); ?></th>
                     <td><a href="https://github.com/symmetria-doo/kigocloud-for-woocommerce" target="_blank" rel="noopener">github.com/symmetria-doo/kigocloud-for-woocommerce</a></td>
                 </tr>
+                <?php if (defined('WOO_KIGOCLOUD_GITHUB_UPDATES')): ?>
                 <tr>
                     <th><?php esc_html_e('Releases', 'kigocloud-for-woocommerce'); ?></th>
                     <td><a href="https://github.com/symmetria-doo/kigocloud-for-woocommerce/releases" target="_blank" rel="noopener">github.com/symmetria-doo/kigocloud-for-woocommerce/releases</a></td>
+                </tr>
+                <?php endif; ?>
+                <tr>
+                    <th><?php esc_html_e('Website', 'kigocloud-for-woocommerce'); ?></th>
+                    <td><a href="https://www.kigo.cloud/fiskalizacija-web-trgovine/" target="_blank" rel="noopener">www.kigo.cloud</a></td>
                 </tr>
                 <tr>
                     <th><?php esc_html_e('Changelog', 'kigocloud-for-woocommerce'); ?></th>
