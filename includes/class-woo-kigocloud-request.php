@@ -277,17 +277,11 @@ if (!class_exists('Woo_KigoCloud_Request')) {
                 $product  = $itemValue->get_product();
                 $itemSku  = $product ? $product->get_sku() : ''; // the product may be deleted since the order
 
-                // Manually calculate tax rate (tax can be only rounded number without decimals and 5, 13, 25 are only allowed)
-                $taxRate = $itemValue->get_total_tax() > 0 ? round(($itemValue->get_total_tax() / $itemValue->get_total()) * 100) : 0;
+                $taxRate = $this->get_lines_tax_rate($order, array($itemValue));
 
                 $quantity    = (float)($itemData['quantity'] !== 0) ? $itemData['quantity'] : 1;
-                $singlePrice = (float)$itemData['total'] / $quantity;
-
-                $currentPrice = round($singlePrice, 4); // price without tax
-                if ($taxRate > 0) {
-                    // modify current price to include tax if tax rate exits
-                    $currentPrice = round($currentPrice * (($taxRate / 100) + 1), 4);
-                }
+                // what the buyer paid for one piece, tax included, as on the order
+                $currentPrice = round(((float)$itemValue->get_total() + (float)$itemValue->get_total_tax()) / $quantity, 4);
 
 				if (empty($itemSku) && $fillMissingSKU == 1) {
 					// from the product (or its variation), so the same product gets the same SKU on every order;
@@ -321,7 +315,7 @@ if (!class_exists('Woo_KigoCloud_Request')) {
                 $item->item_name        = $fee_name;
                 $item->price            = (float)$fee_total + (float)$fee_tax;
                 if ($sendVatPercent) {
-                    $item->vat_percent  = $fee->get_total_tax() > 0 ? round(($fee->get_total_tax() / $fee->get_total()) * 100) : 0;
+                    $item->vat_percent  = $this->get_lines_tax_rate($order, array($fee));
                 }
                 $item->discount_percent = 0.00; // This could be done without discount_percent set, because fees are Services not Articles.
                 $item->quantity         = 1;
@@ -338,7 +332,7 @@ if (!class_exists('Woo_KigoCloud_Request')) {
                 $item->item_name        = __('Dostava', 'kigocloud-for-woocommerce');
                 $item->price            = $totalShipping;
                 if ($sendVatPercent) {
-                    $item->vat_percent  = $order->get_shipping_tax() > 0 ? round(($order->get_shipping_tax() / $order->get_shipping_total()) * 100) : 0.00;
+                    $item->vat_percent  = $this->get_lines_tax_rate($order, $order->get_items('shipping'));
                 }
                 $item->discount_percent = 0.00; // This could be done without discount_percent set, because shipping should be Service not Article.
                 $item->quantity         = 1; //always one
@@ -622,6 +616,60 @@ if (!class_exists('Woo_KigoCloud_Request')) {
             }
             // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText
             return __($text, 'kigocloud-for-woocommerce');
+        }
+
+        /**
+         * Tax rate of order lines as set in WooCommerce: the order keeps the percent of every tax rate it
+         * charged. A rate worked out from the amounts goes wrong on low prices, because the tax is rounded
+         * to the cent (0.19 / 0.776 gives 24 % for a 25 % product), and Porezna refuses a receipt with
+         * such a rate. The amounts are used only when the lines carry no rate the order knows.
+         *
+         * @param WC_Order        $order
+         * @param WC_Order_Item[] $lines
+         * @return float
+         */
+        private function get_lines_tax_rate($order, $lines)
+        {
+            $ratePercents = array();
+            foreach ($order->get_items('tax') as $taxItem) {
+                if (is_callable(array($taxItem, 'get_rate_percent')) && $taxItem->get_rate_percent() !== null && $taxItem->get_rate_percent() !== '') {
+                    $ratePercents[$taxItem->get_rate_id()] = (float)$taxItem->get_rate_percent();
+                }
+            }
+
+            $linePercents = array();
+            $total        = 0;
+            $tax          = 0;
+            foreach ($lines as $line) {
+                $total += (float)$line->get_total();
+                $tax   += (float)$line->get_total_tax();
+                $taxes  = $line->get_taxes();
+                if (empty($taxes['total']) || !is_array($taxes['total'])) {
+                    continue;
+                }
+                $percent = 0;
+                foreach ($taxes['total'] as $rateId => $amount) {
+                    if ($amount === '') {
+                        continue;
+                    }
+                    if (!isset($ratePercents[$rateId])) {
+                        $percent = null;
+                        break;
+                    }
+                    $percent += $ratePercents[$rateId];
+                }
+                if ($percent === null) {
+                    $linePercents = array();
+                    break;
+                }
+                $linePercents[(string)round($percent, 2)] = round($percent, 2);
+            }
+
+            if (count($linePercents) === 1) {
+                return reset($linePercents);
+            }
+
+            return ($tax > 0 && $total != 0) ? round(($tax / $total) * 100) : 0;
         }
 
         public function add_pdf_attachment($attachments, $email_id, $email_object){

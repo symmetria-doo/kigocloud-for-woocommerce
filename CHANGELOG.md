@@ -4,6 +4,12 @@ All notable changes to KigoCloud for WooCommerce are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.31] - 2026-10-26
+
+### Fixed
+- Tax rate of products, fees and shipping comes from the order's tax items (`WC_Order_Item_Tax::get_rate_percent()` by the rate ids of the line, `get_lines_tax_rate()`), no longer `round(total_tax / total * 100)`: on a low price the tax rounded to the cent gave a rate that does not exist (0.19 / 0.776 = 24 % for a 25 % product) and Porezna refused the receipt (s013/182). The amounts are still used when the line has no rate the order knows.
+- The product price sent is (total + total tax) / quantity, what the buyer paid, instead of the net price times the rate worked out above.
+
 ## [2.1.30] - 2026-10-25
 
 ### Added
