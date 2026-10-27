@@ -32,17 +32,18 @@ class Woo_KigoCloud_i18n {
 
 
 	/**
-	 * Load the plugin text domain for translation.
+	 * Loads the translation the plugin ships for the current locale
+	 * (Croatian, German, English). Without one, WordPress loads the
+	 * wordpress.org language pack on its own when a string is first used.
 	 *
 	 * @since    1.0.0
 	 */
 	public function load_plugin_textdomain() {
 
-		load_plugin_textdomain(
-			'kigocloud-for-woocommerce',
-			false,
-			dirname( dirname( plugin_basename( __FILE__ ) ) ) . '/languages/'
-		);
+		$mofile = dirname( dirname( __FILE__ ) ) . '/languages/kigocloud-for-woocommerce-' . determine_locale() . '.mo';
+		if ( is_readable( $mofile ) ) {
+			load_textdomain( 'kigocloud-for-woocommerce', $mofile );
+		}
 
 	}
 

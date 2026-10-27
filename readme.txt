@@ -4,7 +4,7 @@ Tags: fiskalizacija, fiscalization, croatia, invoice, r1
 Requires at least: 5.5
 Tested up to: 7.1
 Requires PHP: 7.2
-Stable tag: 2.1.31
+Stable tag: 2.1.32
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 WC requires at least: 5.0
@@ -111,6 +111,10 @@ Kigo.Cloud privacy policy: https://www.kigocloud.com/zastita-osobnih-podataka
 
 == Changelog ==
 
+= 2.1.32 =
+* The plugin's own translations (Croatian, German, English) are loaded directly; without one, WordPress loads the wordpress.org language pack.
+* The R1 tab no longer prints an inline script.
+
 = 2.1.31 =
 * Fix: the tax rate of a product, fee and shipping is the rate set in WooCommerce, no longer one worked out from the amounts. On a low price the tax rounded to the cent gave a rate that does not exist (24 % instead of 25 %), and Kigo.Cloud could not fiscalize such a receipt. The price sent is what the buyer paid, tax included, as on the order.
 
@@ -167,6 +171,9 @@ Kigo.Cloud privacy policy: https://www.kigocloud.com/zastita-osobnih-podataka
 Older versions: https://github.com/symmetria-doo/kigocloud-for-woocommerce/blob/main/CHANGELOG.md
 
 == Upgrade Notice ==
+
+= 2.1.32 =
+Small fixes for the wordpress.org release. Settings are kept.
 
 = 2.1.31 =
 The tax rate sent to Kigo.Cloud is the rate set in WooCommerce, so receipts for low prices are fiscalized.

@@ -45,7 +45,7 @@ class Woo_KigoCloud {
      *
      * @since 1.0.0
      */
-    const PLUGIN_VERSION = '2.1.31';
+    const PLUGIN_VERSION = '2.1.32';
 
 	/**
 	 * The loader that's responsible for maintaining and registering all hooks that power
@@ -190,7 +190,7 @@ class Woo_KigoCloud {
 
 		$plugin_i18n = new Woo_KigoCloud_i18n();
 
-		$this->loader->add_action( 'plugins_loaded', $plugin_i18n, 'load_plugin_textdomain' );
+		$this->loader->add_action( 'init', $plugin_i18n, 'load_plugin_textdomain', 0 );
 
 	}
 

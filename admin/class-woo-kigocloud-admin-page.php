@@ -727,11 +727,6 @@ class Woo_KigoCloud_Admin_Page
                 </button>
             </p>
             <div id="kigocloud-test-push-result" class="kc-test-result" style="display:none;"></div>
-            <script>
-                /* If JS is disabled the result box stays hidden; with JS we
-                   reveal it so the test button has somewhere to render to. */
-                document.getElementById('kigocloud-test-push-result').style.display = '';
-            </script>
         </div>
         <?php
     }

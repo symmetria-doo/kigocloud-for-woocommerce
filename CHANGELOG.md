@@ -4,6 +4,12 @@ All notable changes to KigoCloud for WooCommerce are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.32] - 2026-10-27
+
+### Changed
+- `Woo_KigoCloud_i18n::load_plugin_textdomain()` loads the bundled `languages/kigocloud-for-woocommerce-<locale>.mo` with `load_textdomain()` on `init` instead of calling `load_plugin_textdomain()` on `plugins_loaded` (discouraged by Plugin Check). Without a bundled file WordPress loads the wordpress.org language pack just in time.
+- R1 tab: the inline `<script>` that revealed the test result box is removed; `admin/js/kigocloud-admin.js` already shows it on click.
+
 ## [2.1.31] - 2026-10-26
 
 ### Fixed
