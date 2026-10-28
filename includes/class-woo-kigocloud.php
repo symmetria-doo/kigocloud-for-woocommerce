@@ -45,7 +45,22 @@ class Woo_KigoCloud {
      *
      * @since 1.0.0
      */
-    const PLUGIN_VERSION = '2.1.32';
+    const PLUGIN_VERSION = '2.1.33';
+
+    /**
+     * Admin notices of the plugin appear only on the Dashboard, the Plugins
+     * screen and the plugin's own page, never on every admin screen.
+     *
+     * @return bool
+     */
+    public static function is_notice_screen()
+    {
+        if (!function_exists('get_current_screen')) {
+            return false;
+        }
+        $screen = get_current_screen();
+        return $screen && in_array($screen->id, array('dashboard', 'plugins', 'toplevel_page_kigocloud'), true);
+    }
 
 	/**
 	 * The loader that's responsible for maintaining and registering all hooks that power
@@ -190,7 +205,7 @@ class Woo_KigoCloud {
 
 		$plugin_i18n = new Woo_KigoCloud_i18n();
 
-		$this->loader->add_action( 'init', $plugin_i18n, 'load_plugin_textdomain', 0 );
+		$this->loader->add_action( 'init', $plugin_i18n, 'load_bundled_translations', 0 );
 
 	}
 

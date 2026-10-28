@@ -36,7 +36,8 @@ class Woo_KigoCloud_Rest
             'methods' => 'GET',
             'callback' => [$this, 'get_variation_by_sku'],
             'permission_callback' => function () {
-                return current_user_can('read'); // Or use any other capability check suitable for your API access level
+                // The same capability WooCommerce asks for to read products over wc/v3.
+                return current_user_can('read_private_products');
             },
         ]);
     }
@@ -79,7 +80,8 @@ class Woo_KigoCloud_Rest
 			'methods' => 'GET',
 			'callback' => [$this, 'get_product_by_sku'],
 			'permission_callback' => function () {
-				return current_user_can('read'); // Or use any other capability check suitable for your API access level
+				// The same capability WooCommerce asks for to read products over wc/v3.
+				return current_user_can('read_private_products');
 			},
 		]);
 	}

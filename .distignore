@@ -21,3 +21,5 @@ README.md
 *.tar.gz
 .DS_Store
 Thumbs.db
+# wordpress.org delivers the translations from translate.wordpress.org.
+/languages

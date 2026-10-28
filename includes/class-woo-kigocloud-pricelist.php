@@ -418,7 +418,7 @@ class Woo_KigoCloud_Pricelist
      */
     public static function admin_notice()
     {
-        if (!current_user_can('manage_options') || self::base_url() === '' || self::is_current()) {
+        if (!current_user_can('manage_options') || !Woo_KigoCloud::is_notice_screen() || self::base_url() === '' || self::is_current()) {
             return;
         }
         $status = self::status();

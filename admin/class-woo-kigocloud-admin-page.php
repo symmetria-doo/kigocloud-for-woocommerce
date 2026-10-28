@@ -45,8 +45,11 @@ class Woo_KigoCloud_Admin_Page
         $sanitizers    = $this->sanitizers();
         foreach ($opts_by_group as $opts) {
             foreach ($opts as $opt) {
+                // Every option is a string; sanitizers() names the ones that need more than sanitize_text_field.
+                $sanitize_callback = isset($sanitizers[$opt]) ? $sanitizers[$opt] : 'sanitize_text_field';
                 register_setting('kigocloud_settings', $opt, array(
-                    'sanitize_callback' => isset($sanitizers[$opt]) ? $sanitizers[$opt] : 'sanitize_text_field',
+                    'type'              => 'string',
+                    'sanitize_callback' => $sanitize_callback,
                 ));
             }
         }
@@ -59,6 +62,7 @@ class Woo_KigoCloud_Admin_Page
                 $gid = esc_attr($gateway->id);
                 foreach (array('pos_type', 'payment_type', 'on_status', 'pdf_payment_type') as $stem) {
                     register_setting('kigocloud_settings', 'kigocloud_' . $stem . '-' . $gid, array(
+                        'type'              => 'string',
                         'sanitize_callback' => 'sanitize_text_field',
                     ));
                 }

@@ -162,7 +162,7 @@ class Woo_KigoCloud_Admin
 
     public function show_migration_admin_notice($old_version, $new_version)
     {
-        if (!current_user_can('manage_options')) {
+        if (!current_user_can('manage_options') || !Woo_KigoCloud::is_notice_screen()) {
             return;
         }
         $settings_saved = get_option('kigocloud_show_migration_notice', 0);
@@ -184,7 +184,7 @@ class Woo_KigoCloud_Admin
      */
     public function checkout_block_admin_notice()
     {
-        if (!is_admin()) {
+        if (!is_admin() || !current_user_can('manage_woocommerce') || !Woo_KigoCloud::is_notice_screen()) {
             return;
         }
         $enableVatInvoice = (int) get_option('kigocloud_vat_invoices', 0);

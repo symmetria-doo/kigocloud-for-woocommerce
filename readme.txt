@@ -4,7 +4,7 @@ Tags: fiskalizacija, fiscalization, croatia, invoice, r1
 Requires at least: 5.5
 Tested up to: 7.1
 Requires PHP: 7.2
-Stable tag: 2.1.32
+Stable tag: 2.1.33
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 WC requires at least: 5.0
@@ -111,6 +111,10 @@ Kigo.Cloud privacy policy: https://www.kigocloud.com/zastita-osobnih-podataka
 
 == Changelog ==
 
+= 2.1.33 =
+* The product lookup by SKU over the REST API needs the same permission as reading products through the WooCommerce REST API.
+* Admin notices appear only on the Dashboard, the Plugins screen and the KigoCloud page.
+
 = 2.1.32 =
 * The plugin's own translations (Croatian, German, English) are loaded directly; without one, WordPress loads the wordpress.org language pack.
 * The R1 tab no longer prints an inline script.
@@ -171,6 +175,9 @@ Kigo.Cloud privacy policy: https://www.kigocloud.com/zastita-osobnih-podataka
 Older versions: https://github.com/symmetria-doo/kigocloud-for-woocommerce/blob/main/CHANGELOG.md
 
 == Upgrade Notice ==
+
+= 2.1.33 =
+Tighter permission on the SKU lookup and fewer admin notices. Settings are kept.
 
 = 2.1.32 =
 Small fixes for the wordpress.org release. Settings are kept.

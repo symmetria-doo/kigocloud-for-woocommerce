@@ -7,10 +7,12 @@
 # from anywhere else, so this build drops what the GitHub release keeps:
 #   - the vendor/plugin-update-checker folder (via .distignore),
 #   - the "Update URI" header,
-#   - the updater bootstrap between the wporg-strip markers in the main file.
+#   - the updater bootstrap between the wporg-strip markers in the main file,
+#   - the languages folder and the "Domain Path" header: translate.wordpress.org
+#     delivers the language packs.
 # The GitHub release (.github/workflows/release.yml) is not affected.
 #
-# Needs: bash, rsync, zip, msgfmt (gettext). Usage: bin/build-wporg.sh [output dir]
+# Needs: bash, rsync, zip. Usage: bin/build-wporg.sh [output dir]
 
 set -euo pipefail
 
@@ -30,15 +32,15 @@ find "${DEST}" -type f -exec chmod 644 {} +
 
 sed -i '/^ \* Update URI:/d' "${MAIN}"
 sed -i '/wporg-strip-start/,/wporg-strip-end/d' "${MAIN}"
-
-# languages/*.mo is ignored by git; WordPress reads only the compiled files.
-for po in "${DEST}"/languages/*.po; do
-    msgfmt -o "${po%.po}.mo" "${po}"
-done
+sed -i '/^ \* Domain Path:/d' "${MAIN}"
 
 # The build must not be able to update itself.
 if grep -rniE 'plugin-update-checker|PucFactory|Update URI' "${DEST}" --include='*.php'; then
     echo "Updater code left in the wordpress.org build." >&2
+    exit 1
+fi
+if [ -n "$(find "${DEST}" -name '*.po' -o -name '*.mo' -o -name '*.l10n.php')" ]; then
+    echo "Translation files left in the wordpress.org build." >&2
     exit 1
 fi
 if [ -d "${DEST}/vendor" ]; then

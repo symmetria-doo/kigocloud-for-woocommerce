@@ -4,6 +4,15 @@ All notable changes to KigoCloud for WooCommerce are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.33] - 2026-10-28
+
+### Changed
+- REST `wc/v3/kigocloud/products/sku/<sku>` and `.../products/variations/sku/<sku>` require `read_private_products` (what WooCommerce asks for to read products over `wc/v3`) instead of `read`, which every logged-in customer has.
+- Admin notices (update review, KigoKasa switch, stale price list, block checkout on old WooCommerce) are shown only on the Dashboard, the Plugins screen and the KigoCloud page (`Woo_KigoCloud::is_notice_screen()`).
+- `register_setting()` passes `'type' => 'string'` with the sanitize callback.
+- `Woo_KigoCloud_i18n::load_plugin_textdomain()` renamed to `load_bundled_translations()`.
+- wordpress.org build: no `languages/` folder and no `Domain Path` header, translate.wordpress.org delivers the language packs; the GitHub release keeps the bundled translations.
+
 ## [2.1.32] - 2026-10-27
 
 ### Changed

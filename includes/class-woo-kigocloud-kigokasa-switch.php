@@ -294,7 +294,7 @@ class Woo_KigoCloud_KigoKasa_Switch
      */
     public static function admin_notice()
     {
-        if (!current_user_can('activate_plugins')) {
+        if (!current_user_can('activate_plugins') || !Woo_KigoCloud::is_notice_screen()) {
             return;
         }
 
