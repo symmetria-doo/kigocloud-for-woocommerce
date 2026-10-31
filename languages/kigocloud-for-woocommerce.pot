@@ -104,7 +104,7 @@ msgid "Login used to talk to KigoCloud. The endpoint is fixed and shown on the A
 msgstr ""
 
 #: admin/class-woo-kigocloud-admin-page.php:423
-msgid "Nothing is sent to KigoCloud until a username and a password are saved here and a payment method has a document type on the Orders tab."
+msgid "Nothing is sent to KigoCloud until an API key, or a username and a password, are saved here and a payment method has a document type on the Orders tab."
 msgstr ""
 
 #: admin/class-woo-kigocloud-admin-page.php:427
@@ -581,7 +581,7 @@ msgid "Permission denied."
 msgstr ""
 
 #: admin/class-woo-kigocloud-admin-page.php:925
-msgid "Enter the API username and password on the Connection tab and save them first."
+msgid "Enter the API key, or the API username and password, on the Connection tab and save them first."
 msgstr ""
 
 #. translators: %s: error message
@@ -953,3 +953,16 @@ msgstr ""
 #: public/class-woo-kigocloud-public.php:59
 msgid "Sidrena cijena"
 msgstr ""
+
+msgid "API key"
+msgstr ""
+
+msgid "Recommended. Create the key in Kigo.Cloud under Opcije > Integracije > API ključevi with the permissions Čitanje i pisanje, and choose API ključ under Postavke on the same screen. When a key is saved, the username and password below are not used."
+msgstr ""
+
+msgid "Login: API key."
+msgstr ""
+
+msgid "Login: username and password."
+msgstr ""
+

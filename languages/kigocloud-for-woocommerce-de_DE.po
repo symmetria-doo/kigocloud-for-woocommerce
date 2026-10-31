@@ -45,3 +45,21 @@ msgstr "Rechnung"
 msgid "Offer"
 msgstr "Angebot"
 
+msgid "API key"
+msgstr "API-Schlüssel"
+
+msgid "Recommended. Create the key in Kigo.Cloud under Opcije > Integracije > API ključevi with the permissions Čitanje i pisanje, and choose API ključ under Postavke on the same screen. When a key is saved, the username and password below are not used."
+msgstr "Empfohlen. Erstellen Sie den Schlüssel in Kigo.Cloud unter Opcije > Integracije > API ključevi mit den Rechten Čitanje i pisanje und wählen Sie unter Postavke auf derselben Seite API ključ. Ist ein Schlüssel gespeichert, werden Benutzername und Passwort unten nicht verwendet."
+
+msgid "Login: API key."
+msgstr "Anmeldung: API-Schlüssel."
+
+msgid "Login: username and password."
+msgstr "Anmeldung: Benutzername und Passwort."
+
+msgid "Nothing is sent to KigoCloud until an API key, or a username and a password, are saved here and a payment method has a document type on the Orders tab."
+msgstr "Es wird nichts an KigoCloud gesendet, bis hier ein API-Schlüssel oder Benutzername und Passwort gespeichert sind und eine Zahlungsart auf dem Reiter Bestellungen eine Dokumentart hat."
+
+msgid "Enter the API key, or the API username and password, on the Connection tab and save them first."
+msgstr "Geben Sie zuerst den API-Schlüssel oder den API-Benutzernamen und das Passwort auf dem Reiter Verbindung ein und speichern Sie sie."
+

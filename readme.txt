@@ -4,7 +4,7 @@ Tags: fiskalizacija, fiscalization, croatia, invoice, r1
 Requires at least: 5.5
 Tested up to: 7.1
 Requires PHP: 7.2
-Stable tag: 2.1.33
+Stable tag: 2.1.34
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 WC requires at least: 5.0
@@ -43,11 +43,11 @@ On the Connection tab, the **Try with the demo account** button fills in the log
 
 1. In WordPress go to Plugins > Add New, search for "KigoCloud" and install and activate **KigoCloud for WooCommerce**. WooCommerce must be active.
 2. Open **KigoCloud** in the admin menu.
-3. On the **Connection** tab enter the username, password and employee PIN of your Kigo.Cloud user, or click **Try with the demo account**.
+3. On the **Connection** tab enter an API key and the employee PIN, or the username, password and employee PIN of your Kigo.Cloud user, or click **Try with the demo account**.
 4. On the **Orders** tab choose the document type for each payment method you want fiscalized (Disabled leaves that payment method alone).
 5. Optionally set up R1 fields on the **R1** tab and the sender on the **Email** tab, then click **Save all settings**.
 
-Nothing is sent to Kigo.Cloud until a username and password are saved and at least one payment method has a document type.
+Nothing is sent to Kigo.Cloud until an API key, or a username and password, are saved and at least one payment method has a document type.
 
 == Frequently Asked Questions ==
 
@@ -110,6 +110,9 @@ Kigo.Cloud privacy policy: https://www.kigocloud.com/zastita-osobnih-podataka
 4. An order with the fiscalized Kigo.Cloud invoice number.
 
 == Changelog ==
+
+= 2.1.34 =
+* API key login: an optional API key on the Connection tab replaces the username and password. Shops without a key work as before.
 
 = 2.1.33 =
 * The product lookup by SKU over the REST API needs the same permission as reading products through the WooCommerce REST API.
@@ -175,6 +178,9 @@ Kigo.Cloud privacy policy: https://www.kigocloud.com/zastita-osobnih-podataka
 Older versions: https://github.com/symmetria-doo/kigocloud-for-woocommerce/blob/main/CHANGELOG.md
 
 == Upgrade Notice ==
+
+= 2.1.34 =
+Optional login with a Kigo.Cloud API key. Nothing changes for shops that keep the username and password.
 
 = 2.1.33 =
 Tighter permission on the SKU lookup and fewer admin notices. Settings are kept.

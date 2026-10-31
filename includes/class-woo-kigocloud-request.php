@@ -51,12 +51,61 @@ if (!class_exists('Woo_KigoCloud_Request')) {
         }
 
         /**
-         * @return bool True once the shop has entered an API username and password.
+         * API keys exist only on the Kigo.Cloud address; a shop moved from the KigoKasa
+         * add-on can still talk to the old address, which takes username and password.
+         *
+         * @return bool
+         */
+        public static function accepts_api_key()
+        {
+            return strpos((string) wp_parse_url(self::resolveApiUrl(), PHP_URL_HOST), 'kigo.cloud') !== false;
+        }
+
+        /**
+         * @return string The saved API key, empty when there is none or the address takes no keys.
+         */
+        public static function api_key()
+        {
+            return self::accepts_api_key() ? trim((string) get_option('kigocloud_api_key', '')) : '';
+        }
+
+        /**
+         * @return bool True once the shop has entered an API key, or an API username and password.
          */
         public static function has_credentials()
         {
-            return trim((string) get_option('kigocloud_username', '')) !== ''
-                && (string) get_option('kigocloud_password', '') !== '';
+            return self::api_key() !== ''
+                || (trim((string) get_option('kigocloud_username', '')) !== ''
+                    && (string) get_option('kigocloud_password', '') !== '');
+        }
+
+        /**
+         * Login headers of every API call: the API key when one is saved, otherwise the
+         * username and the md5 of the password.
+         *
+         * KigoCloud reads the literal header names "HTTP_X_USERNAME" / "HTTP_X_PASSWORD"
+         * (protected/modules/v1/components/RestController.php). Do NOT change these to
+         * the more standard "X-Username" form.
+         *
+         * @return array
+         */
+        public static function auth_headers()
+        {
+            $key = self::api_key();
+            if ($key !== '') {
+                return array('Authorization' => 'Bearer ' . $key);
+            }
+
+            $username = (string) get_option('kigocloud_username', '');
+            $password = (string) get_option('kigocloud_password', '');
+            if ($username !== 'admin_demo') { // the demo account takes the password as it is
+                $password = md5($password);
+            }
+
+            return array(
+                'HTTP_X_USERNAME' => $username,
+                'HTTP_X_PASSWORD' => $password,
+            );
         }
 
         /**
@@ -454,12 +503,6 @@ if (!class_exists('Woo_KigoCloud_Request')) {
 
             $mainBody->client = $client;
 
-            $username = get_option('kigocloud_username');
-            $password = get_option('kigocloud_password');
-            if ($username != 'admin_demo') { //dummy for now - for demo acc
-                $password = md5($password);
-            }
-
             $language = self::document_language($country);
             $apiUrl   = self::language_api_url($this->apiURL, $language);
 
@@ -480,20 +523,12 @@ if (!class_exists('Woo_KigoCloud_Request')) {
                 'blocking'    => true,
                 'httpversion' => '1.0',
                 'data_format' => 'body',
-                'headers'     => array(
-                    // KigoCloud server reads literal header names via
-                    // apache_request_headers() and matches keys
-                    // "HTTP_X_USERNAME" / "HTTP_X_PASSWORD" (see
-                    // protected/modules/v1/components/RestController.php
-                    // line 102). Do NOT change these to the more standard
-                    // "X-Username" form - the server will not see them.
-                    'HTTP_X_USERNAME' => $username,
-                    'HTTP_X_PASSWORD' => $password,
+                'headers'     => array_merge(self::auth_headers(), array(
                     'Expect'          => '',
                     'Content-Type'    => 'application/json',
                     'Charset'         => 'utf-8',
                     'Accept'          => 'application/json',
-                ),
+                )),
                 'body'        => wp_json_encode($mainBody),
             );
 
@@ -715,13 +750,7 @@ if (!class_exists('Woo_KigoCloud_Request')) {
                 );
 
             // Get PDF from API
-            $username = get_option('kigocloud_username');
-            $password = md5(get_option('kigocloud_password'));
             $replyTo = get_option('kigocloud_reply_to');
-
-            if ($username == 'admin_demo') { //dummy for now - for demo acc
-                $password = get_option('kigocloud_password');
-            }
 
             $postURL = esc_url_raw(($apiUrl ? $apiUrl : $this->apiURL) . 'invoice/getAsPdf/' . $body->id_pos);
             $payload = array(
@@ -730,10 +759,7 @@ if (!class_exists('Woo_KigoCloud_Request')) {
                 'redirection' => 0,
                 'blocking'    => true,
                 'httpversion' => '1.0',
-                'headers'     => array(
-                    'HTTP_X_USERNAME' => $username,
-                    'HTTP_X_PASSWORD' => $password,
-                ),
+                'headers'     => self::auth_headers(),
             );
 
             $response = wp_remote_post($postURL, $payload);

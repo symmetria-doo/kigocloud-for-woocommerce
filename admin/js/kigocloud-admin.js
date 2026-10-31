@@ -75,6 +75,9 @@
                 var input = document.getElementById(id);
                 if (input) { input.value = demoBtn.getAttribute('data-' + fields[id]) || ''; }
             }
+            // A saved API key would win over the demo login.
+            var apiKey = document.getElementById('kigocloud_api_key');
+            if (apiKey) { apiKey.value = ''; }
             var hint = document.getElementById('kigocloud-use-demo-hint');
             if (hint) { hint.style.display = ''; }
         });

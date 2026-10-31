@@ -310,6 +310,7 @@ class Woo_KigoCloud_Admin_Page
             // kigocloud_api_url is deliberately absent: the endpoint is not editable
             // from the admin screen, see Woo_KigoCloud_Request::resolveApiUrl().
             'kigocloud_connection' => array(
+                'kigocloud_api_key',
                 'kigocloud_username',
                 'kigocloud_password',
                 'kigocloud_pin',
@@ -428,10 +429,16 @@ class Woo_KigoCloud_Admin_Page
         <div class="kc-card">
             <h2><?php esc_html_e('API credentials', 'kigocloud-for-woocommerce'); ?></h2>
             <p class="kc-desc"><?php esc_html_e('Login used to talk to KigoCloud. The endpoint is fixed and shown on the About tab.', 'kigocloud-for-woocommerce'); ?></p>
-            <p class="kc-desc"><?php esc_html_e('Nothing is sent to KigoCloud until a username and a password are saved here and a payment method has a document type on the Orders tab.', 'kigocloud-for-woocommerce'); ?></p>
+            <p class="kc-desc"><?php esc_html_e('Nothing is sent to KigoCloud until an API key, or a username and a password, are saved here and a payment method has a document type on the Orders tab.', 'kigocloud-for-woocommerce'); ?></p>
             <?php $this->open_form('kigocloud_connection'); ?>
             <table class="form-table" role="presentation">
                 <?php
+                if (Woo_KigoCloud_Request::accepts_api_key()) {
+                    $this->text_field('kigocloud_api_key', __('API key', 'kigocloud-for-woocommerce'), array(
+                        'type'        => 'password',
+                        'description' => __('Recommended. Create the key in Kigo.Cloud under Opcije > Integracije > API ključevi with the permissions Čitanje i pisanje, and choose API ključ under Postavke on the same screen. When a key is saved, the username and password below are not used.', 'kigocloud-for-woocommerce'),
+                    ));
+                }
                 $this->text_field('kigocloud_username', __('API username', 'kigocloud-for-woocommerce'), array(
                     'description' => sprintf(
                         /* translators: %s: link to the Kigo.Cloud website */
@@ -925,13 +932,7 @@ class Woo_KigoCloud_Admin_Page
 
         // Nothing goes out before the shop has entered a login.
         if (!Woo_KigoCloud_Request::has_credentials()) {
-            wp_send_json_error(array('message' => __('Enter the API username and password on the Connection tab and save them first.', 'kigocloud-for-woocommerce')));
-        }
-        $username = (string) get_option('kigocloud_username', '');
-        $password = (string) get_option('kigocloud_password', '');
-
-        if ($username !== 'admin_demo') {
-            $password = md5($password);
+            wp_send_json_error(array('message' => __('Enter the API key, or the API username and password, on the Connection tab and save them first.', 'kigocloud-for-woocommerce')));
         }
 
         $url = Woo_KigoCloud_Request::resolveApiUrl() . 'invoice/create';
@@ -970,12 +971,10 @@ class Woo_KigoCloud_Admin_Page
             'redirection' => 0,
             'blocking'    => true,
             'data_format' => 'body',
-            'headers'     => array(
-                'HTTP_X_USERNAME' => $username,
-                'HTTP_X_PASSWORD' => $password,
+            'headers'     => array_merge(Woo_KigoCloud_Request::auth_headers(), array(
                 'Content-Type'    => 'application/json',
                 'Accept'          => 'application/json',
-            ),
+            )),
             'body'        => wp_json_encode($body),
         ));
 
@@ -999,7 +998,9 @@ class Woo_KigoCloud_Admin_Page
                 $json->pos_number,
                 isset($json->fina_data_place_short) ? $json->fina_data_place_short : '',
                 isset($json->fina_data_place_pos) ? $json->fina_data_place_pos : ''
-            );
+            ) . ' ' . (Woo_KigoCloud_Request::api_key() !== ''
+                ? __('Login: API key.', 'kigocloud-for-woocommerce')
+                : __('Login: username and password.', 'kigocloud-for-woocommerce'));
             Woo_KigoCloud_Request::log_call(0, 'invoice/create (test)', true, $msg);
             wp_send_json_success(array('message' => $msg));
         }

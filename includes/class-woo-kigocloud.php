@@ -45,7 +45,7 @@ class Woo_KigoCloud {
      *
      * @since 1.0.0
      */
-    const PLUGIN_VERSION = '2.1.33';
+    const PLUGIN_VERSION = '2.1.34';
 
     /**
      * Admin notices of the plugin appear only on the Dashboard, the Plugins

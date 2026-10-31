@@ -452,8 +452,8 @@ msgstr "Za R1 račun obavezan je poštanski broj tvrtke."
 msgid "Invalid OIB. Must be 11 digits and pass the checksum."
 msgstr "OIB nije ispravan. Mora imati 11 znamenki i ispravnu kontrolnu znamenku."
 
-msgid "Nothing is sent to KigoCloud until a username and a password are saved here and a payment method has a document type on the Orders tab."
-msgstr "Ništa se ne šalje u KigoCloud dok ovdje ne spremite korisničko ime i lozinku i dok neki način plaćanja nema vrstu dokumenta na kartici Narudžbe."
+msgid "Nothing is sent to KigoCloud until an API key, or a username and a password, are saved here and a payment method has a document type on the Orders tab."
+msgstr "Ništa se ne šalje u KigoCloud dok ovdje ne spremite API ključ, ili korisničko ime i lozinku, i dok neki način plaćanja nema vrstu dokumenta na kartici Narudžbe."
 
 #, php-format
 msgid "No account yet? See %s."
@@ -478,8 +478,8 @@ msgstr "Demo prijava je upisana. Kliknite Spremi sve postavke da je upotrijebite
 msgid "The documents can be seen in the demo at %s (username and password admin_demo)."
 msgstr "Dokumente možete vidjeti u demu na %s (korisničko ime i lozinka admin_demo)."
 
-msgid "Enter the API username and password on the Connection tab and save them first."
-msgstr "Najprije upišite API korisničko ime i lozinku na kartici Veza i spremite ih."
+msgid "Enter the API key, or the API username and password, on the Connection tab and save them first."
+msgstr "Najprije upišite API ključ, ili API korisničko ime i lozinku, na kartici Veza i spremite ih."
 
 msgid "The price list could not be saved in the uploads folder."
 msgstr "Cjenik nije moguće spremiti u mapu uploads."
@@ -519,6 +519,18 @@ msgstr "Postavke su spremljene."
 
 msgid "One Save covers every tab."
 msgstr "Jedno spremanje vrijedi za sve kartice."
+
+msgid "API key"
+msgstr "API ključ"
+
+msgid "Recommended. Create the key in Kigo.Cloud under Opcije > Integracije > API ključevi with the permissions Čitanje i pisanje, and choose API ključ under Postavke on the same screen. When a key is saved, the username and password below are not used."
+msgstr "Preporučeno. Ključ napravite u Kigo.Cloudu pod Opcije > Integracije > API ključevi s pravima Čitanje i pisanje, a pod Postavke na istom ekranu odaberite API ključ. Kad je ključ spremljen, korisničko ime i lozinka ispod se ne koriste."
+
+msgid "Login: API key."
+msgstr "Prijava: API ključ."
+
+msgid "Login: username and password."
+msgstr "Prijava: korisničko ime i lozinka."
 
 #~ msgid "Document number"
 #~ msgstr "Broj dokumenta"

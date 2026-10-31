@@ -4,6 +4,12 @@ All notable changes to KigoCloud for WooCommerce are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.34] - 2026-10-30
+
+### Added
+- API key login: new `kigocloud_api_key` option on the Connection tab, sent as `Authorization: Bearer` by every API call (documents, PDF download, test offer) through `Woo_KigoCloud_Request::auth_headers()`. The field is shown only on the Kigo.Cloud address, where keys exist. Without a key the username and password headers are sent exactly as before.
+- The test offer says which login it used.
+
 ## [2.1.33] - 2026-10-28
 
 ### Changed
