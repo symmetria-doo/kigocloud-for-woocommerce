@@ -29,7 +29,7 @@ if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
-define( 'WOO_KIGOCLOUD_PLUGIN_NAME_VERSION', '2.1.33' );
+define( 'WOO_KIGOCLOUD_PLUGIN_NAME_VERSION', '2.1.34' );
 define( 'WOO_KIGOCLOUD_PLUGIN_FILE', __FILE__ );
 define( 'WOO_KIGOCLOUD_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'WOO_KIGOCLOUD_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
