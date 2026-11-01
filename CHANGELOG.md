@@ -4,6 +4,11 @@ All notable changes to KigoCloud for WooCommerce are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.35] - 2026-11-01
+
+### Changed
+- `mail_text()` removed: the e-mail subject, the e-mail text and `document_type_title()` call `__()` and `MO::translate()` with literal strings, no gettext call takes a variable.
+
 ## [2.1.34] - 2026-10-30
 
 ### Added

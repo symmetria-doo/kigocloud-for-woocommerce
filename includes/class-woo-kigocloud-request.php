@@ -117,13 +117,10 @@ if (!class_exists('Woo_KigoCloud_Request')) {
          */
         public static function document_type_title($documentType, $translations = null)
         {
-            $text = ((string) $documentType === '2') ? 'Offer' : 'Invoice';
-            if ($translations) {
-                return $translations->translate($text);
+            if ((string) $documentType === '2') {
+                return $translations ? $translations->translate('Offer') : __('Offer', 'kigocloud-for-woocommerce');
             }
-            return ($text === 'Offer')
-                ? __('Offer', 'kigocloud-for-woocommerce')
-                : __('Invoice', 'kigocloud-for-woocommerce');
+            return $translations ? $translations->translate('Invoice') : __('Invoice', 'kigocloud-for-woocommerce');
         }
 
         /** Countries whose customers get German with the "by country" setting. */
@@ -640,20 +637,6 @@ if (!class_exists('Woo_KigoCloud_Request')) {
         }
 
         /**
-         * @param string  $text         One of this plugin's e-mail strings, as in the .pot file.
-         * @param MO|null $translations From language_translations(); null = the shop's language.
-         * @return string
-         */
-        private static function mail_text($text, $translations)
-        {
-            if ($translations) {
-                return $translations->translate($text);
-            }
-            // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText
-            return __($text, 'kigocloud-for-woocommerce');
-        }
-
-        /**
          * Tax rate of order lines as set in WooCommerce: the order keeps the percent of every tax rate it
          * charged. A rate worked out from the amounts goes wrong on low prices, because the tax is rounded
          * to the cent (0.19 / 0.776 gives 24 % for a 25 % product), and Porezna refuses a receipt with
@@ -732,18 +715,21 @@ if (!class_exists('Woo_KigoCloud_Request')) {
                 return;
             }
 
-            $mailSubject =  sprintf(self::mail_text('%1$s sending you %2$s no. %3$s', $translations), get_bloginfo('name'), $documentTypeTitle, $formattedPosNumber);
+            $mailSubject = sprintf(
+                $translations
+                    ? $translations->translate('%1$s sending you %2$s no. %3$s')
+                    /* translators: 1: shop name, 2: document type (Invoice/Offer), 3: document number */
+                    : __('%1$s sending you %2$s no. %3$s', 'kigocloud-for-woocommerce'),
+                get_bloginfo('name'),
+                $documentTypeTitle,
+                $formattedPosNumber
+            );
             $mailText =
-                /**
-                 * translators: %1$s: Username
-                 * translators: %2$s: Document Type (Invoice/Offer)
-                 * translators: %3$s: Document Number
-                 */
                 sprintf(
-                    self::mail_text(
-                        'Hi %1$s,<br /><br />Thank you for your order.<br /><br />Your %2$s with number <b>%3$s</b> is in the attachment.<br /><br />We look forward to fulfilling your order soon.',
-                        $translations
-                    ),
+                    $translations
+                        ? $translations->translate('Hi %1$s,<br /><br />Thank you for your order.<br /><br />Your %2$s with number <b>%3$s</b> is in the attachment.<br /><br />We look forward to fulfilling your order soon.')
+                        /* translators: 1: customer name, 2: document type (Invoice/Offer), 3: document number */
+                        : __('Hi %1$s,<br /><br />Thank you for your order.<br /><br />Your %2$s with number <b>%3$s</b> is in the attachment.<br /><br />We look forward to fulfilling your order soon.', 'kigocloud-for-woocommerce'),
                     $fullName,
                     $documentTypeTitle,
                     $formattedPosNumber

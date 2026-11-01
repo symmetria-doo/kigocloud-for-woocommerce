@@ -4,7 +4,7 @@ Tags: fiskalizacija, fiscalization, croatia, invoice, r1
 Requires at least: 5.5
 Tested up to: 7.1
 Requires PHP: 7.2
-Stable tag: 2.1.34
+Stable tag: 2.1.35
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 WC requires at least: 5.0
@@ -111,6 +111,9 @@ Kigo.Cloud privacy policy: https://www.kigocloud.com/zastita-osobnih-podataka
 
 == Changelog ==
 
+= 2.1.35 =
+* The e-mail strings are now plain translatable strings in the code.
+
 = 2.1.34 =
 * API key login: an optional API key on the Connection tab replaces the username and password. Shops without a key work as before.
 
@@ -178,6 +181,9 @@ Kigo.Cloud privacy policy: https://www.kigocloud.com/zastita-osobnih-podataka
 Older versions: https://github.com/symmetria-doo/kigocloud-for-woocommerce/blob/main/CHANGELOG.md
 
 == Upgrade Notice ==
+
+= 2.1.35 =
+Small code fix for the wordpress.org review. Settings are kept.
 
 = 2.1.34 =
 Optional login with a Kigo.Cloud API key. Nothing changes for shops that keep the username and password.
