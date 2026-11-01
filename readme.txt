@@ -4,7 +4,7 @@ Tags: fiskalizacija, fiscalization, croatia, invoice, r1
 Requires at least: 5.5
 Tested up to: 7.1
 Requires PHP: 7.2
-Stable tag: 2.1.35
+Stable tag: 2.1.36
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 WC requires at least: 5.0
@@ -111,6 +111,9 @@ Kigo.Cloud privacy policy: https://www.kigocloud.com/zastita-osobnih-podataka
 
 == Changelog ==
 
+= 2.1.36 =
+* New: the order sends the shipping country to Kigo.Cloud. With the setting Distance sales in the EU (OSS) on, an order shipped to a private buyer in another EU country is issued without fiscalization, decided by where the goods are shipped, not by the billing address.
+
 = 2.1.35 =
 * The e-mail strings are now plain translatable strings in the code.
 
@@ -181,6 +184,9 @@ Kigo.Cloud privacy policy: https://www.kigocloud.com/zastita-osobnih-podataka
 Older versions: https://github.com/symmetria-doo/kigocloud-for-woocommerce/blob/main/CHANGELOG.md
 
 == Upgrade Notice ==
+
+= 2.1.36 =
+The shipping country is sent to Kigo.Cloud for EU distance sales (OSS).
 
 = 2.1.35 =
 Small code fix for the wordpress.org review. Settings are kept.

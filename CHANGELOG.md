@@ -4,6 +4,11 @@ All notable changes to KigoCloud for WooCommerce are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.36] - 2026-11-01
+
+### Added
+- The invoice request sends `delivery_country_iso`, the order shipping country (`WC_Order::get_shipping_country()`, the buyer country when the order has no shipping). Kigo.Cloud uses it only with the setting Distance sales in the EU (OSS): a B2C sale is placed where the goods are shipped (Porezna, receipts to end consumers, question 8), so an order billed in Croatia and shipped to Austria is issued without fiscalization and one billed in Germany and shipped to Croatia is fiscalized.
+
 ## [2.1.35] - 2026-11-01
 
 ### Changed

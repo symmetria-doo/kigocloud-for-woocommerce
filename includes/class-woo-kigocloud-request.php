@@ -500,6 +500,11 @@ if (!class_exists('Woo_KigoCloud_Request')) {
 
             $mainBody->client = $client;
 
+            // Country the goods are shipped to: Kigo.Cloud places an EU distance sale (OSS) there.
+            // An order without shipping (virtual goods) goes where the buyer is.
+            $shippingCountry = $order->get_shipping_country();
+            $mainBody->delivery_country_iso = $shippingCountry ? $shippingCountry : $country;
+
             $language = self::document_language($country);
             $apiUrl   = self::language_api_url($this->apiURL, $language);
 
