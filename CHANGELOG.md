@@ -4,6 +4,15 @@ All notable changes to KigoCloud for WooCommerce are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.0] - 2026-11-04
+
+### Added
+- Kigo.Cloud gift vouchers in the cart (`Woo_KigoCloud_Gift_Voucher`). A voucher number (XXXX-XXXX) typed in the coupon field is checked in Kigo.Cloud (`giftVoucher/check`) and becomes a virtual `fixed_cart` coupon of what is left on the voucher, tax included (`woocommerce_get_shop_coupon_data`; a real coupon with the same code wins). The checked balance is reused for 120 seconds and forgotten when the order is sent or cancelled. The order coupon line keeps the number in `_kigocloud_gift_voucher`.
+- `invoice/create` sends `gift_vouchers` (code and amount taken off, tax included) and the items at their price before the voucher; Kigo.Cloud adds the used voucher line, as with Shopify discount codes. Other coupons still lower the item price as before.
+- An order paid in full with a voucher (no payment method, total 0) is sent as an invoice with payment type T when it is placed.
+- `on_order_cancelled`: an order moved to cancelled or refunded, that has a Kigo.Cloud document, calls `invoice/cancelOrder` with its `internal_number` once (`_kigocloud_cancelled`). Kigo.Cloud cancels the invoice (storno) or, for an offer, releases the reserved gift vouchers; the answer is an order note and a Logs entry.
+- `Woo_KigoCloud_Request::call()` for API calls outside sending an order.
+
 ## [2.1.36] - 2026-11-01
 
 ### Added

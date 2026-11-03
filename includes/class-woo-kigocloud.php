@@ -45,7 +45,7 @@ class Woo_KigoCloud {
      *
      * @since 1.0.0
      */
-    const PLUGIN_VERSION = '2.1.36';
+    const PLUGIN_VERSION = '2.2.0';
 
     /**
      * Admin notices of the plugin appear only on the Dashboard, the Plugins
@@ -187,6 +187,11 @@ class Woo_KigoCloud {
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-woo-kigocloud-pricelist.php';
 		Woo_KigoCloud_Pricelist::init();
 
+		/**
+		 * Kigo.Cloud gift vouchers in the cart.
+		 */
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-woo-kigocloud-gift-voucher.php';
+
 
 		$this->loader = new Woo_KigoCloud_Loader();
 
@@ -237,6 +242,13 @@ class Woo_KigoCloud {
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
 
         $this->loader->add_action('woocommerce_order_status_changed', $plugin_request, 'on_order_status_change',14,3);
+        $this->loader->add_action('woocommerce_order_status_changed', $plugin_request, 'on_order_cancelled', 15, 3);
+
+        // Kigo.Cloud gift voucher typed in the coupon field
+        $plugin_gift_voucher = new Woo_KigoCloud_Gift_Voucher();
+        $this->loader->add_filter('woocommerce_get_shop_coupon_data', $plugin_gift_voucher, 'virtual_coupon', 10, 3);
+        $this->loader->add_action('woocommerce_checkout_create_order_coupon_item', $plugin_gift_voucher, 'mark_order_coupon', 10, 3);
+        $this->loader->add_filter('woocommerce_cart_totals_coupon_label', $plugin_gift_voucher, 'coupon_label', 10, 2);
 
         $r1_mode = Woo_KigoCloud_R1::mode();
         if ($r1_mode > 0) {

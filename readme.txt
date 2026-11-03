@@ -4,7 +4,7 @@ Tags: fiskalizacija, fiscalization, croatia, invoice, r1
 Requires at least: 5.5
 Tested up to: 7.1
 Requires PHP: 7.2
-Stable tag: 2.1.36
+Stable tag: 2.2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 WC requires at least: 5.0
@@ -111,6 +111,11 @@ Kigo.Cloud privacy policy: https://www.kigocloud.com/zastita-osobnih-podataka
 
 == Changelog ==
 
+= 2.2.0 =
+* New: Kigo.Cloud gift vouchers in the shop. The buyer types the voucher number in the coupon field, the cart takes off what is left on the voucher, and Kigo.Cloud puts the used voucher on the invoice. An order paid in full with a voucher is sent as an invoice.
+* New: an order cancelled or refunded in the shop cancels its Kigo.Cloud invoice. An order that has only an offer so far releases the reserved gift voucher.
+* A gift voucher bought in the shop is a product with the SKU KIGO-BON-amount (for example KIGO-BON-50); Kigo.Cloud issues it with the invoice and sends it to the buyer by e-mail.
+
 = 2.1.36 =
 * New: the order sends the shipping country to Kigo.Cloud. With the setting Distance sales in the EU (OSS) on, an order shipped to a private buyer in another EU country is issued without fiscalization, decided by where the goods are shipped, not by the billing address.
 
@@ -184,6 +189,9 @@ Kigo.Cloud privacy policy: https://www.kigocloud.com/zastita-osobnih-podataka
 Older versions: https://github.com/symmetria-doo/kigocloud-for-woocommerce/blob/main/CHANGELOG.md
 
 == Upgrade Notice ==
+
+= 2.2.0 =
+Kigo.Cloud gift vouchers can be used in the cart, and a cancelled or refunded order cancels its Kigo.Cloud invoice.
 
 = 2.1.36 =
 The shipping country is sent to Kigo.Cloud for EU distance sales (OSS).

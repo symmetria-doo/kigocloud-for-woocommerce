@@ -205,20 +205,25 @@ if (!class_exists('Woo_KigoCloud_Request')) {
 
 		    // Get payment method and document type
 		    $payment_method = $order->get_payment_method();
-		    $documentType = get_option('kigocloud_pos_type-' . esc_attr($payment_method), '0'); // Default to '0' (Disabled)
-		    // If the document type is disabled, skip further processing
-		    if ($documentType === '0') {
-			    return;
-		    }
+		    if (self::is_voucher_only($order)) {
+			    // paid in full with a gift voucher: no payment method, an invoice as soon as the order is placed
+			    $callApi = 0;
+		    } else {
+			    $documentType = get_option('kigocloud_pos_type-' . esc_attr($payment_method), '0'); // Default to '0' (Disabled)
+			    // If the document type is disabled, skip further processing
+			    if ($documentType === '0') {
+				    return;
+			    }
 
-		    // Check if the gateway is enabled
-		    $gateway = wc_get_payment_gateway_by_order($order);
-		    if (!$gateway) {
-			    return; // Skip if no gateway is associated with the order
-		    }
+			    // Check if the gateway is enabled
+			    $gateway = wc_get_payment_gateway_by_order($order);
+			    if (!$gateway) {
+				    return; // Skip if no gateway is associated with the order
+			    }
 
-		    $gateway_setting_key = 'kigocloud_on_status-' . esc_attr($payment_method);
-		    $callApi = get_option($gateway_setting_key, 0); // Default to 'Order Creation' (0)
+			    $gateway_setting_key = 'kigocloud_on_status-' . esc_attr($payment_method);
+			    $callApi = get_option($gateway_setting_key, 0); // Default to 'Order Creation' (0)
+		    }
 
 		    /**
 		     * $callApi options:
@@ -286,7 +291,8 @@ if (!class_exists('Woo_KigoCloud_Request')) {
         private function execute_api_call($command, $order)
         {
             $orderData         = $order->get_data();
-            $documentType      = get_option('kigocloud_pos_type' . '-' . esc_attr($orderData['payment_method']));
+            $voucherOnly       = self::is_voucher_only($order);
+            $documentType      = $voucherOnly ? '1' : get_option('kigocloud_pos_type' . '-' . esc_attr($orderData['payment_method']));
             if ($documentType === '0') { // Disabled
                 return;
             }
@@ -302,7 +308,7 @@ if (!class_exists('Woo_KigoCloud_Request')) {
             $mainBody           = new stdClass();
             $mainBody->pin      = get_option('kigocloud_pin');
             $mainBody->pos_type = $documentType;
-            $mainBody->payment  = get_option('kigocloud_payment_type' . '-' . esc_attr($orderData['payment_method']));
+            $mainBody->payment  = $voucherOnly ? 'T' : get_option('kigocloud_payment_type' . '-' . esc_attr($orderData['payment_method']));
             // Cheque was offered until 2.1.28, but KigoCloud rejects it: a gateway still saved with it goes as Other
             if ($mainBody->payment === 'C') {
                 $mainBody->payment = 'O';
@@ -316,6 +322,10 @@ if (!class_exists('Woo_KigoCloud_Request')) {
             // about the real rate: then no rate is sent and the document uses the rate of the item itself.
             $sendVatPercent = wc_tax_enabled();
 
+            // paid with a Kigo.Cloud gift voucher: the items go at their price before the voucher,
+            // Kigo.Cloud puts the used voucher on the invoice
+            $voucherPaid = Woo_KigoCloud_Gift_Voucher::from_order($order);
+
             $items = array();
             foreach (array_unique($order->get_items()) as $itemKey => $itemValue) { // this includes any coupons or discounts
                 $itemName = $itemValue->get_name();
@@ -327,7 +337,8 @@ if (!class_exists('Woo_KigoCloud_Request')) {
 
                 $quantity    = (float)($itemData['quantity'] !== 0) ? $itemData['quantity'] : 1;
                 // what the buyer paid for one piece, tax included, as on the order
-                $currentPrice = round(((float)$itemValue->get_total() + (float)$itemValue->get_total_tax()) / $quantity, 4);
+                $voucherPart  = isset($voucherPaid['by_item'][$itemKey]) ? $voucherPaid['by_item'][$itemKey] : 0;
+                $currentPrice = round(((float)$itemValue->get_total() + (float)$itemValue->get_total_tax() + $voucherPart) / $quantity, 4);
 
 				if (empty($itemSku) && $fillMissingSKU == 1) {
 					// from the product (or its variation), so the same product gets the same SKU on every order;
@@ -387,6 +398,9 @@ if (!class_exists('Woo_KigoCloud_Request')) {
             }
 
             $mainBody->items = $items;
+            if (!empty($voucherPaid['vouchers'])) {
+                $mainBody->gift_vouchers = $voucherPaid['vouchers'];
+            }
 
             $client   = new stdClass();
             $vatField = 'shipping';
@@ -576,6 +590,7 @@ if (!class_exists('Woo_KigoCloud_Request')) {
                 $order->save();
 
                 self::log_call($order->get_id(), $command, true, $documentTypeTitle . ' ' . $formattedPosNumber);
+                Woo_KigoCloud_Gift_Voucher::forget_order_vouchers($order);
 
                 $sendPdf = get_option('kigocloud_pdf_payment_type-' . esc_attr($orderData['payment_method']));
                 if ($sendPdf === '1') {
@@ -588,6 +603,115 @@ if (!class_exists('Woo_KigoCloud_Request')) {
                 $msg = isset($body->error) ? $body->error : (isset($body->message) ? $body->message : __('No document number returned', 'kigocloud-for-woocommerce'));
                 self::log_call($order->get_id(), $command, false, is_scalar($msg) ? (string) $msg : wp_json_encode($msg));
             }
+        }
+
+        /**
+         * Order with nothing left to pay because a Kigo.Cloud gift voucher paid it (WooCommerce then
+         * keeps no payment method).
+         *
+         * @param WC_Order $order
+         * @return bool
+         */
+        private static function is_voucher_only($order)
+        {
+            if ($order->get_payment_method() !== '' || (float) $order->get_total() > 0) {
+                return false;
+            }
+            $paid = Woo_KigoCloud_Gift_Voucher::from_order($order);
+            return !empty($paid['vouchers']);
+        }
+
+        /**
+         * Order cancelled or refunded in the shop: Kigo.Cloud cancels the invoice of the order (storno),
+         * or, when the order has only an offer so far, releases the gift vouchers reserved for it.
+         * Once per order.
+         *
+         * @param int    $order_id
+         * @param string $old_status
+         * @param string $new_status
+         */
+        public function on_order_cancelled($order_id, $old_status, $new_status)
+        {
+            if (!in_array($new_status, array('cancelled', 'refunded'), true) || !self::has_credentials()) {
+                return;
+            }
+            $order = wc_get_order($order_id);
+            if (!$order || empty($order->get_meta('_kigocloud_id_pos')) || $order->get_meta('_kigocloud_cancelled')) {
+                return;
+            }
+
+            $command = 'invoice/cancelOrder';
+            $body    = self::call('POST', $command, array(
+                'pin'             => get_option('kigocloud_pin'),
+                'internal_number' => 'web' . $order->get_order_number(),
+            ));
+            if (is_wp_error($body)) {
+                self::log_call($order->get_id(), $command, false, $body->get_error_message());
+                return;
+            }
+            if (!is_object($body) || empty($body->result)) {
+                $msg = (is_object($body) && isset($body->message)) ? $body->message : __('No answer from KigoCloud', 'kigocloud-for-woocommerce');
+                self::log_call($order->get_id(), $command, false, is_scalar($msg) ? (string) $msg : wp_json_encode($msg));
+                return;
+            }
+
+            if ($body->result === 'storno') {
+                $stornoNumber = $body->pos_number
+                    . '/' . (isset($body->fina_data_place_short) ? $body->fina_data_place_short : '')
+                    . '/' . (isset($body->fina_data_place_pos) ? $body->fina_data_place_pos : '');
+                /* translators: 1: number of the invoice, 2: number of the cancellation (storno) invoice */
+                $note = sprintf(__('KigoCloud invoice %1$s cancelled with %2$s', 'kigocloud-for-woocommerce'), $order->get_meta('_kigocloud_pos_number'), $stornoNumber);
+            } elseif ($body->result === 'already_cancelled') {
+                $note = __('KigoCloud invoice of this order was already cancelled', 'kigocloud-for-woocommerce');
+            } elseif ($body->result === 'released') {
+                $note = __('No KigoCloud invoice for this order yet: the reserved gift voucher was released', 'kigocloud-for-woocommerce');
+            } else {
+                $note = __('No KigoCloud invoice for this order yet: nothing to cancel', 'kigocloud-for-woocommerce');
+            }
+            $order->add_order_note($note);
+            $order->update_meta_data('_kigocloud_cancelled', $body->result);
+            $order->save();
+            Woo_KigoCloud_Gift_Voucher::forget_order_vouchers($order);
+            self::log_call($order->get_id(), $command, true, $note);
+        }
+
+        /**
+         * One KigoCloud API call with the shop's login, outside of sending an order.
+         *
+         * @param string     $method  GET or POST
+         * @param string     $command e.g. 'giftVoucher/check?code=XXXX-XXXX'
+         * @param array|null $data    JSON body of a POST
+         * @return object|WP_Error The answer, or the error of the connection or of KigoCloud
+         */
+        public static function call($method, $command, $data = null)
+        {
+            $args = array(
+                'method'      => $method,
+                'timeout'     => 15,
+                'redirection' => 0,
+                'headers'     => array_merge(self::auth_headers(), array(
+                    'Expect'       => '',
+                    'Content-Type' => 'application/json',
+                    'Accept'       => 'application/json',
+                )),
+            );
+            if ($data !== null) {
+                $args['body'] = wp_json_encode($data);
+            }
+            $response = wp_remote_request(esc_url_raw(self::resolveApiUrl() . $command), $args);
+            if (is_wp_error($response)) {
+                return $response;
+            }
+            $body = json_decode(wp_remote_retrieve_body($response));
+            if (!is_object($body)) {
+                return new \WP_Error('kigocloud_invalid_json', 'Invalid JSON');
+            }
+            $code = (int) wp_remote_retrieve_response_code($response);
+            if ($code >= 400) {
+                $msg = isset($body->message) ? $body->message : ('HTTP ' . $code);
+                return new \WP_Error('kigocloud_' . $code, is_scalar($msg) ? (string) $msg : wp_json_encode($msg));
+            }
+            return $body;
         }
 
         /**

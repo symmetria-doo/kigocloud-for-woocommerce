@@ -532,6 +532,34 @@ msgstr "Prijava: API ključ."
 msgid "Login: username and password."
 msgstr "Prijava: korisničko ime i lozinka."
 
+#. translators: %s: gift voucher number
+#: includes/class-woo-kigocloud-gift-voucher.php
+#, php-format
+msgid "Gift voucher %s"
+msgstr "Poklon bon %s"
+
+#. translators: 1: number of the invoice, 2: number of the cancellation (storno) invoice
+#: includes/class-woo-kigocloud-request.php
+#, php-format
+msgid "KigoCloud invoice %1$s cancelled with %2$s"
+msgstr "KigoCloud račun %1$s storniran računom %2$s"
+
+#: includes/class-woo-kigocloud-request.php
+msgid "KigoCloud invoice of this order was already cancelled"
+msgstr "KigoCloud račun ove narudžbe je već storniran"
+
+#: includes/class-woo-kigocloud-request.php
+msgid "No KigoCloud invoice for this order yet: the reserved gift voucher was released"
+msgstr "Za ovu narudžbu još nema KigoCloud računa: rezervirani poklon bon je otpušten"
+
+#: includes/class-woo-kigocloud-request.php
+msgid "No KigoCloud invoice for this order yet: nothing to cancel"
+msgstr "Za ovu narudžbu još nema KigoCloud računa: nema se što stornirati"
+
+#: includes/class-woo-kigocloud-request.php
+msgid "No answer from KigoCloud"
+msgstr "KigoCloud nije odgovorio"
+
 #~ msgid "Document number"
 #~ msgstr "Broj dokumenta"
 
