@@ -4,6 +4,12 @@ All notable changes to KigoCloud for WooCommerce are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.2] - 2026-11-07
+
+### Changed
+- Links to the website (Plugin URI, readme, Connection and About tabs) point to https://www.kigocloud.com instead of www.kigo.cloud.
+- wordpress.org icon: the Kigo.Cloud cloud on white instead of a dark square; banner shows www.kigocloud.com.
+
 ## [2.2.1] - 2026-11-07
 
 ### Changed

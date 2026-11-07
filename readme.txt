@@ -4,7 +4,7 @@ Tags: fiskalizacija, fiscalization, croatia, invoice, r1
 Requires at least: 5.5
 Tested up to: 7.1
 Requires PHP: 7.2
-Stable tag: 2.2.1
+Stable tag: 2.2.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 WC requires at least: 5.0
@@ -14,7 +14,7 @@ Fiskalizacija for WooCommerce: every order becomes a fiscalized Croatian invoice
 
 == Description ==
 
-**Fiskalizacija web trgovine bez prepisivanja.** KigoCloud for WooCommerce connects your shop to [Kigo.Cloud](https://www.kigo.cloud/fiskalizacija-web-trgovine/), the Croatian invoicing and fiscalization service by Symmetria d.o.o. When a customer orders and pays, the order is sent to Kigo.Cloud, which issues the invoice, fiscalizes it (ZKI and JIR from the Tax Administration) and the plugin e-mails the PDF to the customer.
+**Fiskalizacija web trgovine bez prepisivanja.** KigoCloud for WooCommerce connects your shop to [Kigo.Cloud](https://www.kigocloud.com/fiskalizacija-web-trgovine/), the Croatian invoicing and fiscalization service by Symmetria d.o.o. When a customer orders and pays, the order is sent to Kigo.Cloud, which issues the invoice, fiscalizes it (ZKI and JIR from the Tax Administration) and the plugin e-mails the PDF to the customer.
 
 Croatian law requires every sale paid by card, cash or a similar method to be fiscalized, web shops included. With this plugin there is nothing to retype: the items, prices, VAT, shipping and the customer come from the WooCommerce order.
 
@@ -33,7 +33,7 @@ Croatian law requires every sale paid by card, cash or a similar method to be fi
 
 = About Kigo.Cloud =
 
-Kigo.Cloud is an online program for issuing and fiscalizing invoices, eRačun (Fiscalization 2.0), stock and price lists, developed in Zagreb since 2013. Connecting a web shop and fiscalizing its orders is available from the Standard plan; two-way sync of items, stock and prices and the anchor price in the shop from the Business plan. Registration is free and needs no card. Plans and prices: [www.kigo.cloud](https://www.kigo.cloud/cijene/).
+Kigo.Cloud is an online program for issuing and fiscalizing invoices, eRačun (Fiscalization 2.0), stock and price lists, developed in Zagreb since 2013. Connecting a web shop and fiscalizing its orders is available from the Standard plan; two-way sync of items, stock and prices and the anchor price in the shop from the Business plan. Registration is free and needs no card. Plans and prices: [www.kigocloud.com](https://www.kigocloud.com/cijene/).
 
 = Try it without an account =
 
@@ -81,7 +81,7 @@ KigoCloud copies its settings on activation and does not send orders while the K
 
 = Where do I get help? =
 
-Write to the support forum here or to the e-mail address on [www.kigo.cloud](https://www.kigo.cloud/).
+Write to the support forum here or to the e-mail address on [www.kigocloud.com](https://www.kigocloud.com/).
 
 == External services ==
 
@@ -112,6 +112,9 @@ Kigo.Cloud privacy policy: https://www.kigocloud.com/zastita-osobnih-podataka
 4. An order with the fiscalized Kigo.Cloud invoice number.
 
 == Changelog ==
+
+= 2.2.2 =
+* Links to the Kigo.Cloud website point to www.kigocloud.com. New plugin icon and banner.
 
 = 2.2.1 =
 * The External services section lists the gift voucher check, the cancelled order call, the API key login and the shipping country.
@@ -194,6 +197,9 @@ Kigo.Cloud privacy policy: https://www.kigocloud.com/zastita-osobnih-podataka
 Older versions: https://github.com/symmetria-doo/kigocloud-for-woocommerce/blob/main/CHANGELOG.md
 
 == Upgrade Notice ==
+
+= 2.2.2 =
+Website links point to www.kigocloud.com.
 
 = 2.2.1 =
 Documentation only: the readme lists every call the plugin makes to Kigo.Cloud.

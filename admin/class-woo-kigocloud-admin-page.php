@@ -443,7 +443,7 @@ class Woo_KigoCloud_Admin_Page
                     'description' => sprintf(
                         /* translators: %s: link to the Kigo.Cloud website */
                         __('No account yet? See %s.', 'kigocloud-for-woocommerce'),
-                        '<a href="https://www.kigo.cloud/fiskalizacija-web-trgovine/" target="_blank" rel="noopener">www.kigo.cloud</a>'
+                        '<a href="https://www.kigocloud.com/fiskalizacija-web-trgovine/" target="_blank" rel="noopener">www.kigocloud.com</a>'
                     ),
                 ));
                 $this->text_field('kigocloud_password', __('API password', 'kigocloud-for-woocommerce'), array(
@@ -1156,7 +1156,7 @@ class Woo_KigoCloud_Admin_Page
                 <?php endif; ?>
                 <tr>
                     <th><?php esc_html_e('Website', 'kigocloud-for-woocommerce'); ?></th>
-                    <td><a href="https://www.kigo.cloud/fiskalizacija-web-trgovine/" target="_blank" rel="noopener">www.kigo.cloud</a></td>
+                    <td><a href="https://www.kigocloud.com/fiskalizacija-web-trgovine/" target="_blank" rel="noopener">www.kigocloud.com</a></td>
                 </tr>
                 <tr>
                     <th><?php esc_html_e('Changelog', 'kigocloud-for-woocommerce'); ?></th>
