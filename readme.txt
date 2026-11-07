@@ -4,7 +4,7 @@ Tags: fiskalizacija, fiscalization, croatia, invoice, r1
 Requires at least: 5.5
 Tested up to: 7.1
 Requires PHP: 7.2
-Stable tag: 2.2.0
+Stable tag: 2.2.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 WC requires at least: 5.0
@@ -85,12 +85,14 @@ Write to the support forum here or to the e-mail address on [www.kigo.cloud](htt
 
 == External services ==
 
-This plugin connects your shop to Kigo.Cloud (https://app.kigo.cloud), an invoicing and fiscalization service run by Symmetria d.o.o., Zagreb, Croatia. It is needed to issue and fiscalize the invoices; without it the plugin does nothing. Nothing is sent before you save a Kigo.Cloud username and password (or the demo login) in the plugin settings.
+This plugin connects your shop to Kigo.Cloud (https://app.kigo.cloud), an invoicing and fiscalization service run by Symmetria d.o.o., Zagreb, Croatia. It is needed to issue and fiscalize the invoices; without it the plugin does nothing. Nothing is sent before you save a Kigo.Cloud API key, or a username and password (or the demo login), in the plugin settings.
 
 What is sent, and when:
 
-* **Order to invoice** (`https://app.kigo.cloud/hr/api/v1/invoice/create`, or `/en/` or `/de/` for a foreign customer): when an order reaches the status you chose for its payment method (placed or completed), and only for payment methods that have a document type. Sent: the order number, the items (name, SKU, quantity, price, VAT rate, discount), shipping, the payment type, the customer note, the customer's name or company name, OIB, address, city, postcode, country, e-mail and phone, the employee PIN, and your Kigo.Cloud username and password (the password as an MD5 hash) for authentication.
+* **Order to invoice** (`https://app.kigo.cloud/hr/api/v1/invoice/create`, or `/en/` or `/de/` for a foreign customer): when an order reaches the status you chose for its payment method (placed or completed), and only for payment methods that have a document type. Sent: the order number, the items (name, SKU, quantity, price, VAT rate, discount), shipping, the payment type, the customer note, the customer's name or company name, OIB, address, city, postcode, country, shipping country, e-mail and phone, the number and amount of any Kigo.Cloud gift voucher used, the employee PIN, and your Kigo.Cloud login for authentication (the API key, or the username and the password as an MD5 hash).
 * **Invoice PDF** (`https://app.kigo.cloud/hr/api/v1/invoice/getAsPdf/...`): right after the invoice is created, only for payment methods where sending the PDF to the customer is turned on. Sent: the document id and your Kigo.Cloud login. The PDF is e-mailed to the customer from your site.
+* **Gift voucher check** (`https://app.kigo.cloud/hr/api/v1/giftVoucher/check`): when a buyer types something shaped like a voucher number (XXXX-XXXX) in the cart's coupon field and no shop coupon has that code. Sent: the voucher number and your Kigo.Cloud login. No data about the buyer is sent. The answer (what is left on the voucher) is kept for two minutes.
+* **Order cancelled** (`https://app.kigo.cloud/hr/api/v1/invoice/cancelOrder`): once, when an order that already has a Kigo.Cloud document is set to cancelled or refunded. Sent: the order number, the employee PIN and your Kigo.Cloud login. Kigo.Cloud cancels the invoice, or releases the gift voucher reserved for an offer.
 * **Connection test** (R1 tab button): when you click it. Sends a test offer with made-up buyer data and your Kigo.Cloud login.
 * **Price list** (the Kigo.Cloud address you enter on the Price list tab): once a day at 7:00, when you save the address, and when a page with the `[kigo_cjenik]` shortcode finds that day's copy missing. Only the CSV and XML files are downloaded; no data about your shop or customers is sent.
 * **Demo account**: if you use the demo login, the same order data goes into the public Kigo.Cloud demo, which anyone can open with that login.
@@ -110,6 +112,9 @@ Kigo.Cloud privacy policy: https://www.kigocloud.com/zastita-osobnih-podataka
 4. An order with the fiscalized Kigo.Cloud invoice number.
 
 == Changelog ==
+
+= 2.2.1 =
+* The External services section lists the gift voucher check, the cancelled order call, the API key login and the shipping country.
 
 = 2.2.0 =
 * New: Kigo.Cloud gift vouchers in the shop. The buyer types the voucher number in the coupon field, the cart takes off what is left on the voucher, and Kigo.Cloud puts the used voucher on the invoice. An order paid in full with a voucher is sent as an invoice.
@@ -189,6 +194,9 @@ Kigo.Cloud privacy policy: https://www.kigocloud.com/zastita-osobnih-podataka
 Older versions: https://github.com/symmetria-doo/kigocloud-for-woocommerce/blob/main/CHANGELOG.md
 
 == Upgrade Notice ==
+
+= 2.2.1 =
+Documentation only: the readme lists every call the plugin makes to Kigo.Cloud.
 
 = 2.2.0 =
 Kigo.Cloud gift vouchers can be used in the cart, and a cancelled or refunded order cancels its Kigo.Cloud invoice.

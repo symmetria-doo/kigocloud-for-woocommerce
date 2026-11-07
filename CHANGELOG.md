@@ -4,6 +4,11 @@ All notable changes to KigoCloud for WooCommerce are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.1] - 2026-11-07
+
+### Changed
+- readme.txt, External services: the gift voucher check (`giftVoucher/check`), the cancelled order call (`invoice/cancelOrder`), the API key login and the shipping country and gift vouchers sent with the order, as wordpress.org requires every external call to be described. No code changes.
+
 ## [2.2.0] - 2026-11-04
 
 ### Added
