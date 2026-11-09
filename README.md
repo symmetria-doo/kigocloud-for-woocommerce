@@ -18,20 +18,24 @@ WordPress plugin that sends WooCommerce orders to the KigoCloud service. Handles
 - Custom meta-to-billing mapping for sites that already collect R1 data through other plugins
 - Sends invoice PDF to the customer by email after successful KigoCloud document creation
 - Custom REST endpoints for SKU lookup (product + variation)
-- In-place auto-update against GitHub Releases
+- Updates through wordpress.org; installs from the GitHub release zip update in place from GitHub Releases
 
 ## Installation
 
-1. Download the latest release zip from [Releases](https://github.com/symmetria-doo/kigocloud-for-woocommerce/releases).
-2. In WordPress admin: Plugins -> Add New -> Upload Plugin -> choose the zip -> Install.
-3. Activate the plugin.
-4. WooCommerce -> Settings -> KigoCloud tab. Fill in API credentials.
+KigoCloud for WooCommerce is the official plugin in the WordPress Plugin Directory: [wordpress.org/plugins/kigocloud-for-woocommerce](https://wordpress.org/plugins/kigocloud-for-woocommerce/). Install it straight from WordPress, with no file to download:
 
-After installation the plugin checks for updates against GitHub Releases automatically.
+1. In WordPress admin: Plugins -> Add New.
+2. Search for "KigoCloud".
+3. At KigoCloud for WooCommerce click Install Now, then Activate.
+4. Open the KigoCloud item in the left WordPress menu and fill in the API credentials on the Connection tab.
+
+For manual installation, download the ZIP from [GitHub Releases](https://github.com/symmetria-doo/kigocloud-for-woocommerce/releases/latest/download/kigocloud-for-woocommerce.zip) or the [WordPress.org plugin page](https://wordpress.org/plugins/kigocloud-for-woocommerce/), then use Plugins -> Add New -> Upload Plugin -> Install Now -> Activate.
+
+WordPress offers new versions like for any other plugin. If you installed the plugin earlier from the zip on [GitHub Releases](https://github.com/symmetria-doo/kigocloud-for-woocommerce/releases), you don't need to change anything: that installation keeps updating itself from GitHub Releases.
 
 ## Configuration
 
-API endpoint defaults to `https://app.kigo.cloud/hr/api/v1/`. To point at a different server, set the `kigocloud_api_url` option (override available from the Connection section under WooCommerce -> Settings -> KigoCloud).
+API endpoint defaults to `https://app.kigo.cloud/hr/api/v1/`. It is not editable from the admin screen. To point at a different server, define `WOO_KIGOCLOUD_API_URL` in `wp-config.php` or use the `kigocloud_api_url` filter; a `kigocloud_api_url` option stored by an earlier version is still honoured.
 
 ## Development
 
