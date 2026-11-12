@@ -47,7 +47,7 @@ class Woo_KigoCloud_Pricelist
     const OPTION_CURRENT = 'kigocloud_pricelist_current';
 
     /**
-     * Anchor prices read from the current CSV: array('file' => name,
+     * Anchor prices read from Kigo.Cloud (item/list): array('day' => Y-m-d,
      * 'ref' => array(sifra => array(price, date)), 'barcode' => array(barkod => array(price, date))).
      * Not autoloaded.
      */
@@ -75,6 +75,7 @@ class Woo_KigoCloud_Pricelist
         // whether it works instead of waiting for tomorrow morning.
         add_action('update_option_' . self::OPTION_URL, array(__CLASS__, 'on_url_saved'), 10, 0);
         add_action('add_option_' . self::OPTION_URL, array(__CLASS__, 'on_url_saved'), 10, 0);
+        self::init_anchor();
     }
 
     /**
@@ -295,7 +296,6 @@ class Woo_KigoCloud_Pricelist
         }
         $current['day'] = current_time('Y-m-d');
         update_option(self::OPTION_CURRENT, $current, false);
-        self::build_anchor_index();
         self::purge();
 
         return self::store_status('ok', $fetched > 0
@@ -304,73 +304,178 @@ class Woo_KigoCloud_Pricelist
     }
 
     /**
-     * Reads the anchor price of every item from the current CSV, so the shop can
-     * show it next to the product price without Kigo.Cloud writing it into each
-     * product. Rows without an anchor price are left out.
+     * Anchor prices for the shop. They have nothing to do with the price list
+     * publication above (the Price list tab, the price list on the shop's own
+     * domain): they come from Kigo.Cloud's Sidrene cijene through the API.
      *
-     * The CSV is the one Kigo.Cloud publishes (AnchorPricePublisher::writeCsv):
-     * UTF-8 with a BOM, ";" between fields, decimal comma, a header row with
-     * sifra, sidrena_cijena, referentni_dan and barkod. Columns are found by
-     * name, so a column added later does not break the read.
-     *
-     * @return int number of items with an anchor price
+     * When "Anchor price" is set to show, the plugin reads the item list of the
+     * v1 API (GET item/list), which carries anchor_prices for every item: one
+     * entry per switched-on reference day that applies to the item and has a
+     * price, oldest day first. The newest one is the anchor price the shop
+     * shows. Anchor prices are in every Kigo.Cloud package. Read once a day after
+     * 8:00 and when the settings are saved; nothing is typed in by hand.
      */
-    public static function build_anchor_index()
+
+    /** Last read: array('time', 'count', 'reason', 'message'). Not autoloaded. */
+    const OPTION_ANCHOR_SOURCE = 'kigocloud_anchor_source';
+
+    /** Daily refresh of the anchor prices, after Kigo.Cloud publishes at 8:00. */
+    const ANCHOR_CRON = 'kigocloud_anchor_refresh';
+
+    /**
+     * Hooks of the anchor prices. Called from init().
+     */
+    private static function init_anchor()
     {
-        self::$anchor_index = null;
-        $path = self::path('csv');
-        $handle = ($path !== '' && is_readable($path)) ? fopen($path, 'r') : false;
-        if ($handle === false) {
-            delete_option(self::OPTION_ANCHOR);
+        add_action(self::ANCHOR_CRON, array(__CLASS__, 'refresh_anchor_prices'));
+        add_action('init', array(__CLASS__, 'schedule_anchor'));
+        // Switching the anchor price on, or a new login, fetches them at once.
+        foreach (array('kigocloud_show_anchor_price', 'kigocloud_api_key', 'kigocloud_username', 'kigocloud_password') as $option) {
+            add_action('update_option_' . $option, array(__CLASS__, 'on_anchor_settings_saved'), 20, 0);
+            add_action('add_option_' . $option, array(__CLASS__, 'on_anchor_settings_saved'), 20, 0);
+        }
+    }
+
+    /**
+     * @return bool the anchor price is shown and there is a login to ask Kigo.Cloud with
+     */
+    private static function anchor_wanted()
+    {
+        return '1' === (string) get_option('kigocloud_show_anchor_price', '0')
+            && class_exists('Woo_KigoCloud_Request')
+            && Woo_KigoCloud_Request::has_credentials();
+    }
+
+    /**
+     * Hooked on `init`: the daily refresh at 08:15 while the anchor price is shown.
+     */
+    public static function schedule_anchor()
+    {
+        $next = wp_next_scheduled(self::ANCHOR_CRON);
+        if (!self::anchor_wanted()) {
+            if ($next) {
+                wp_unschedule_event($next, self::ANCHOR_CRON);
+            }
+            return;
+        }
+        if (!$next) {
+            wp_schedule_event(strtotime('tomorrow 08:15'), 'daily', self::ANCHOR_CRON);
+        }
+    }
+
+    /**
+     * The anchor price was switched on or the login changed. The settings form
+     * saves every option in one request, so the refresh waits for the end of it
+     * and asks Kigo.Cloud with the login just saved.
+     */
+    public static function on_anchor_settings_saved()
+    {
+        if (!has_action('shutdown', array(__CLASS__, 'refresh_after_save'))) {
+            add_action('shutdown', array(__CLASS__, 'refresh_after_save'));
+        }
+    }
+
+    /**
+     * Hooked on `shutdown` by on_anchor_settings_saved().
+     */
+    public static function refresh_after_save()
+    {
+        if (self::anchor_wanted()) {
+            self::refresh_anchor_prices();
+        }
+        self::schedule_anchor();
+    }
+
+    /**
+     * @return array the last read (time, count, reason, message), array() before the first one
+     */
+    public static function anchor_source()
+    {
+        $source = get_option(self::OPTION_ANCHOR_SOURCE, array());
+
+        return is_array($source) ? $source : array();
+    }
+
+    /** Items per page of item/list (its maximum). */
+    const ANCHOR_PAGE = 3000;
+
+    /**
+     * Reads the anchor prices of all items from Kigo.Cloud (GET item/list, page
+     * by page) and stores the newest one of each item. A failed call keeps the
+     * anchor prices read before.
+     *
+     * @return int number of items with an anchor price, 0 when nothing was read
+     */
+    public static function refresh_anchor_prices()
+    {
+        if (!self::anchor_wanted()) {
             return 0;
         }
-        $index = array('file' => basename($path), 'ref' => array(), 'barcode' => array());
-        $header = fgetcsv($handle, 0, ';');
-        if (!is_array($header)) {
-            fclose($handle);
-            delete_option(self::OPTION_ANCHOR);
-            return 0;
-        }
-        $header[0] = preg_replace('/^\xEF\xBB\xBF/', '', (string) $header[0]);
-        $columns = array_flip(array_map('trim', $header));
-        if (!isset($columns['sidrena_cijena']) || (!isset($columns['sifra']) && !isset($columns['barkod']))) {
-            fclose($handle);
-            delete_option(self::OPTION_ANCHOR);
-            return 0;
-        }
+        $index = array('day' => current_time('Y-m-d'), 'ref' => array(), 'barcode' => array());
         $count = 0;
-        while (($row = fgetcsv($handle, 0, ';')) !== false) {
-            $price = isset($row[$columns['sidrena_cijena']]) ? trim((string) $row[$columns['sidrena_cijena']]) : '';
-            if ($price === '') {
-                continue;
+        // 20 pages of 3000: far more items than a shop has.
+        for ($page = 0; $page < 20; $page++) {
+            $answer = Woo_KigoCloud_Request::call('GET', 'item/list?pageSize=' . self::ANCHOR_PAGE . ($page > 0 ? '&page=' . $page : ''));
+            if (is_wp_error($answer)) {
+                self::store_anchor_source(array('reason' => 'error', 'message' => $answer->get_error_message()));
+                return 0;
             }
-            $price = str_replace(',', '.', $price);
-            if (!is_numeric($price)) {
-                continue;
-            }
-            $date = (isset($columns['referentni_dan']) && isset($row[$columns['referentni_dan']]))
-                ? trim((string) $row[$columns['referentni_dan']]) : '';
-            $entry = array((float) $price, $date);
-            $added = false;
-            foreach (array('sifra' => 'ref', 'barkod' => 'barcode') as $column => $key) {
-                if (!isset($columns[$column]) || !isset($row[$columns[$column]])) {
+            $rows = (isset($answer->data) && is_array($answer->data)) ? $answer->data : array();
+            foreach ($rows as $row) {
+                $entry = self::newest_anchor($row);
+                if ($entry === null) {
                     continue;
                 }
-                // csvText() puts a ' in front of a value that starts like a formula.
-                $code = self::anchor_key(preg_replace("/^'(?=\s*[=+@-])/u", '', (string) $row[$columns[$column]]));
-                if ($code !== '') {
-                    $index[$key][$code] = $entry;
-                    $added = true;
+                $added = false;
+                foreach (array('reference' => 'ref', 'barcode' => 'barcode') as $field => $key) {
+                    $code = isset($row->$field) ? self::anchor_key((string) $row->$field) : '';
+                    if ($code !== '') {
+                        $index[$key][$code] = $entry;
+                        $added = true;
+                    }
+                }
+                if ($added) {
+                    $count++;
                 }
             }
-            if ($added) {
-                $count++;
+            if (count($rows) < self::ANCHOR_PAGE) {
+                break;
             }
         }
-        fclose($handle);
         update_option(self::OPTION_ANCHOR, $index, false);
+        self::$anchor_index = null;
+        self::store_anchor_source(array('reason' => $count > 0 ? '' : 'empty', 'count' => $count));
 
         return $count;
+    }
+
+    /**
+     * The anchor price of the newest reference day of an item/list row.
+     *
+     * @param object $row
+     * @return array|null array(price, date)
+     */
+    private static function newest_anchor($row)
+    {
+        if (empty($row->anchor_prices) || !is_array($row->anchor_prices)) {
+            return null;
+        }
+        // Kigo.Cloud lists the reference days oldest first.
+        $last = end($row->anchor_prices);
+        if (!is_object($last) || !isset($last->price) || !is_numeric($last->price) || (float) $last->price < 0) {
+            return null;
+        }
+
+        return array((float) $last->price, isset($last->date) ? (string) $last->date : '');
+    }
+
+    /**
+     * @param array $source
+     */
+    private static function store_anchor_source(array $source)
+    {
+        $source['time'] = time();
+        update_option(self::OPTION_ANCHOR_SOURCE, $source, false);
     }
 
     /** @var array|null index loaded in this request */
@@ -388,24 +493,17 @@ class Woo_KigoCloud_Pricelist
     }
 
     /**
-     * Anchor price from the published price list for a product or variation:
+     * Anchor price from Kigo.Cloud for a product or variation:
      * matched by SKU against the Kigo.Cloud item code (sifra), the same match
      * the orders use, then by GTIN/EAN against the barcode (barkod).
      *
      * @param WC_Product $product
-     * @return array|null array(price, date) or null when the price list has none
+     * @return array|null array(price, date) or null when there is none
      */
     public static function anchor_for($product)
     {
         if (self::$anchor_index === null) {
             $index = get_option(self::OPTION_ANCHOR, null);
-            $path = self::path('csv');
-            // The index belongs to one CSV; a newer file, or one fetched before
-            // this version, is read again once.
-            if ($path !== '' && (!is_array($index) || !isset($index['file']) || $index['file'] !== basename($path))) {
-                self::build_anchor_index();
-                $index = get_option(self::OPTION_ANCHOR, null);
-            }
             self::$anchor_index = is_array($index) ? $index : array();
         }
         if (empty(self::$anchor_index)) {

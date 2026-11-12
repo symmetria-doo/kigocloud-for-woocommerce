@@ -1033,3 +1033,25 @@ msgstr ""
 #, php-format
 msgid "referentni dan %s"
 msgstr ""
+
+msgid "Kigo.Cloud has no anchor prices: switch on a reference day in Opcije > Šifrarnici > Sidrene cijene and fill in its prices."
+msgstr ""
+
+msgid "Save the settings: the plugin then reads the anchor prices from Kigo.Cloud."
+msgstr ""
+
+msgid "Anchor prices"
+msgstr ""
+
+#, php-format
+msgid "%1$d items, read from Kigo.Cloud (Sidrene cijene, newest reference day) on %2$s."
+msgstr ""
+
+msgid "Read again every morning and when these settings are saved."
+msgstr ""
+
+msgid "The anchor prices could not be read from Kigo.Cloud."
+msgstr ""
+
+msgid "Croatian Government decision: the price that applied on the reference day is shown next to the retail price. The plugin reads it from Kigo.Cloud (Sidrene cijene, newest reference day) every morning, by itself."
+msgstr ""

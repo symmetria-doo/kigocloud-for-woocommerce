@@ -4,7 +4,7 @@ Tags: fiskalizacija, fiscalization, croatia, invoice, r1
 Requires at least: 5.5
 Tested up to: 7.1
 Requires PHP: 7.2
-Stable tag: 2.2.7
+Stable tag: 2.2.8
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 WC requires at least: 5.0
@@ -94,6 +94,7 @@ What is sent, and when:
 * **Gift voucher check** (`https://app.kigo.cloud/hr/api/v1/giftVoucher/check`): when a buyer types something shaped like a voucher number (XXXX-XXXX) in the cart's coupon field and no shop coupon has that code. Sent: the voucher number and your Kigo.Cloud login. No data about the buyer is sent. The answer (what is left on the voucher) is kept for two minutes.
 * **Order cancelled** (`https://app.kigo.cloud/hr/api/v1/invoice/cancelOrder`): once, when an order that already has a Kigo.Cloud document is set to cancelled or refunded. Sent: the order number, the employee PIN and your Kigo.Cloud login. Kigo.Cloud cancels the invoice, or releases the gift voucher reserved for an offer.
 * **Connection test** (R1 tab button): when you click it. Sends a test offer with made-up buyer data and your Kigo.Cloud login.
+* **Anchor prices** (`https://app.kigo.cloud/hr/api/v1/item/list`): while "Anchor price" is set to show, once a day at 8:15 and when the settings are saved. Sent: your Kigo.Cloud login. The answer is your Kigo.Cloud item list with the anchor prices; the plugin keeps the item code, barcode and anchor price. No data about your shop or customers is sent.
 * **Price list** (the Kigo.Cloud address you enter on the Price list tab): once a day at 7:00, when you save the address, and when a page with the `[kigo_cjenik]` shortcode finds that day's copy missing. Only the CSV and XML files are downloaded; no data about your shop or customers is sent.
 * **Demo account**: if you use the demo login, the same order data goes into the public Kigo.Cloud demo, which anyone can open with that login.
 
@@ -110,6 +111,10 @@ Kigo.Cloud privacy policy: https://www.kigocloud.com/zastita-osobnih-podataka
 4. An order with the fiscalized Kigo.Cloud invoice number.
 
 == Changelog ==
+
+= 2.2.8 =
+* Anchor prices without typing anything in. With "Anchor price" set to show, the plugin reads them every morning from Kigo.Cloud (Sidrene cijene) through the API: for each item the anchor price of the newest switched-on reference day. The Prices tab says how many items have one. Works in every Kigo.Cloud package.
+* The Price list tab is only for publishing the price list on your own domain; the anchor prices no longer depend on it.
 
 = 2.2.7 =
 * The anchor price is always on its own line under the price, in small grey text, whatever the theme does with the price (flex rows, coloured or large prices). On the product page it shows the reference day; on product cards the line is shorter and the reference day is in the tooltip. Where a theme puts the card price in a box that hides a second line, the anchor price is moved right under that box.
@@ -211,6 +216,9 @@ Kigo.Cloud privacy policy: https://www.kigocloud.com/zastita-osobnih-podataka
 Older versions: https://github.com/symmetria-doo/kigocloud-for-woocommerce/blob/main/CHANGELOG.md
 
 == Upgrade Notice ==
+
+= 2.2.8 =
+Anchor prices come from Kigo.Cloud by themselves, from the newest reference day.
 
 = 2.2.7 =
 The anchor price is shown under the price on every theme.

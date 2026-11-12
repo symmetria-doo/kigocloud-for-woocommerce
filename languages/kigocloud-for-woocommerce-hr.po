@@ -600,6 +600,28 @@ msgstr "Šifra artikla u KigoCloudu za stavku dostave. Prazno znači \"shipping\
 msgid "referentni dan %s"
 msgstr "referentni dan %s"
 
+msgid "Kigo.Cloud has no anchor prices: switch on a reference day in Opcije > Šifrarnici > Sidrene cijene and fill in its prices."
+msgstr "Kigo.Cloud nema sidrenih cijena: uključite referentni dan u Opcije > Šifrarnici > Sidrene cijene i popunite mu cijene."
+
+msgid "Save the settings: the plugin then reads the anchor prices from Kigo.Cloud."
+msgstr "Spremite postavke: plugin tada čita sidrene cijene iz Kigo.Clouda."
+
+msgid "Anchor prices"
+msgstr "Sidrene cijene"
+
+#, php-format
+msgid "%1$d items, read from Kigo.Cloud (Sidrene cijene, newest reference day) on %2$s."
+msgstr "%1$d artikala, pročitano iz Kigo.Clouda (Sidrene cijene, najnoviji referentni dan) %2$s."
+
+msgid "Read again every morning and when these settings are saved."
+msgstr "Čita se ponovno svako jutro i kad se ove postavke spreme."
+
+msgid "The anchor prices could not be read from Kigo.Cloud."
+msgstr "Sidrene cijene nije bilo moguće pročitati iz Kigo.Clouda."
+
+msgid "Croatian Government decision: the price that applied on the reference day is shown next to the retail price. The plugin reads it from Kigo.Cloud (Sidrene cijene, newest reference day) every morning, by itself."
+msgstr "Odluka Vlade RH: uz maloprodajnu cijenu ističe se cijena s referentnog dana. Plugin je sam čita iz Kigo.Clouda (Sidrene cijene, najnoviji referentni dan) svako jutro."
+
 #~ msgid "Document number"
 #~ msgstr "Broj dokumenta"
 

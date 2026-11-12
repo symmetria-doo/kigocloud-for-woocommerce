@@ -102,3 +102,25 @@ msgstr "KigoCloud-Artikelreferenz für die Versandposition. Leer lassen für \"s
 #, php-format
 msgid "referentni dan %s"
 msgstr "Referenztag %s"
+
+msgid "Kigo.Cloud has no anchor prices: switch on a reference day in Opcije > Šifrarnici > Sidrene cijene and fill in its prices."
+msgstr "Kigo.Cloud hat keine Ankerpreise: schalten Sie einen Referenztag unter Opcije > Šifrarnici > Sidrene cijene ein und füllen Sie seine Preise aus."
+
+msgid "Save the settings: the plugin then reads the anchor prices from Kigo.Cloud."
+msgstr "Speichern Sie die Einstellungen: das Plugin liest dann die Ankerpreise aus Kigo.Cloud."
+
+msgid "Anchor prices"
+msgstr "Ankerpreise"
+
+#, php-format
+msgid "%1$d items, read from Kigo.Cloud (Sidrene cijene, newest reference day) on %2$s."
+msgstr "%1$d Artikel, aus Kigo.Cloud gelesen (Sidrene cijene, neuester Referenztag) am %2$s."
+
+msgid "Read again every morning and when these settings are saved."
+msgstr "Wird jeden Morgen und beim Speichern dieser Einstellungen neu gelesen."
+
+msgid "The anchor prices could not be read from Kigo.Cloud."
+msgstr "Die Ankerpreise konnten nicht aus Kigo.Cloud gelesen werden."
+
+msgid "Croatian Government decision: the price that applied on the reference day is shown next to the retail price. The plugin reads it from Kigo.Cloud (Sidrene cijene, newest reference day) every morning, by itself."
+msgstr "Beschluss der kroatischen Regierung: neben dem Verkaufspreis wird der Preis am Referenztag angezeigt. Das Plugin liest ihn jeden Morgen selbst aus Kigo.Cloud (Sidrene cijene, neuester Referenztag)."

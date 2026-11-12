@@ -4,6 +4,13 @@ All notable changes to KigoCloud for WooCommerce are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.8] - 2026-11-12
+
+### Changed
+- Anchor prices come from Kigo.Cloud's Sidrene cijene through the API, not from the price list. `Woo_KigoCloud_Pricelist::refresh_anchor_prices()` reads `GET item/list?pageSize=3000` page by page; every row carries `anchor_prices` (switched-on reference days of the item with a price, oldest first) and the plugin keeps the newest one per item, by `reference` and `barcode`, in `kigocloud_anchor_index`. `kigocloud_anchor_source` keeps the time, the number of items or the error. It runs daily at 08:15 (`kigocloud_anchor_refresh`) while "Anchor price" is set to show and there is a login, and at the end of the request that saves the anchor setting, the API key, username or password. A failed read keeps the anchor prices read before. Works in every package (anchor prices are in all of them).
+- The Price list tab (publication on the shop's own domain) no longer has anything to do with the anchor prices; the 2.2.6 reading of anchor prices from the downloaded price list CSV is removed.
+- The Prices tab shows how many items have an anchor price and when they were read, or why not.
+
 ## [2.2.7] - 2026-11-12
 
 ### Changed

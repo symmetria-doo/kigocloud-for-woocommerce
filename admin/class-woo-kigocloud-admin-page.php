@@ -575,10 +575,51 @@ class Woo_KigoCloud_Admin_Page
                 '1' => __('Show below the product price', 'kigocloud-for-woocommerce'),
             ), array(
                 'default'     => '0',
-                'description' => __('Croatian Government decision, in force from 1 October 2026: the price that applied on the reference day is shown next to the retail price. KigoCloud sends it with the product.', 'kigocloud-for-woocommerce'),
+                'description' => __('Croatian Government decision: the price that applied on the reference day is shown next to the retail price. The plugin reads it from Kigo.Cloud (Sidrene cijene, newest reference day) every morning, by itself.', 'kigocloud-for-woocommerce'),
             ));
+            $this->render_anchor_source();
             ?>
         </table>
+        <?php
+    }
+
+    /**
+     * Where the anchor prices come from, or why Kigo.Cloud gave none (package,
+     * publication off, anchor prices not in use).
+     */
+    private function render_anchor_source()
+    {
+        if ('1' !== (string) get_option('kigocloud_show_anchor_price', '0')) {
+            return;
+        }
+        $source = Woo_KigoCloud_Pricelist::anchor_source();
+        $reason = isset($source['reason']) ? (string) $source['reason'] : 'never';
+        $reasons = array(
+            'empty'         => __('Kigo.Cloud has no anchor prices: switch on a reference day in Opcije > Šifrarnici > Sidrene cijene and fill in its prices.', 'kigocloud-for-woocommerce'),
+            'never'         => __('Save the settings: the plugin then reads the anchor prices from Kigo.Cloud.', 'kigocloud-for-woocommerce'),
+        );
+        ?>
+        <tr>
+            <th scope="row"><?php esc_html_e('Anchor prices', 'kigocloud-for-woocommerce'); ?></th>
+            <td>
+                <?php if ($reason === ''): ?>
+                    <p><span class="kc-status-ok"><?php
+                        echo esc_html(sprintf(
+                            /* translators: 1: number of items, 2: date and time */
+                            __('%1$d items, read from Kigo.Cloud (Sidrene cijene, newest reference day) on %2$s.', 'kigocloud-for-woocommerce'),
+                            isset($source['count']) ? (int) $source['count'] : 0,
+                            date_i18n(get_option('date_format') . ' ' . get_option('time_format'), isset($source['time']) ? (int) $source['time'] : time())
+                        ));
+                    ?></span></p>
+                    <p class="description"><?php esc_html_e('Read again every morning and when these settings are saved.', 'kigocloud-for-woocommerce'); ?></p>
+                <?php elseif (isset($reasons[$reason])): ?>
+                    <p><span class="kc-status-bad"><?php echo esc_html($reasons[$reason]); ?></span></p>
+                <?php else: ?>
+                    <p><span class="kc-status-bad"><?php esc_html_e('The anchor prices could not be read from Kigo.Cloud.', 'kigocloud-for-woocommerce'); ?></span>
+                        <?php echo esc_html(isset($source['message']) ? (string) $source['message'] : ''); ?></p>
+                <?php endif; ?>
+            </td>
+        </tr>
         <?php
     }
 
