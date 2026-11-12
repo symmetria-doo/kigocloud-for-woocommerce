@@ -46,6 +46,13 @@ class Woo_KigoCloud_Pricelist
     /** Current files: array('csv' => file name, 'xml' => file name, 'day' => Y-m-d). */
     const OPTION_CURRENT = 'kigocloud_pricelist_current';
 
+    /**
+     * Anchor prices read from the current CSV: array('file' => name,
+     * 'ref' => array(sifra => array(price, date)), 'barcode' => array(barkod => array(price, date))).
+     * Not autoloaded.
+     */
+    const OPTION_ANCHOR = 'kigocloud_anchor_index';
+
     /** Cron hook name. */
     const CRON_HOOK = 'kigocloud_pricelist_fetch';
 
@@ -288,11 +295,134 @@ class Woo_KigoCloud_Pricelist
         }
         $current['day'] = current_time('Y-m-d');
         update_option(self::OPTION_CURRENT, $current, false);
+        self::build_anchor_index();
         self::purge();
 
         return self::store_status('ok', $fetched > 0
             ? __('The price list has been refreshed.', 'kigocloud-for-woocommerce')
             : __('The price list is already up to date.', 'kigocloud-for-woocommerce'));
+    }
+
+    /**
+     * Reads the anchor price of every item from the current CSV, so the shop can
+     * show it next to the product price without Kigo.Cloud writing it into each
+     * product. Rows without an anchor price are left out.
+     *
+     * The CSV is the one Kigo.Cloud publishes (AnchorPricePublisher::writeCsv):
+     * UTF-8 with a BOM, ";" between fields, decimal comma, a header row with
+     * sifra, sidrena_cijena, referentni_dan and barkod. Columns are found by
+     * name, so a column added later does not break the read.
+     *
+     * @return int number of items with an anchor price
+     */
+    public static function build_anchor_index()
+    {
+        self::$anchor_index = null;
+        $path = self::path('csv');
+        $handle = ($path !== '' && is_readable($path)) ? fopen($path, 'r') : false;
+        if ($handle === false) {
+            delete_option(self::OPTION_ANCHOR);
+            return 0;
+        }
+        $index = array('file' => basename($path), 'ref' => array(), 'barcode' => array());
+        $header = fgetcsv($handle, 0, ';');
+        if (!is_array($header)) {
+            fclose($handle);
+            delete_option(self::OPTION_ANCHOR);
+            return 0;
+        }
+        $header[0] = preg_replace('/^\xEF\xBB\xBF/', '', (string) $header[0]);
+        $columns = array_flip(array_map('trim', $header));
+        if (!isset($columns['sidrena_cijena']) || (!isset($columns['sifra']) && !isset($columns['barkod']))) {
+            fclose($handle);
+            delete_option(self::OPTION_ANCHOR);
+            return 0;
+        }
+        $count = 0;
+        while (($row = fgetcsv($handle, 0, ';')) !== false) {
+            $price = isset($row[$columns['sidrena_cijena']]) ? trim((string) $row[$columns['sidrena_cijena']]) : '';
+            if ($price === '') {
+                continue;
+            }
+            $price = str_replace(',', '.', $price);
+            if (!is_numeric($price)) {
+                continue;
+            }
+            $date = (isset($columns['referentni_dan']) && isset($row[$columns['referentni_dan']]))
+                ? trim((string) $row[$columns['referentni_dan']]) : '';
+            $entry = array((float) $price, $date);
+            $added = false;
+            foreach (array('sifra' => 'ref', 'barkod' => 'barcode') as $column => $key) {
+                if (!isset($columns[$column]) || !isset($row[$columns[$column]])) {
+                    continue;
+                }
+                // csvText() puts a ' in front of a value that starts like a formula.
+                $code = self::anchor_key(preg_replace("/^'(?=\s*[=+@-])/u", '', (string) $row[$columns[$column]]));
+                if ($code !== '') {
+                    $index[$key][$code] = $entry;
+                    $added = true;
+                }
+            }
+            if ($added) {
+                $count++;
+            }
+        }
+        fclose($handle);
+        update_option(self::OPTION_ANCHOR, $index, false);
+
+        return $count;
+    }
+
+    /** @var array|null index loaded in this request */
+    private static $anchor_index = null;
+
+    /**
+     * @param string $code item code or barcode
+     * @return string the code as it is compared: trimmed, lower case
+     */
+    private static function anchor_key($code)
+    {
+        $code = trim((string) $code);
+
+        return function_exists('mb_strtolower') ? mb_strtolower($code, 'UTF-8') : strtolower($code);
+    }
+
+    /**
+     * Anchor price from the published price list for a product or variation:
+     * matched by SKU against the Kigo.Cloud item code (sifra), the same match
+     * the orders use, then by GTIN/EAN against the barcode (barkod).
+     *
+     * @param WC_Product $product
+     * @return array|null array(price, date) or null when the price list has none
+     */
+    public static function anchor_for($product)
+    {
+        if (self::$anchor_index === null) {
+            $index = get_option(self::OPTION_ANCHOR, null);
+            $path = self::path('csv');
+            // The index belongs to one CSV; a newer file, or one fetched before
+            // this version, is read again once.
+            if ($path !== '' && (!is_array($index) || !isset($index['file']) || $index['file'] !== basename($path))) {
+                self::build_anchor_index();
+                $index = get_option(self::OPTION_ANCHOR, null);
+            }
+            self::$anchor_index = is_array($index) ? $index : array();
+        }
+        if (empty(self::$anchor_index)) {
+            return null;
+        }
+        $sku = self::anchor_key($product->get_sku());
+        if ($sku !== '' && isset(self::$anchor_index['ref'][$sku])) {
+            return self::$anchor_index['ref'][$sku];
+        }
+        if (is_callable(array($product, 'get_global_unique_id'))) {
+            $gtin = self::anchor_key($product->get_global_unique_id());
+            if ($gtin !== '' && isset(self::$anchor_index['barcode'][$gtin])) {
+                return self::$anchor_index['barcode'][$gtin];
+            }
+        }
+
+        return null;
     }
 
     /**

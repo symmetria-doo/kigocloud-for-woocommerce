@@ -572,6 +572,29 @@ msgstr "Samo bez API ključa. Ostavite oba polja prazna kad koristite API ključ
 msgid "KigoCloud employee PIN used when creating documents, with the API key and with the username and password alike."
 msgstr "PIN djelatnika u KigoCloudu s kojim se izrađuju dokumenti, i uz API ključ i uz korisničko ime i lozinku."
 
+msgid "Locations not covered by your other zones"
+msgstr "Lokacije koje nisu pokrivene drugim zonama"
+
+msgid "Reference per shipping method"
+msgstr "Šifra po načinu dostave"
+
+msgid "Shipping zone"
+msgstr "Zona dostave"
+
+msgid "Shipping method"
+msgstr "Način dostave"
+
+msgid "KigoCloud reference"
+msgstr "Šifra u KigoCloudu"
+
+msgid "disabled"
+msgstr "isključeno"
+
+msgid "The KigoCloud service code (Šifra) for each shipping method. Leave a field empty to use the shipping reference above."
+msgstr "Šifra usluge u KigoCloudu za svaki način dostave. Prazno polje koristi šifru dostave iznad."
+
+msgid "KigoCloud item reference used for the shipping line. Leave blank for \"shipping\". A shipping method with its own reference below uses that one instead."
+msgstr "Šifra artikla u KigoCloudu za stavku dostave. Prazno znači \"shipping\". Način dostave koji ispod ima svoju šifru koristi nju."
 
 #~ msgid "Document number"
 #~ msgstr "Broj dokumenta"

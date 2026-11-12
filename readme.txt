@@ -4,7 +4,7 @@ Tags: fiskalizacija, fiscalization, croatia, invoice, r1
 Requires at least: 5.5
 Tested up to: 7.1
 Requires PHP: 7.2
-Stable tag: 2.2.5
+Stable tag: 2.2.6
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 WC requires at least: 5.0
@@ -111,6 +111,10 @@ Kigo.Cloud privacy policy: https://www.kigocloud.com/zastita-osobnih-podataka
 
 == Changelog ==
 
+= 2.2.6 =
+* The anchor price is shown from the price list as well. When Kigo.Cloud has not written the anchor price into a product, the plugin takes it from the price list it downloads every day (Price list tab), matching the product or variation SKU to the Kigo.Cloud item code, or its GTIN/EAN to the barcode. So the anchor price shows as soon as the price list address is set.
+* Shipping reference per shipping method. The Orders tab lists every shipping method of every shipping zone with its own Kigo.Cloud reference field (for example dostava_25, dostava_eu). An empty field uses the general shipping reference. Each shipping method on the order is a line of its own.
+
 = 2.2.5 =
 * Connection tab: the API key and the username and password are shown as two ways to log in, separated by a line with "or". The username and password are under "Legacy login" and are needed only without an API key. The employee PIN is set apart, as it is used with both.
 
@@ -204,6 +208,9 @@ Kigo.Cloud privacy policy: https://www.kigocloud.com/zastita-osobnih-podataka
 Older versions: https://github.com/symmetria-doo/kigocloud-for-woocommerce/blob/main/CHANGELOG.md
 
 == Upgrade Notice ==
+
+= 2.2.6 =
+Anchor price from the price list, and a Kigo.Cloud reference for each shipping method.
 
 = 2.2.5 =
 Clearer Connection tab: API key or the legacy username and password.

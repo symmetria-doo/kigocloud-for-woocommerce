@@ -40,8 +40,10 @@ class Woo_KigoCloud_Public
      * Anchor price (Croatian Government decision, in force 1 October 2026):
      * prints the price that applied on the reference day under the product or
      * variation price. KigoCloud sends it with the product as the
-     * _kigo_anchor_price and _kigo_anchor_price_date meta; without that meta
-     * the price HTML is returned unchanged.
+     * _kigo_anchor_price and _kigo_anchor_price_date meta. Without that meta the
+     * anchor price comes from the price list the plugin downloads from Kigo.Cloud
+     * every day (Price list tab), matched by SKU or GTIN; without either the price
+     * HTML is returned unchanged.
      *
      * @param string     $price_html
      * @param WC_Product $product
@@ -57,11 +59,19 @@ class Woo_KigoCloud_Public
             return $price_html;
         }
         $anchor = $product->get_meta('_kigo_anchor_price', true);
-        if ($anchor === '' || $anchor === null || !is_numeric($anchor) || (float) $anchor < 0) {
+        $date   = $product->get_meta('_kigo_anchor_price_date', true);
+        if ($anchor === '' || $anchor === null || !is_numeric($anchor)) {
+            $listed = class_exists('Woo_KigoCloud_Pricelist') ? Woo_KigoCloud_Pricelist::anchor_for($product) : null;
+            if ($listed === null) {
+                return $price_html;
+            }
+            $anchor = $listed[0];
+            $date   = $listed[1];
+        }
+        if ((float) $anchor < 0) {
             return $price_html;
         }
         $label = __('Sidrena cijena', 'kigocloud-for-woocommerce');
-        $date  = $product->get_meta('_kigo_anchor_price_date', true);
         if (!empty($date)) {
             $timestamp = strtotime($date);
             if ($timestamp) {

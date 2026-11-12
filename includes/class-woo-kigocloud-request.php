@@ -56,6 +56,28 @@ if (!class_exists('Woo_KigoCloud_Request')) {
         }
 
         /**
+         * Kigo.Cloud item reference for a shipping line: the one set for that
+         * shipping method instance (kigocloud_shipping_reference-<instance id>),
+         * else the general shipping reference, else "shipping".
+         *
+         * @param int|string $instanceId shipping method instance id from the order line
+         * @return string
+         */
+        public static function shipping_reference($instanceId)
+        {
+            $instanceId = absint($instanceId);
+            if ($instanceId > 0) {
+                $own = trim((string) get_option('kigocloud_shipping_reference-' . $instanceId, ''));
+                if ($own !== '') {
+                    return $own;
+                }
+            }
+            $general = trim((string) get_option('kigocloud_shipping_reference', 'shipping'));
+
+            return $general === '' ? 'shipping' : $general;
+        }
+
+        /**
          * @param string $url
          * @return bool True for an address on the KigoKasa server (kigoserver.com).
          */
@@ -394,17 +416,22 @@ if (!class_exists('Woo_KigoCloud_Request')) {
                 $items[]                = $item;
             }
 
-            // Get shipping
-            $shippingItemReference = get_option('kigocloud_shipping_reference', 'shipping');
-            $totalShipping         = $order->get_shipping_total() + $order->get_shipping_tax(); // total price is base + tax
-            if ((float)$totalShipping > 0) {
+            // Shipping: one line per shipping method on the order, each with the
+            // Kigo.Cloud reference set for that method on the Orders tab, or the
+            // general shipping reference when the method has none.
+            $shippingItems = array();
+            foreach ($order->get_items('shipping') as $shippingLine) {
+                $lineShipping = (float)$shippingLine->get_total() + (float)$shippingLine->get_total_tax(); // base + tax
+                if ($lineShipping <= 0) {
+                    continue;
+                }
                 $item                   = new stdClass();
-                $shippingItem           = $item;
-                $item->reference        = empty($shippingItemReference) ? 'shipping' : $shippingItemReference;
+                $shippingItems[]        = $item;
+                $item->reference        = self::shipping_reference($shippingLine->get_instance_id());
                 $item->item_name        = __('Dostava', 'kigocloud-for-woocommerce');
-                $item->price            = $totalShipping;
+                $item->price            = $lineShipping;
                 if ($sendVatPercent) {
-                    $item->vat_percent  = $this->get_lines_tax_rate($order, $order->get_items('shipping'));
+                    $item->vat_percent  = $this->get_lines_tax_rate($order, array($shippingLine));
                 }
                 $item->discount_percent = 0.00; // This could be done without discount_percent set, because shipping should be Service not Article.
                 $item->quantity         = 1; //always one
@@ -541,7 +568,7 @@ if (!class_exists('Woo_KigoCloud_Request')) {
             $translations = self::language_translations($language);
             if ($translations) {
                 $mainBody->note = $invoiceNote . $translations->translate('Web Order #') . $order->get_order_number();
-                if (isset($shippingItem)) {
+                foreach ($shippingItems as $shippingItem) {
                     $shippingItem->item_name = $translations->translate('Dostava');
                 }
             }

@@ -4,6 +4,12 @@ All notable changes to KigoCloud for WooCommerce are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.6] - 2026-11-12
+
+### Added
+- Anchor price from the price list. `Woo_KigoCloud_Pricelist::build_anchor_index()` reads `sifra`, `sidrena_cijena`, `referentni_dan` and `barkod` from the current CSV (found by column name; BOM, `;` and decimal comma as Kigo.Cloud writes them) into the non-autoloaded option `kigocloud_anchor_index`, after every fetch and once for a CSV fetched before this version. `anchor_price_html()` keeps `_kigo_anchor_price` / `_kigo_anchor_price_date` first and otherwise uses `anchor_for()`: product or variation SKU against `sifra` (trimmed, case-insensitive), then `get_global_unique_id()` against `barkod`. Shops whose products Kigo.Cloud does not sync now show the anchor price once the price list address is set.
+- Shipping reference per shipping method. The Orders tab lists every shipping method instance (all zones and zone 0) with an option `kigocloud_shipping_reference-<instance id>`. `invoice/create` sends one shipping line per order shipping item, each with `Woo_KigoCloud_Request::shipping_reference()`: the method's own reference, else `kigocloud_shipping_reference`, else `shipping`. The VAT rate is taken per line.
+
 ## [2.2.5] - 2026-11-12
 
 ### Changed

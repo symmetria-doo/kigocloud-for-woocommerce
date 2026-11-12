@@ -54,6 +54,13 @@ class Woo_KigoCloud_Admin_Page
             }
         }
 
+        foreach (self::shipping_methods() as $method) {
+            register_setting('kigocloud_settings', 'kigocloud_shipping_reference-' . $method['instance_id'], array(
+                'type'              => 'string',
+                'sanitize_callback' => 'sanitize_text_field',
+            ));
+        }
+
         if (function_exists('WC') && WC()->payment_gateways) {
             foreach (WC()->payment_gateways->payment_gateways() as $gateway) {
                 if ('yes' !== $gateway->enabled) {
@@ -68,6 +75,47 @@ class Woo_KigoCloud_Admin_Page
                 }
             }
         }
+    }
+
+    /**
+     * Every shipping method set up in WooCommerce > Settings > Shipping, in every
+     * zone and in "Locations not covered by your other zones" (zone 0).
+     *
+     * @return array list of array('instance_id' => int, 'zone' => string, 'title' => string)
+     */
+    private static function shipping_methods()
+    {
+        if (!class_exists('WC_Shipping_Zones') || !class_exists('WC_Shipping_Zone')) {
+            return array();
+        }
+        $zones = array();
+        foreach (WC_Shipping_Zones::get_zones() as $zone) {
+            $zones[] = array(
+                'name'    => isset($zone['zone_name']) ? (string) $zone['zone_name'] : '',
+                'methods' => isset($zone['shipping_methods']) ? (array) $zone['shipping_methods'] : array(),
+            );
+        }
+        $rest = new WC_Shipping_Zone(0);
+        $zones[] = array(
+            'name'    => __('Locations not covered by your other zones', 'kigocloud-for-woocommerce'),
+            'methods' => $rest->get_shipping_methods(),
+        );
+        $methods = array();
+        foreach ($zones as $zone) {
+            foreach ($zone['methods'] as $method) {
+                if (!is_object($method) || empty($method->instance_id)) {
+                    continue;
+                }
+                $methods[] = array(
+                    'instance_id' => absint($method->instance_id),
+                    'zone'        => $zone['name'],
+                    'title'       => is_callable(array($method, 'get_title')) ? (string) $method->get_title() : (string) $method->id,
+                    'enabled'     => !isset($method->enabled) || $method->enabled === 'yes',
+                );
+            }
+        }
+
+        return $methods;
     }
 
     /**
@@ -586,6 +634,55 @@ class Woo_KigoCloud_Admin_Page
         <?php
     }
 
+    /**
+     * One reference field per shipping method, so each method lands on its own
+     * Kigo.Cloud service (for example dostava_25, dostava_eu).
+     */
+    private function render_shipping_references()
+    {
+        $methods = self::shipping_methods();
+        if (empty($methods)) {
+            return;
+        }
+        $general = trim((string) get_option('kigocloud_shipping_reference', ''));
+        ?>
+        <tr>
+            <th scope="row"><?php esc_html_e('Reference per shipping method', 'kigocloud-for-woocommerce'); ?></th>
+            <td>
+                <table class="kc-gateway-table">
+                    <thead>
+                        <tr>
+                            <th><?php esc_html_e('Shipping zone', 'kigocloud-for-woocommerce'); ?></th>
+                            <th><?php esc_html_e('Shipping method', 'kigocloud-for-woocommerce'); ?></th>
+                            <th><?php esc_html_e('KigoCloud reference', 'kigocloud-for-woocommerce'); ?></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($methods as $method):
+                            $key = 'kigocloud_shipping_reference-' . $method['instance_id']; ?>
+                            <tr>
+                                <td><?php echo esc_html($method['zone']); ?></td>
+                                <td>
+                                    <?php echo esc_html($method['title']); ?>
+                                    <?php if (!$method['enabled']): ?>
+                                        <em>(<?php esc_html_e('disabled', 'kigocloud-for-woocommerce'); ?>)</em>
+                                    <?php endif; ?>
+                                </td>
+                                <td>
+                                    <input type="text" id="<?php echo esc_attr($key); ?>" name="<?php echo esc_attr($key); ?>"
+                                           value="<?php echo esc_attr((string) get_option($key, '')); ?>"
+                                           placeholder="<?php echo esc_attr($general === '' ? 'shipping' : $general); ?>" />
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+                <p class="description"><?php esc_html_e('The KigoCloud service code (Šifra) for each shipping method. Leave a field empty to use the shipping reference above.', 'kigocloud-for-woocommerce'); ?></p>
+            </td>
+        </tr>
+        <?php
+    }
+
     private function render_tab_orders()
     {
         ?>
@@ -596,8 +693,9 @@ class Woo_KigoCloud_Admin_Page
                 <?php
                 $this->text_field('kigocloud_shipping_reference', __('Shipping reference', 'kigocloud-for-woocommerce'), array(
                     'placeholder' => 'shipping',
-                    'description' => __('KigoCloud item reference used for the shipping line. Leave blank for "shipping".', 'kigocloud-for-woocommerce'),
+                    'description' => __('KigoCloud item reference used for the shipping line. Leave blank for "shipping". A shipping method with its own reference below uses that one instead.', 'kigocloud-for-woocommerce'),
                 ));
+                $this->render_shipping_references();
                 $this->select_field('kigocloud_fill_empty_sku', __('Fill empty SKU', 'kigocloud-for-woocommerce'), array(
                     '0' => __('No', 'kigocloud-for-woocommerce'),
                     '1' => __('Yes - use product ID', 'kigocloud-for-woocommerce'),

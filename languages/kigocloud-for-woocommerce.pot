@@ -1005,3 +1005,27 @@ msgstr ""
 
 msgid "KigoCloud employee PIN used when creating documents, with the API key and with the username and password alike."
 msgstr ""
+
+msgid "Locations not covered by your other zones"
+msgstr ""
+
+msgid "Reference per shipping method"
+msgstr ""
+
+msgid "Shipping zone"
+msgstr ""
+
+msgid "Shipping method"
+msgstr ""
+
+msgid "KigoCloud reference"
+msgstr ""
+
+msgid "disabled"
+msgstr ""
+
+msgid "The KigoCloud service code (Šifra) for each shipping method. Leave a field empty to use the shipping reference above."
+msgstr ""
+
+msgid "KigoCloud item reference used for the shipping line. Leave blank for \"shipping\". A shipping method with its own reference below uses that one instead."
+msgstr ""

@@ -74,3 +74,27 @@ msgstr "Nur ohne API-Schlüssel. Lassen Sie beide Felder leer, wenn Sie einen AP
 
 msgid "KigoCloud employee PIN used when creating documents, with the API key and with the username and password alike."
 msgstr "KigoCloud-Mitarbeiter-PIN zum Erstellen von Dokumenten, mit dem API-Schlüssel ebenso wie mit Benutzername und Passwort."
+
+msgid "Locations not covered by your other zones"
+msgstr "Gebiete, die nicht von Ihren anderen Zonen abgedeckt werden"
+
+msgid "Reference per shipping method"
+msgstr "Referenz je Versandart"
+
+msgid "Shipping zone"
+msgstr "Versandzone"
+
+msgid "Shipping method"
+msgstr "Versandart"
+
+msgid "KigoCloud reference"
+msgstr "KigoCloud-Referenz"
+
+msgid "disabled"
+msgstr "deaktiviert"
+
+msgid "The KigoCloud service code (Šifra) for each shipping method. Leave a field empty to use the shipping reference above."
+msgstr "Der KigoCloud-Dienstleistungscode (Šifra) für jede Versandart. Leer lassen, um die Versandreferenz oben zu verwenden."
+
+msgid "KigoCloud item reference used for the shipping line. Leave blank for \"shipping\". A shipping method with its own reference below uses that one instead."
+msgstr "KigoCloud-Artikelreferenz für die Versandposition. Leer lassen für \"shipping\". Eine Versandart mit eigener Referenz unten verwendet diese."
