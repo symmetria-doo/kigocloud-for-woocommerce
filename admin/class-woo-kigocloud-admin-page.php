@@ -126,6 +126,16 @@ class Woo_KigoCloud_Admin_Page
                 color: #50575e;
             }
             .kigocloud-admin .kc-card p.kc-desc { color: #50575e; margin: 0 0 1em; }
+            .kigocloud-admin .kc-or td { padding: 18px 0 6px; }
+            .kigocloud-admin .kc-or-line {
+                display: flex; align-items: center; gap: 12px;
+                color: #50575e; font-weight: 600; text-transform: uppercase; letter-spacing: .04em;
+            }
+            .kigocloud-admin .kc-or-line::before,
+            .kigocloud-admin .kc-or-line::after { content: ""; flex: 1; border-top: 2px solid #c3c4c7; }
+            .kigocloud-admin .kc-legacy-title td { padding: 6px 0 0; }
+            .kigocloud-admin .kc-legacy-title strong { font-size: 14px; }
+            .kigocloud-admin .kc-legacy-title p { color: #50575e; margin: 4px 0 0; }
             .kigocloud-admin .form-table th { padding: 14px 10px 14px 0; width: 220px; }
             .kigocloud-admin .form-table td input[type=text],
             .kigocloud-admin .form-table td input[type=email],
@@ -433,11 +443,25 @@ class Woo_KigoCloud_Admin_Page
             <?php $this->open_form('kigocloud_connection'); ?>
             <table class="form-table" role="presentation">
                 <?php
-                if (Woo_KigoCloud_Request::accepts_api_key()) {
+                $accepts_key = Woo_KigoCloud_Request::accepts_api_key();
+                if ($accepts_key) {
                     $this->text_field('kigocloud_api_key', __('API key', 'kigocloud-for-woocommerce'), array(
                         'type'        => 'password',
                         'description' => __('Recommended. Create the key in Kigo.Cloud under Opcije > Integracije > API ključevi with the permissions Čitanje i pisanje, and choose API ključ under Postavke on the same screen. When a key is saved, the username and password below are not used.', 'kigocloud-for-woocommerce'),
                     ));
+                    // The key and the username + password are two ways to log in, not
+                    // three fields to fill: the line makes that visible.
+                    ?>
+                    <tr class="kc-or">
+                        <td colspan="2"><div class="kc-or-line"><?php esc_html_e('or', 'kigocloud-for-woocommerce'); ?></div></td>
+                    </tr>
+                    <tr class="kc-legacy-title">
+                        <td colspan="2">
+                            <strong><?php esc_html_e('Legacy login: username and password', 'kigocloud-for-woocommerce'); ?></strong>
+                            <p><?php esc_html_e('Only without an API key. Leave both empty when you use an API key.', 'kigocloud-for-woocommerce'); ?></p>
+                        </td>
+                    </tr>
+                    <?php
                 }
                 $this->text_field('kigocloud_username', __('API username', 'kigocloud-for-woocommerce'), array(
                     'description' => sprintf(
@@ -449,9 +473,18 @@ class Woo_KigoCloud_Admin_Page
                 $this->text_field('kigocloud_password', __('API password', 'kigocloud-for-woocommerce'), array(
                     'type' => 'password',
                 ));
+                if ($accepts_key) {
+                    ?>
+                    <tr class="kc-or">
+                        <td colspan="2"><div class="kc-or-line"></div></td>
+                    </tr>
+                    <?php
+                }
                 $this->text_field('kigocloud_pin', __('Employee PIN', 'kigocloud-for-woocommerce'), array(
                     'default'     => '1',
-                    'description' => __('KigoCloud employee PIN used when creating documents.', 'kigocloud-for-woocommerce'),
+                    'description' => $accepts_key
+                        ? __('KigoCloud employee PIN used when creating documents, with the API key and with the username and password alike.', 'kigocloud-for-woocommerce')
+                        : __('KigoCloud employee PIN used when creating documents.', 'kigocloud-for-woocommerce'),
                 ));
                 ?>
             </table>

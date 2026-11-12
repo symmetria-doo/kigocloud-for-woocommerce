@@ -4,6 +4,11 @@ All notable changes to KigoCloud for WooCommerce are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.5] - 2026-11-12
+
+### Changed
+- Connection tab: the API key and the username and password are shown as two ways to log in, not three fields to fill. A line with "or" separates them, the username and password sit under "Legacy login: username and password" (only without an API key), and a second line sets the employee PIN apart, as it is used with both. Shown only where the address takes API keys.
+
 ## [2.2.4] - 2026-11-12
 
 ### Fixed

@@ -4,7 +4,7 @@ Tags: fiskalizacija, fiscalization, croatia, invoice, r1
 Requires at least: 5.5
 Tested up to: 7.1
 Requires PHP: 7.2
-Stable tag: 2.2.4
+Stable tag: 2.2.5
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 WC requires at least: 5.0
@@ -111,6 +111,9 @@ Kigo.Cloud privacy policy: https://www.kigocloud.com/zastita-osobnih-podataka
 
 == Changelog ==
 
+= 2.2.5 =
+* Connection tab: the API key and the username and password are shown as two ways to log in, separated by a line with "or". The username and password are under "Legacy login" and are needed only without an API key. The employee PIN is set apart, as it is used with both.
+
 = 2.2.4 =
 * Saving the price list address on the Price list tab no longer ends in a fatal error (Undefined constant FS_CHMOD_FILE) on sites where WordPress had not set up its file system in that request. The daily price list refresh and the [kigo_cjenik] shortcode had the same problem.
 
@@ -201,6 +204,9 @@ Kigo.Cloud privacy policy: https://www.kigocloud.com/zastita-osobnih-podataka
 Older versions: https://github.com/symmetria-doo/kigocloud-for-woocommerce/blob/main/CHANGELOG.md
 
 == Upgrade Notice ==
+
+= 2.2.5 =
+Clearer Connection tab: API key or the legacy username and password.
 
 = 2.2.4 =
 Fixes a fatal error when saving the price list address.

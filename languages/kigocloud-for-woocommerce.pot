@@ -994,3 +994,14 @@ msgstr ""
 msgid "No answer from KigoCloud"
 msgstr ""
 
+msgid "or"
+msgstr ""
+
+msgid "Legacy login: username and password"
+msgstr ""
+
+msgid "Only without an API key. Leave both empty when you use an API key."
+msgstr ""
+
+msgid "KigoCloud employee PIN used when creating documents, with the API key and with the username and password alike."
+msgstr ""

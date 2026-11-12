@@ -560,6 +560,19 @@ msgstr "Za ovu narudžbu još nema KigoCloud računa: nema se što stornirati"
 msgid "No answer from KigoCloud"
 msgstr "KigoCloud nije odgovorio"
 
+msgid "or"
+msgstr "ili"
+
+msgid "Legacy login: username and password"
+msgstr "Stara prijava: korisničko ime i lozinka"
+
+msgid "Only without an API key. Leave both empty when you use an API key."
+msgstr "Samo bez API ključa. Ostavite oba polja prazna kad koristite API ključ."
+
+msgid "KigoCloud employee PIN used when creating documents, with the API key and with the username and password alike."
+msgstr "PIN djelatnika u KigoCloudu s kojim se izrađuju dokumenti, i uz API ključ i uz korisničko ime i lozinku."
+
+
 #~ msgid "Document number"
 #~ msgstr "Broj dokumenta"
 

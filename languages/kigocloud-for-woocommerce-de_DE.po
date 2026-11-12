@@ -63,3 +63,14 @@ msgstr "Es wird nichts an KigoCloud gesendet, bis hier ein API-Schlüssel oder B
 msgid "Enter the API key, or the API username and password, on the Connection tab and save them first."
 msgstr "Geben Sie zuerst den API-Schlüssel oder den API-Benutzernamen und das Passwort auf dem Reiter Verbindung ein und speichern Sie sie."
 
+msgid "or"
+msgstr "oder"
+
+msgid "Legacy login: username and password"
+msgstr "Alte Anmeldung: Benutzername und Passwort"
+
+msgid "Only without an API key. Leave both empty when you use an API key."
+msgstr "Nur ohne API-Schlüssel. Lassen Sie beide Felder leer, wenn Sie einen API-Schlüssel verwenden."
+
+msgid "KigoCloud employee PIN used when creating documents, with the API key and with the username and password alike."
+msgstr "KigoCloud-Mitarbeiter-PIN zum Erstellen von Dokumenten, mit dem API-Schlüssel ebenso wie mit Benutzername und Passwort."
