@@ -97,8 +97,6 @@ What is sent, and when:
 * **Price list** (the Kigo.Cloud address you enter on the Price list tab): once a day at 7:00, when you save the address, and when a page with the `[kigo_cjenik]` shortcode finds that day's copy missing. Only the CSV and XML files are downloaded; no data about your shop or customers is sent.
 * **Demo account**: if you use the demo login, the same order data goes into the public Kigo.Cloud demo, which anyone can open with that login.
 
-Shops that switched from the KigoKasa API for WooCommerce plugin keep using the KigoKasa server they used before (`https://trgovina.kigoserver.com`, also run by Symmetria d.o.o.) for the same calls, with the same data.
-
 In the other direction, Kigo.Cloud reads products from your shop through the WooCommerce REST API (and this plugin's SKU lookup route, `/wp-json/wc/v3/kigocloud/...`) only if you create WooCommerce REST API keys and enter them in Kigo.Cloud.
 
 Kigo.Cloud terms of use: https://www.kigocloud.com/uvjeti-koristenja

@@ -4,6 +4,12 @@ All notable changes to KigoCloud for WooCommerce are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+- KigoCloud no longer sends anything to the KigoKasa server (`https://trgovina.kigoserver.com`). Versions 2.1.19 - 2.2.2 stored it as `kigocloud_api_url` when they copied the KigoKasa settings, so a shop that switched from KigoKasa kept sending orders there and the About tab showed it as the API endpoint. The settings copy no longer touches the endpoint, `Woo_KigoCloud_Request::resolveApiUrl()` ignores a stored `kigoserver.com` address and uses `https://app.kigo.cloud/hr/api/v1/`, and `admin_init` deletes that stored value. The `WOO_KIGOCLOUD_API_URL` constant and the `kigocloud_api_url` filter still win.
+- Such a shop now logs in to Kigo.Cloud: the API key field shows on the Connection tab, and the copied KigoKasa username and password are sent to Kigo.Cloud until a key is saved.
+
 ## [2.2.2] - 2026-11-07
 
 ### Changed

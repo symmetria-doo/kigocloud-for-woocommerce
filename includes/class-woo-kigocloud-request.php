@@ -32,7 +32,9 @@ if (!class_exists('Woo_KigoCloud_Request')) {
          *   add_filter( 'kigocloud_api_url', function () { return '…'; } );
          *
          * A value stored by an earlier version is still honoured so shops that talk
-         * to a non-default instance keep working after the update.
+         * to a non-default instance keep working after the update, except the KigoKasa
+         * server: 2.1.19 - 2.2.2 stored it when copying the KigoKasa settings, and
+         * KigoCloud sends nothing there.
          */
         public static function resolveApiUrl()
         {
@@ -41,7 +43,10 @@ if (!class_exists('Woo_KigoCloud_Request')) {
                 $configured = (string) WOO_KIGOCLOUD_API_URL;
             }
             if ($configured === '') {
-                $configured = (string) get_option('kigocloud_api_url', '');
+                $stored = (string) get_option('kigocloud_api_url', '');
+                if (!self::is_kigokasa_url($stored)) {
+                    $configured = $stored;
+                }
             }
             $configured = trim((string) apply_filters('kigocloud_api_url', $configured));
             if ($configured !== '') {
@@ -51,8 +56,18 @@ if (!class_exists('Woo_KigoCloud_Request')) {
         }
 
         /**
-         * API keys exist only on the Kigo.Cloud address; a shop moved from the KigoKasa
-         * add-on can still talk to the old address, which takes username and password.
+         * @param string $url
+         * @return bool True for an address on the KigoKasa server (kigoserver.com).
+         */
+        public static function is_kigokasa_url($url)
+        {
+            $host = strtolower((string) wp_parse_url((string) $url, PHP_URL_HOST));
+            return $host === 'kigoserver.com' || substr($host, -15) === '.kigoserver.com';
+        }
+
+        /**
+         * API keys exist only on the Kigo.Cloud address; an endpoint set in code
+         * (constant or filter) to another host takes only username and password.
          *
          * @return bool
          */

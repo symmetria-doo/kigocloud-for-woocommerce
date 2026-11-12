@@ -8,8 +8,8 @@
  * - On activation KigoCloud copies the KigoKasa settings (connection,
  *   per-gateway document types, R1 mode, mail, mapping) into its own
  *   options, but only while KigoCloud has no username set, so a configured
- *   install is never touched. The imported credentials keep the KigoKasa
- *   server as the endpoint.
+ *   install is never touched. The endpoint is not copied: KigoCloud talks
+ *   only to Kigo.Cloud, and an endpoint stored by 2.1.19 - 2.2.2 is removed.
  * - While the KigoKasa plugin is active, KigoCloud sends no orders
  *   (Woo_KigoCloud_Request checks is_kigokasa_active()) and wp-admin shows
  *   a notice with a button. The button deactivates the KigoKasa plugin (no
@@ -31,7 +31,6 @@ if (!defined('ABSPATH')) {
 class Woo_KigoCloud_KigoKasa_Switch
 {
     const KIGOKASA_PLUGIN = 'kigokasa-api-for-woocommerce/kigokasa-api-for-woocommerce.php';
-    const KIGOKASA_API_URL = 'https://trgovina.kigoserver.com/hr/api/v1/';
     const IMPORTED_OPTION = 'kigocloud_kigokasa_imported';
     const SWITCHED_OPTION = 'kigocloud_kigokasa_switched';
     const ACTION = 'kigocloud_switch_from_kigokasa';
@@ -137,12 +136,6 @@ class Woo_KigoCloud_KigoKasa_Switch
             }
         }
 
-        // The imported credentials belong to the KigoKasa server. A shop
-        // that already had an endpoint set keeps it.
-        if ((string) get_option('kigocloud_api_url', '') === '' && !defined('WOO_KIGOCLOUD_API_URL')) {
-            update_option('kigocloud_api_url', self::KIGOKASA_API_URL);
-        }
-
         update_option(self::IMPORTED_OPTION, 1, false);
         return true;
     }
@@ -152,8 +145,22 @@ class Woo_KigoCloud_KigoKasa_Switch
      */
     public static function maybe_import()
     {
+        self::forget_kigokasa_endpoint();
         if (self::is_kigokasa_active()) {
             self::import_settings();
+        }
+    }
+
+    /**
+     * Versions 2.1.19 - 2.2.2 stored the KigoKasa server as the endpoint when
+     * they copied the KigoKasa settings. Woo_KigoCloud_Request already ignores
+     * that value; this removes it so the option no longer carries it.
+     */
+    public static function forget_kigokasa_endpoint()
+    {
+        $stored = (string) get_option('kigocloud_api_url', '');
+        if ($stored !== '' && Woo_KigoCloud_Request::is_kigokasa_url($stored)) {
+            delete_option('kigocloud_api_url');
         }
     }
 
