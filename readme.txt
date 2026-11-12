@@ -4,7 +4,7 @@ Tags: fiskalizacija, fiscalization, croatia, invoice, r1
 Requires at least: 5.5
 Tested up to: 7.1
 Requires PHP: 7.2
-Stable tag: 2.2.3
+Stable tag: 2.2.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 WC requires at least: 5.0
@@ -111,6 +111,9 @@ Kigo.Cloud privacy policy: https://www.kigocloud.com/zastita-osobnih-podataka
 
 == Changelog ==
 
+= 2.2.4 =
+* Saving the price list address on the Price list tab no longer ends in a fatal error (Undefined constant FS_CHMOD_FILE) on sites where WordPress had not set up its file system in that request. The daily price list refresh and the [kigo_cjenik] shortcode had the same problem.
+
 = 2.2.3 =
 * Shops that switched from the KigoKasa API for WooCommerce plugin no longer send orders to the KigoKasa server (trgovina.kigoserver.com). The KigoKasa settings copy stored that address as the endpoint; it is now ignored and removed, and orders go to Kigo.Cloud (app.kigo.cloud). If the copied KigoKasa username and password do not work in Kigo.Cloud, enter a Kigo.Cloud API key on the Connection tab.
 
@@ -198,6 +201,9 @@ Kigo.Cloud privacy policy: https://www.kigocloud.com/zastita-osobnih-podataka
 Older versions: https://github.com/symmetria-doo/kigocloud-for-woocommerce/blob/main/CHANGELOG.md
 
 == Upgrade Notice ==
+
+= 2.2.4 =
+Fixes a fatal error when saving the price list address.
 
 = 2.2.3 =
 Shops moved from the KigoKasa plugin send orders to Kigo.Cloud instead of the KigoKasa server. Check that the Connection tab has a working Kigo.Cloud login.

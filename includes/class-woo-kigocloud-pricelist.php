@@ -319,12 +319,23 @@ class Woo_KigoCloud_Pricelist
      * Direct file access for the plugin's own folder in uploads, which PHP can
      * always write to. Also used from WP-Cron, where no FTP credentials can be asked.
      *
+     * FS_CHMOD_FILE and FS_CHMOD_DIR are defined by WP_Filesystem(), which is not
+     * called here, so they are defined the same way when nothing defined them yet.
+     * Without them saving the price list address ended in a fatal error.
+     *
      * @return WP_Filesystem_Direct
      */
     private static function filesystem()
     {
         require_once ABSPATH . 'wp-admin/includes/class-wp-filesystem-base.php';
         require_once ABSPATH . 'wp-admin/includes/class-wp-filesystem-direct.php';
+
+        if (!defined('FS_CHMOD_DIR')) {
+            define('FS_CHMOD_DIR', (fileperms(ABSPATH) & 0777 | 0755));
+        }
+        if (!defined('FS_CHMOD_FILE')) {
+            define('FS_CHMOD_FILE', (fileperms(ABSPATH . 'index.php') & 0777 | 0644));
+        }
 
         return new WP_Filesystem_Direct(null);
     }

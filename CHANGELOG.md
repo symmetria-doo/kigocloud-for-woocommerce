@@ -4,6 +4,11 @@ All notable changes to KigoCloud for WooCommerce are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.4] - 2026-11-12
+
+### Fixed
+- Saving the price list address (Price list tab) ended in a fatal error, `Undefined constant "FS_CHMOD_FILE"`, on sites where nothing had called `WP_Filesystem()` in that request. `Woo_KigoCloud_Pricelist::filesystem()` now defines `FS_CHMOD_FILE` and `FS_CHMOD_DIR` the way `WP_Filesystem()` does when they are not defined yet. The same fetch from WP-Cron and from the shortcode had the same problem.
+
 ## [2.2.3] - 2026-11-12
 
 ### Fixed
