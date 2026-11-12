@@ -10,7 +10,7 @@
  * Plugin Name:       KigoCloud for WooCommerce
  * Plugin URI:        https://www.kigocloud.com/fiskalizacija-web-trgovine/
  * Description:       Croatian fiscalization for WooCommerce: every order becomes a fiscalized invoice in Kigo.Cloud, with R1 invoices, the invoice PDF for the customer and stock sync.
- * Version:           2.2.2
+ * Version:           2.2.3
  * Requires at least: 5.5
  * Requires PHP:      7.2
  * Requires Plugins:  woocommerce
@@ -29,7 +29,7 @@ if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
-define( 'WOO_KIGOCLOUD_PLUGIN_NAME_VERSION', '2.2.2' );
+define( 'WOO_KIGOCLOUD_PLUGIN_NAME_VERSION', '2.2.3' );
 define( 'WOO_KIGOCLOUD_PLUGIN_FILE', __FILE__ );
 define( 'WOO_KIGOCLOUD_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'WOO_KIGOCLOUD_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
