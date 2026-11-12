@@ -4,7 +4,7 @@ Tags: fiskalizacija, fiscalization, croatia, invoice, r1
 Requires at least: 5.5
 Tested up to: 7.1
 Requires PHP: 7.2
-Stable tag: 2.2.6
+Stable tag: 2.2.7
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 WC requires at least: 5.0
@@ -111,6 +111,9 @@ Kigo.Cloud privacy policy: https://www.kigocloud.com/zastita-osobnih-podataka
 
 == Changelog ==
 
+= 2.2.7 =
+* The anchor price is always on its own line under the price, in small grey text, whatever the theme does with the price (flex rows, coloured or large prices). On the product page it shows the reference day; on product cards the line is shorter and the reference day is in the tooltip. Where a theme puts the card price in a box that hides a second line, the anchor price is moved right under that box.
+
 = 2.2.6 =
 * The anchor price is shown from the price list as well. When Kigo.Cloud has not written the anchor price into a product, the plugin takes it from the price list it downloads every day (Price list tab), matching the product or variation SKU to the Kigo.Cloud item code, or its GTIN/EAN to the barcode. So the anchor price shows as soon as the price list address is set.
 * Shipping reference per shipping method. The Orders tab lists every shipping method of every shipping zone with its own Kigo.Cloud reference field (for example dostava_25, dostava_eu). An empty field uses the general shipping reference. Each shipping method on the order is a line of its own.
@@ -208,6 +211,9 @@ Kigo.Cloud privacy policy: https://www.kigocloud.com/zastita-osobnih-podataka
 Older versions: https://github.com/symmetria-doo/kigocloud-for-woocommerce/blob/main/CHANGELOG.md
 
 == Upgrade Notice ==
+
+= 2.2.7 =
+The anchor price is shown under the price on every theme.
 
 = 2.2.6 =
 Anchor price from the price list, and a Kigo.Cloud reference for each shipping method.

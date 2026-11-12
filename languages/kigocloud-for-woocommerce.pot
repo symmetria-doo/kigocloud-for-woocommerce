@@ -1029,3 +1029,7 @@ msgstr ""
 
 msgid "KigoCloud item reference used for the shipping line. Leave blank for \"shipping\". A shipping method with its own reference below uses that one instead."
 msgstr ""
+
+#, php-format
+msgid "referentni dan %s"
+msgstr ""

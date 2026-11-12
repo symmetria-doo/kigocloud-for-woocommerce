@@ -98,3 +98,7 @@ msgstr "Der KigoCloud-Dienstleistungscode (Šifra) für jede Versandart. Leer la
 
 msgid "KigoCloud item reference used for the shipping line. Leave blank for \"shipping\". A shipping method with its own reference below uses that one instead."
 msgstr "KigoCloud-Artikelreferenz für die Versandposition. Leer lassen für \"shipping\". Eine Versandart mit eigener Referenz unten verwendet diese."
+
+#, php-format
+msgid "referentni dan %s"
+msgstr "Referenztag %s"

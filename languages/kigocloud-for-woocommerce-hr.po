@@ -596,6 +596,10 @@ msgstr "Šifra usluge u KigoCloudu za svaki način dostave. Prazno polje koristi
 msgid "KigoCloud item reference used for the shipping line. Leave blank for \"shipping\". A shipping method with its own reference below uses that one instead."
 msgstr "Šifra artikla u KigoCloudu za stavku dostave. Prazno znači \"shipping\". Način dostave koji ispod ima svoju šifru koristi nju."
 
+#, php-format
+msgid "referentni dan %s"
+msgstr "referentni dan %s"
+
 #~ msgid "Document number"
 #~ msgstr "Broj dokumenta"
 

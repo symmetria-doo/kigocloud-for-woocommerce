@@ -4,6 +4,14 @@ All notable changes to KigoCloud for WooCommerce are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.7] - 2026-11-12
+
+### Changed
+- Anchor price look. `anchor_price_html()` stacks the price and the anchor price in a column of their own (`.kigo-price`, inline-flex, column), because themes often make the price element a flex row (on Glosson it ended up next to the price). The line carries its own inline style with `!important` (13px, grey, normal weight) and a plain-text amount, so the theme's `.price` / `.amount` colours and sizes do not reach it; that also holds in the variation price WooCommerce inserts with JavaScript.
+- Product page (the page's product or its variations, and `wc-ajax=get_variation`): "Sidrena cijena: 12,00 € · referentni dan 2. 9. 2026.". Product cards and widgets: "Sidrena cijena: 12,00 €" at 12px, the reference day in the tooltip.
+- A small inline footer script (`kigocloud-anchor-price`, only while the anchor price setting is on) moves the anchor price right under the card's price box when that box hides it (`overflow: hidden`, as in themes that swap the price for the cart button on hover).
+- Filter `kigocloud_anchor_price_html` for themes that want their own markup.
+
 ## [2.2.6] - 2026-11-12
 
 ### Added
