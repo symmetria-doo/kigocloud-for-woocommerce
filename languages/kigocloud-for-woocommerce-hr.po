@@ -1089,9 +1089,6 @@ msgstr "Oblik: izvorni_meta:cilj.polje, odvojeno zarezima."
 msgid "Mapping rules"
 msgstr "Pravila mapiranja"
 
-msgid "Example: r1_oib_tvrtke:_billing_vat_number, r1_ime_tvrtke:billing.company, r1_adresa_tvrtke:billing.address_1"
-msgstr "Primjer: r1_oib_tvrtke:_billing_vat_number, r1_ime_tvrtke:billing.company, r1_adresa_tvrtke:billing.address_1"
-
 msgid "Recent API calls"
 msgstr "Zadnji API pozivi"
 
@@ -1244,10 +1241,6 @@ msgstr "Objavljeni cjenici (zadnjih 30 dana)"
 
 msgid "No document number returned"
 msgstr "Nije vraćen broj dokumenta"
-
-#, php-format
-msgid "Hi %1$s,<br /><br />Thank you for your order.<br /><br />Your %2$s with number <b>%3$s</b> is in the attachment.<br /><br />We look forward to fulfilling your order soon."
-msgstr "Poštovani %1$s,<br /><br />hvala na narudžbi.<br /><br />Vaš dokument %2$s broj <b>%3$s</b> nalazi se u privitku.<br /><br />Radujemo se što ćemo vašu narudžbu uskoro isporučiti."
 
 msgid "Sidrena cijena"
 msgstr "Sidrena cijena"
