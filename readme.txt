@@ -4,7 +4,7 @@ Tags: fiskalizacija, fiscalization, croatia, invoice, r1
 Requires at least: 5.5
 Tested up to: 7.1
 Requires PHP: 7.2
-Stable tag: 2.2.8
+Stable tag: 2.2.9
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 WC requires at least: 5.0
@@ -112,6 +112,13 @@ Kigo.Cloud privacy policy: https://www.kigocloud.com/zastita-osobnih-podataka
 
 == Changelog ==
 
+= 2.2.9 =
+* Connection tab: "Test connection" button, and every Save checks whether Kigo.Cloud takes the login. A refused login says what to do (for example: the Kigo.Cloud account is set to the legacy login, so it does not take API keys until it is switched to API ključ).
+* The saved API key is shown by its start (kgc_7097c7d7…), as in Kigo.Cloud; the field is for a new key. Leave it empty to keep the saved one.
+* A login Kigo.Cloud refused is not tried again every morning; the next Save or test checks it.
+* Every Save reads the anchor prices again, also when nothing changed on the page.
+* Anchor price written as Kigo.Cloud prints it on shelf labels: "Sidrena cijena (10. 9. 2026.): 12,00 €", on the product page and on product cards alike.
+
 = 2.2.8 =
 * Anchor prices without typing anything in. With "Anchor price" set to show, the plugin reads them every morning from Kigo.Cloud (Sidrene cijene) through the API: for each item the anchor price of the newest switched-on reference day. The Prices tab says how many items have one. Works in every Kigo.Cloud package.
 * The Price list tab is only for publishing the price list on your own domain; the anchor prices no longer depend on it.
@@ -216,6 +223,9 @@ Kigo.Cloud privacy policy: https://www.kigocloud.com/zastita-osobnih-podataka
 Older versions: https://github.com/symmetria-doo/kigocloud-for-woocommerce/blob/main/CHANGELOG.md
 
 == Upgrade Notice ==
+
+= 2.2.9 =
+Test connection on the Connection tab; the saved API key is shown by its start.
 
 = 2.2.8 =
 Anchor prices come from Kigo.Cloud by themselves, from the newest reference day.

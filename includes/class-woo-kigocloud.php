@@ -45,7 +45,7 @@ class Woo_KigoCloud {
      *
      * @since 1.0.0
      */
-    const PLUGIN_VERSION = '2.2.8';
+    const PLUGIN_VERSION = '2.2.9';
 
     /**
      * Admin notices of the plugin appear only on the Dashboard, the Plugins
@@ -186,6 +186,7 @@ class Woo_KigoCloud {
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-woo-kigocloud-pricelist.php';
 		Woo_KigoCloud_Pricelist::init();
+		Woo_KigoCloud_Request::init_login_check();
 
 		/**
 		 * Kigo.Cloud gift vouchers in the cart.
@@ -237,6 +238,7 @@ class Woo_KigoCloud {
 		$this->loader->add_action( 'admin_init', $plugin_admin_page, 'maybe_clear_logs' );
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin_page, 'enqueue_admin_css' );
 		$this->loader->add_action( 'wp_ajax_kigocloud_test_push', $plugin_admin_page, 'ajax_test_push' );
+		$this->loader->add_action( 'wp_ajax_kigocloud_check_login', $plugin_admin_page, 'ajax_check_login' );
 
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );

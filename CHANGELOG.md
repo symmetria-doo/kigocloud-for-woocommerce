@@ -4,6 +4,17 @@ All notable changes to KigoCloud for WooCommerce are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.9] - 2026-11-13
+
+### Added
+- Connection tab: "Kigo.Cloud login" row with a "Test connection" button (`wp_ajax_kigocloud_check_login`). `Woo_KigoCloud_Request::check_login()` calls `GET item/list?pageSize=1` with the saved login and stores the answer in `kigocloud_login_check`; it also runs at the end of every Save of the settings form. `login_hint()` turns Kigo.Cloud's refusals into what to do: account set to the legacy login while a key is saved (switch to API ključ under API ključevi > Postavke), account on keys only, wrong or revoked key, read-only key, wrong username or password. The Prices tab shows the same hint.
+
+### Changed
+- The API key is no longer printed into the page: the field is empty, the saved key is shown above it by its first 12 characters (as Kigo.Cloud lists keys) with a Remove box. An empty field on Save keeps the saved key.
+- The daily anchor price refresh is skipped while the last login check was refused, so Kigo.Cloud does not log a refused login every morning. A Save with a refused login does not call item/list a second time.
+- The anchor price line reads "Sidrena cijena (10. 9. 2026.): 12,00 €", as Kigo.Cloud prints it on shelf labels and declarations (`ItemAnchorDate::getLabelWithDate`), on the product page and on product cards alike (before: "· referentni dan" on the product page, the day only in the tooltip on cards).
+- Every Save of the settings form reads the anchor prices again (before only when the anchor setting or the login changed), so a login switched in Kigo.Cloud is picked up with one Save.
+
 ## [2.2.8] - 2026-11-12
 
 ### Changed

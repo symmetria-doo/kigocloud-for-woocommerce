@@ -116,6 +116,115 @@ if (!class_exists('Woo_KigoCloud_Request')) {
                     && (string) get_option('kigocloud_password', '') !== '');
         }
 
+        /** Last login check: array('time', 'ok', 'message'). Not autoloaded. */
+        const OPTION_LOGIN_CHECK = 'kigocloud_login_check';
+
+        /**
+         * Every save of the settings form asks Kigo.Cloud once whether it takes
+         * the saved login, so the Connection tab says so at once instead of the
+         * first order failing.
+         */
+        public static function init_login_check()
+        {
+            add_action('admin_init', array(__CLASS__, 'on_settings_form'));
+        }
+
+        /**
+         * @return bool this request saves the plugin's settings form
+         */
+        public static function is_settings_save()
+        {
+            return isset($GLOBALS['pagenow'], $_POST['option_page'])
+                && $GLOBALS['pagenow'] === 'options.php'
+                && 'kigocloud_settings' === sanitize_key(wp_unslash($_POST['option_page'])); // phpcs:ignore WordPress.Security.NonceVerification.Missing -- options.php checks the nonce
+        }
+
+        /**
+         * Hooked on `admin_init`: the check runs at the end of the save, with the
+         * login just saved.
+         */
+        public static function on_settings_form()
+        {
+            if (self::is_settings_save() && !has_action('shutdown', array(__CLASS__, 'check_login'))) {
+                add_action('shutdown', array(__CLASS__, 'check_login'), 5);
+            }
+        }
+
+        /**
+         * Asks Kigo.Cloud for one item with the saved login and stores the answer.
+         *
+         * @return array|null the stored check, null without a login
+         */
+        public static function check_login()
+        {
+            if (!self::has_credentials()) {
+                delete_option(self::OPTION_LOGIN_CHECK);
+                return null;
+            }
+            $answer = self::call('GET', 'item/list?pageSize=1');
+            $check = array(
+                'time'    => time(),
+                'ok'      => !is_wp_error($answer),
+                'message' => is_wp_error($answer) ? $answer->get_error_message() : '',
+                'key'     => self::api_key() !== '',
+            );
+            update_option(self::OPTION_LOGIN_CHECK, $check, false);
+
+            return $check;
+        }
+
+        /**
+         * @return array the last login check, array() before the first one
+         */
+        public static function login_check()
+        {
+            $check = get_option(self::OPTION_LOGIN_CHECK, array());
+
+            return is_array($check) ? $check : array();
+        }
+
+        /**
+         * What to do about a login Kigo.Cloud refused, from its error message.
+         *
+         * @param string $message
+         * @return string empty when there is nothing more to say
+         */
+        public static function login_hint($message)
+        {
+            $message = (string) $message;
+            if (strpos($message, 'legacy way') !== false) {
+                return __('Kigo.Cloud refused the API key from the Connection tab: the Kigo.Cloud account is set to take only the username and password. In Kigo.Cloud, Opcije > Integracije > API ključevi > Postavke, choose API ključ, then click Save all settings here again.', 'kigocloud-for-woocommerce');
+            }
+            if (strpos($message, 'API keys only') !== false) {
+                return __('Kigo.Cloud refused the username and password from the Connection tab: the Kigo.Cloud account takes API keys only. Enter an API key on the Connection tab.', 'kigocloud-for-woocommerce');
+            }
+            if (strpos($message, 'Wrong API key') !== false || strpos($message, 'revoked') !== false) {
+                return __('Kigo.Cloud does not know the API key from the Connection tab, or it was revoked. Create a new key in Kigo.Cloud under Opcije > Integracije > API ključevi and paste it on the Connection tab.', 'kigocloud-for-woocommerce');
+            }
+            if (strpos($message, 'does not allow this action') !== false) {
+                return __('The API key from the Connection tab may only read. Create a key with the permissions Čitanje i pisanje in Kigo.Cloud under Opcije > Integracije > API ključevi and paste it on the Connection tab.', 'kigocloud-for-woocommerce');
+            }
+            if (strpos($message, 'Wrong credentials') !== false) {
+                return __('Kigo.Cloud refused the username and password from the Connection tab: they must be those of the Kigo.Cloud administrator.', 'kigocloud-for-woocommerce');
+            }
+
+            return '';
+        }
+
+        /**
+         * What the shop owner reads about a refused call: the plain explanation of
+         * a known refusal, otherwise Kigo.Cloud's own message.
+         *
+         * @param string $message
+         * @return string
+         */
+        public static function describe_error($message)
+        {
+            $hint = self::login_hint($message);
+
+            return $hint !== '' ? $hint : (string) $message;
+        }
+
         /**
          * Login headers of every API call: the API key when one is saved, otherwise the
          * username and the md5 of the password.

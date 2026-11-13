@@ -128,6 +128,7 @@ class Woo_KigoCloud_Admin_Page
         return array(
             // Kept as typed: a password may contain characters sanitize_text_field would strip.
             'kigocloud_password'                => array(__CLASS__, 'sanitize_password'),
+            'kigocloud_api_key'                 => array(__CLASS__, 'sanitize_api_key'),
             'kigocloud_email_from'              => 'sanitize_email',
             'kigocloud_reply_to'                => 'sanitize_email',
             'kigocloud_custom_mapping'          => 'sanitize_textarea_field',
@@ -146,6 +147,38 @@ class Woo_KigoCloud_Admin_Page
         }
         // Control characters and line breaks cannot be part of a password typed into a single-line field.
         return trim(preg_replace('/[\x00-\x1F\x7F]/', '', (string) $value));
+    }
+
+    /**
+     * The key field is shown empty (the page never prints the key), so an empty
+     * field on Save keeps the saved key; "Remove the saved key" clears it.
+     *
+     * @param mixed $value
+     * @return string
+     */
+    public static function sanitize_api_key($value)
+    {
+        $value = is_scalar($value) ? preg_replace('/[\x00-\x20\x7F]/', '', (string) $value) : '';
+        if ($value !== '' || !Woo_KigoCloud_Request::is_settings_save()) {
+            return $value;
+        }
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- options.php checks the nonce
+        if (!empty($_POST['kigocloud_api_key_remove'])) {
+            return '';
+        }
+
+        return (string) get_option('kigocloud_api_key', '');
+    }
+
+    /**
+     * @param string $key
+     * @return string the start of the key and an ellipsis, as Kigo.Cloud lists keys
+     */
+    public static function mask_api_key($key)
+    {
+        $key = (string) $key;
+
+        return $key === '' ? '' : substr($key, 0, 12) . '…';
     }
 
     public function enqueue_admin_css($hook)
@@ -493,10 +526,28 @@ class Woo_KigoCloud_Admin_Page
                 <?php
                 $accepts_key = Woo_KigoCloud_Request::accepts_api_key();
                 if ($accepts_key) {
-                    $this->text_field('kigocloud_api_key', __('API key', 'kigocloud-for-woocommerce'), array(
-                        'type'        => 'password',
-                        'description' => __('Recommended. Create the key in Kigo.Cloud under Opcije > Integracije > API ključevi with the permissions Čitanje i pisanje, and choose API ključ under Postavke on the same screen. When a key is saved, the username and password below are not used.', 'kigocloud-for-woocommerce'),
-                    ));
+                    $saved_key = trim((string) get_option('kigocloud_api_key', ''));
+                    ?>
+                    <tr>
+                        <th scope="row"><label for="kigocloud_api_key"><?php esc_html_e('API key', 'kigocloud-for-woocommerce'); ?></label></th>
+                        <td>
+                            <?php if ($saved_key !== ''): ?>
+                                <p class="kc-saved-key"><?php
+                                    printf(
+                                        /* translators: %s: start of the saved key, e.g. kgc_7097c7d7… */
+                                        esc_html__('Saved key: %s', 'kigocloud-for-woocommerce'),
+                                        '<code>' . esc_html(self::mask_api_key($saved_key)) . '</code>'
+                                    );
+                                ?>
+                                    <label style="margin-left:12px;"><input type="checkbox" id="kigocloud_api_key_remove" name="kigocloud_api_key_remove" value="1" />
+                                    <?php esc_html_e('Remove', 'kigocloud-for-woocommerce'); ?></label></p>
+                            <?php endif; ?>
+                            <input type="password" id="kigocloud_api_key" name="kigocloud_api_key" value="" autocomplete="new-password"
+                                   placeholder="<?php echo esc_attr($saved_key !== '' ? __('New key (leave empty to keep the saved one)', 'kigocloud-for-woocommerce') : 'kgc_...'); ?>" />
+                            <p class="description"><?php esc_html_e('Recommended. Create the key in Kigo.Cloud under Opcije > Integracije > API ključevi with the permissions Čitanje i pisanje (a read-only key cannot send orders), and choose API ključ under Postavke on the same screen. When a key is saved, the username and password below are not used.', 'kigocloud-for-woocommerce'); ?></p>
+                        </td>
+                    </tr>
+                    <?php
                     // The key and the username + password are two ways to log in, not
                     // three fields to fill: the line makes that visible.
                     ?>
@@ -534,6 +585,7 @@ class Woo_KigoCloud_Admin_Page
                         ? __('KigoCloud employee PIN used when creating documents, with the API key and with the username and password alike.', 'kigocloud-for-woocommerce')
                         : __('KigoCloud employee PIN used when creating documents.', 'kigocloud-for-woocommerce'),
                 ));
+                $this->render_login_check();
                 ?>
             </table>
             <?php $this->close_form(); ?>
@@ -561,6 +613,54 @@ class Woo_KigoCloud_Admin_Page
                 ?>
             </p>
         </div>
+        <?php
+    }
+
+    /**
+     * Whether Kigo.Cloud took the saved login at the last Save.
+     */
+    private function render_login_check()
+    {
+        if (!Woo_KigoCloud_Request::has_credentials()) {
+            return;
+        }
+        $check = Woo_KigoCloud_Request::login_check();
+        $when = isset($check['time']) ? date_i18n(get_option('date_format') . ' ' . get_option('time_format'), (int) $check['time']) : '';
+        ?>
+        <tr>
+            <th scope="row"><?php esc_html_e('Kigo.Cloud login', 'kigocloud-for-woocommerce'); ?></th>
+            <td>
+                <?php if (empty($check)): ?>
+                    <p><?php esc_html_e('Not checked yet: click Save all settings.', 'kigocloud-for-woocommerce'); ?></p>
+                <?php elseif (!empty($check['ok'])): ?>
+                    <p><span class="kc-status-ok"><?php
+                        echo esc_html(sprintf(
+                            /* translators: %s: date and time */
+                            !empty($check['key']) ? __('Kigo.Cloud accepted the API key on %s.', 'kigocloud-for-woocommerce') : __('Kigo.Cloud accepted the username and password on %s.', 'kigocloud-for-woocommerce'),
+                            $when
+                        ));
+                    ?></span></p>
+                <?php else: ?>
+                    <p><span class="kc-status-bad"><?php
+                        echo esc_html(sprintf(
+                            /* translators: %s: date and time */
+                            __('Kigo.Cloud refused the login on %s. Orders are not sent until this is fixed.', 'kigocloud-for-woocommerce'),
+                            $when
+                        ));
+                    ?></span></p>
+                    <p><strong><?php echo esc_html(Woo_KigoCloud_Request::describe_error(isset($check['message']) ? $check['message'] : '')); ?></strong></p>
+                <?php endif; ?>
+                <p>
+                    <button type="button" class="button button-secondary" id="kigocloud-check-login"
+                            data-nonce="<?php echo esc_attr(wp_create_nonce('kigocloud_check_login')); ?>"
+                            data-running-label="<?php esc_attr_e('Asking Kigo.Cloud...', 'kigocloud-for-woocommerce'); ?>">
+                        <?php esc_html_e('Test connection', 'kigocloud-for-woocommerce'); ?>
+                    </button>
+                </p>
+                <div id="kigocloud-check-login-result" class="kc-test-result" style="display:none;"></div>
+                <p class="description"><?php esc_html_e('Tests the saved login (save a new one first). Also checked every time the settings are saved. Whether the key may send orders shows the R1 tab test, which sends a test offer.', 'kigocloud-for-woocommerce'); ?></p>
+            </td>
+        </tr>
         <?php
     }
 
@@ -616,7 +716,7 @@ class Woo_KigoCloud_Admin_Page
                     <p><span class="kc-status-bad"><?php echo esc_html($reasons[$reason]); ?></span></p>
                 <?php else: ?>
                     <p><span class="kc-status-bad"><?php esc_html_e('The anchor prices could not be read from Kigo.Cloud.', 'kigocloud-for-woocommerce'); ?></span>
-                        <?php echo esc_html(isset($source['message']) ? (string) $source['message'] : ''); ?></p>
+                        <?php echo esc_html(Woo_KigoCloud_Request::describe_error(isset($source['message']) ? $source['message'] : '')); ?></p>
                 <?php endif; ?>
             </td>
         </tr>
@@ -1095,6 +1195,27 @@ class Woo_KigoCloud_Admin_Page
      * KigoCloud endpoint using the saved credentials. Returns a
      * human-readable summary suitable for inline display.
      */
+    /**
+     * "Test connection" on the Connection tab: one read call with the saved login.
+     */
+    public function ajax_check_login()
+    {
+        if (!current_user_can(self::CAPABILITY)) {
+            wp_send_json_error(array('message' => __('Permission denied.', 'kigocloud-for-woocommerce')), 403);
+        }
+        check_ajax_referer('kigocloud_check_login', 'nonce');
+        $check = Woo_KigoCloud_Request::check_login();
+        if ($check === null) {
+            wp_send_json_error(array('message' => __('Enter the API key, or the API username and password, and save them first.', 'kigocloud-for-woocommerce')));
+        }
+        if (!empty($check['ok'])) {
+            wp_send_json_success(array('message' => !empty($check['key'])
+                ? __('Kigo.Cloud accepted the API key.', 'kigocloud-for-woocommerce')
+                : __('Kigo.Cloud accepted the username and password.', 'kigocloud-for-woocommerce')));
+        }
+        wp_send_json_error(array('message' => Woo_KigoCloud_Request::describe_error($check['message'])));
+    }
+
     public function ajax_test_push()
     {
         if (!current_user_can(self::CAPABILITY)) {

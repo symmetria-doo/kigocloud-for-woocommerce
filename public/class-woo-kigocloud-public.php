@@ -120,18 +120,19 @@ JS;
         if ((float) $anchor < 0) {
             return $price_html;
         }
-        $day = '';
+        // "Sidrena cijena (10. 9. 2026.): 12,00 €", as Kigo.Cloud prints it on
+        // shelf labels and declarations (ItemAnchorDate::getLabelWithDate).
+        $label = esc_html__('Sidrena cijena', 'kigocloud-for-woocommerce');
         if (!empty($date)) {
             $timestamp = strtotime($date);
             if ($timestamp) {
-                /* translators: %s: reference day, for example 2. 9. 2026. */
-                $day = sprintf(__('referentni dan %s', 'kigocloud-for-woocommerce'), date_i18n('j. n. Y.', $timestamp));
+                /* translators: %s: reference day, for example 10. 9. 2026. */
+                $label = esc_html(sprintf(__('Sidrena cijena (%s)', 'kigocloud-for-woocommerce'), date_i18n('j. n. Y.', $timestamp)));
             }
         }
         // Plain text amount: the theme's rules for .amount (colour, size, weight)
         // must not reach the anchor price, only the line's own style does.
         $amount = trim(wp_strip_all_tags(wc_price((float) $anchor)));
-        $label  = esc_html__('Sidrena cijena', 'kigocloud-for-woocommerce');
 
         // Themes lay the price out as flex rows, absolutely positioned boxes of a
         // fixed height and so on, so the line carries its own style with
@@ -143,15 +144,12 @@ JS;
         // Always on its own line under the price. The price and the anchor price
         // are stacked in a column of their own, because the theme's price
         // element is often a flex row that would put them side by side.
-        // On the product page the line carries the reference day; on product
-        // cards and widgets it is shorter and the day is in the tooltip.
-        if ($this->is_main_price($product)) {
-            $line  = $label . ': ' . $amount . ($day !== '' ? ' &middot; ' . esc_html($day) : '');
-            $title = '';
-        } else {
-            $line  = $label . ': ' . $amount;
-            $title = $day !== '' ? ' title="' . esc_attr($day) . '"' : '';
-            $text  = str_replace('13px', '12px', $text);
+        // The same line on the product page and on product cards and widgets,
+        // there a size smaller.
+        $line  = $label . ': ' . esc_html($amount);
+        $title = '';
+        if (!$this->is_main_price($product)) {
+            $text = str_replace('13px', '12px', $text);
         }
         $html = '<span class="kigo-price" style="display:inline-flex !important;flex-direction:column !important;align-items:flex-start !important;gap:2px;vertical-align:top;max-width:100%;">'
             . '<span class="kigo-price-main">' . $price_html . '</span>'

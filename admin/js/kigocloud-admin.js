@@ -78,6 +78,8 @@
             // A saved API key would win over the demo login.
             var apiKey = document.getElementById('kigocloud_api_key');
             if (apiKey) { apiKey.value = ''; }
+            var removeKey = document.getElementById('kigocloud_api_key_remove');
+            if (removeKey) { removeKey.checked = true; }
             var hint = document.getElementById('kigocloud-use-demo-hint');
             if (hint) { hint.style.display = ''; }
         });
@@ -85,11 +87,13 @@
 
     // Test-push button wiring (the button lives inside the R1 pane which
     // is always present in the DOM, so a single bind is enough).
-    var btn = document.getElementById('kigocloud-test-push');
+    // The same wiring serves "Test connection" on the Connection tab.
+    [['kigocloud-test-push', 'kigocloud_test_push'], ['kigocloud-check-login', 'kigocloud_check_login']].forEach(function (pair) {
+    var btn = document.getElementById(pair[0]);
     if (btn) {
         btn.addEventListener('click', function (e) {
             e.preventDefault();
-            var resultBox = document.getElementById('kigocloud-test-push-result');
+            var resultBox = document.getElementById(pair[0] + '-result');
             var nonce = btn.dataset.nonce || '';
             btn.disabled = true;
             if (resultBox) {
@@ -98,7 +102,7 @@
                 resultBox.style.display = '';
             }
             var fd = new FormData();
-            fd.append('action', 'kigocloud_test_push');
+            fd.append('action', pair[1]);
             fd.append('nonce', nonce);
             fetch(window.ajaxurl, {
                 method: 'POST',
@@ -126,4 +130,5 @@
                 .then(function () { btn.disabled = false; });
         });
     }
+    });
 })();

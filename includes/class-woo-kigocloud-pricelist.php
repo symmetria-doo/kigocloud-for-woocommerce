@@ -327,8 +327,11 @@ class Woo_KigoCloud_Pricelist
      */
     private static function init_anchor()
     {
-        add_action(self::ANCHOR_CRON, array(__CLASS__, 'refresh_anchor_prices'));
+        add_action(self::ANCHOR_CRON, array(__CLASS__, 'cron_refresh'));
         add_action('init', array(__CLASS__, 'schedule_anchor'));
+        // Every Save reads them again, also when nothing changed here (a login
+        // switched in Kigo.Cloud, a reference day changed there).
+        add_action('admin_init', array(__CLASS__, 'on_settings_form'));
         // Switching the anchor price on, or a new login, fetches them at once.
         foreach (array('kigocloud_show_anchor_price', 'kigocloud_api_key', 'kigocloud_username', 'kigocloud_password') as $option) {
             add_action('update_option_' . $option, array(__CLASS__, 'on_anchor_settings_saved'), 20, 0);
@@ -376,11 +379,39 @@ class Woo_KigoCloud_Pricelist
     }
 
     /**
+     * The daily refresh. A login Kigo.Cloud refused at the last check is not
+     * tried again every morning (each try is a refused login in Kigo.Cloud's
+     * log): the next Save or "Test connection" checks it again.
+     */
+    public static function cron_refresh()
+    {
+        $check = Woo_KigoCloud_Request::login_check();
+        if (isset($check['ok']) && !$check['ok']) {
+            return 0;
+        }
+
+        return self::refresh_anchor_prices();
+    }
+
+    /**
+     * Hooked on `admin_init`.
+     */
+    public static function on_settings_form()
+    {
+        if (Woo_KigoCloud_Request::is_settings_save()) {
+            self::on_anchor_settings_saved();
+        }
+    }
+
+    /**
      * Hooked on `shutdown` by on_anchor_settings_saved().
      */
     public static function refresh_after_save()
     {
-        if (self::anchor_wanted()) {
+        $check = Woo_KigoCloud_Request::login_check();
+        if (isset($check['ok']) && !$check['ok']) {
+            self::store_anchor_source(array('reason' => 'error', 'message' => isset($check['message']) ? (string) $check['message'] : ''));
+        } elseif (self::anchor_wanted()) {
             self::refresh_anchor_prices();
         }
         self::schedule_anchor();

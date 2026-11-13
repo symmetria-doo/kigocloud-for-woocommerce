@@ -1031,7 +1031,7 @@ msgid "KigoCloud item reference used for the shipping line. Leave blank for \"sh
 msgstr ""
 
 #, php-format
-msgid "referentni dan %s"
+msgid "Sidrena cijena (%s)"
 msgstr ""
 
 msgid "Kigo.Cloud has no anchor prices: switch on a reference day in Opcije > Šifrarnici > Sidrene cijene and fill in its prices."
@@ -1054,4 +1054,71 @@ msgid "The anchor prices could not be read from Kigo.Cloud."
 msgstr ""
 
 msgid "Croatian Government decision: the price that applied on the reference day is shown next to the retail price. The plugin reads it from Kigo.Cloud (Sidrene cijene, newest reference day) every morning, by itself."
+msgstr ""
+
+msgid "Asking Kigo.Cloud..."
+msgstr ""
+
+msgid "Kigo.Cloud refused the username and password from the Connection tab: they must be those of the Kigo.Cloud administrator."
+msgstr ""
+
+msgid "Kigo.Cloud does not know the API key from the Connection tab, or it was revoked. Create a new key in Kigo.Cloud under Opcije > Integracije > API ključevi and paste it on the Connection tab."
+msgstr ""
+
+msgid "Enter the API key, or the API username and password, and save them first."
+msgstr ""
+
+#, php-format
+msgid "Kigo.Cloud accepted the API key on %s."
+msgstr ""
+
+msgid "Kigo.Cloud accepted the API key."
+msgstr ""
+
+#, php-format
+msgid "Kigo.Cloud accepted the username and password on %s."
+msgstr ""
+
+msgid "Kigo.Cloud accepted the username and password."
+msgstr ""
+
+msgid "Kigo.Cloud login"
+msgstr ""
+
+#, php-format
+msgid "Kigo.Cloud refused the login on %s. Orders are not sent until this is fixed."
+msgstr ""
+
+msgid "Kigo.Cloud refused the login."
+msgstr ""
+
+msgid "New key (leave empty to keep the saved one)"
+msgstr ""
+
+msgid "Not checked yet: click Save all settings."
+msgstr ""
+
+msgid "Recommended. Create the key in Kigo.Cloud under Opcije > Integracije > API ključevi with the permissions Čitanje i pisanje (a read-only key cannot send orders), and choose API ključ under Postavke on the same screen. When a key is saved, the username and password below are not used."
+msgstr ""
+
+msgid "Remove"
+msgstr ""
+
+#, php-format
+msgid "Saved key: %s"
+msgstr ""
+
+msgid "Test connection"
+msgstr ""
+
+msgid "Tests the saved login (save a new one first). Also checked every time the settings are saved. Whether the key may send orders shows the R1 tab test, which sends a test offer."
+msgstr ""
+
+msgid "The API key from the Connection tab may only read. Create a key with the permissions Čitanje i pisanje in Kigo.Cloud under Opcije > Integracije > API ključevi and paste it on the Connection tab."
+msgstr ""
+
+msgid "Kigo.Cloud refused the username and password from the Connection tab: the Kigo.Cloud account takes API keys only. Enter an API key on the Connection tab."
+msgstr ""
+
+msgid "Kigo.Cloud refused the API key from the Connection tab: the Kigo.Cloud account is set to take only the username and password. In Kigo.Cloud, Opcije > Integracije > API ključevi > Postavke, choose API ključ, then click Save all settings here again."
 msgstr ""
