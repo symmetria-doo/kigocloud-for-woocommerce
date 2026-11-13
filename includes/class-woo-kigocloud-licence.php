@@ -106,6 +106,27 @@ class Woo_KigoCloud_Licence
     }
 
     /**
+     * Reads the licence when it was never read or is older than 12 hours, at
+     * most once a minute. Called when the settings page opens.
+     */
+    public static function maybe_refresh()
+    {
+        if (!Woo_KigoCloud_Request::has_credentials() || get_transient('kigocloud_licence_lock')) {
+            return;
+        }
+        $read = self::get();
+        if (self::data() !== null && isset($read['time']) && (int) $read['time'] > time() - 12 * HOUR_IN_SECONDS) {
+            return;
+        }
+        $check = Woo_KigoCloud_Request::login_check();
+        if (isset($check['ok']) && !$check['ok'] && self::data() !== null) {
+            return; // a refused login is checked again by Save or Test connection
+        }
+        set_transient('kigocloud_licence_lock', 1, 60);
+        self::refresh();
+    }
+
+    /**
      * @return array the last read, array() before the first one
      */
     public static function get()

@@ -1209,3 +1209,12 @@ msgstr ""
 
 msgid "yes"
 msgstr ""
+
+msgid "Shortcode"
+msgstr ""
+
+msgid "Put it on the page of your site where the price list belongs (for example a page Cjenik linked from the footer). It shows today's price list and the downloads of the last 30 days."
+msgstr ""
+
+msgid "Croatian law requires the price list to be published on your own website. The plugin takes the price list address from your Kigo.Cloud licence, downloads the price list every morning and deletes the files older than 30 days. Put the [kigo_cjenik] shortcode on your page to show it."
+msgstr ""

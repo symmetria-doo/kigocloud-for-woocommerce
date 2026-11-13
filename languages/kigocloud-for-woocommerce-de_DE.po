@@ -284,3 +284,12 @@ msgstr "gültig bis %s"
 
 msgid "yes"
 msgstr "ja"
+
+msgid "Shortcode"
+msgstr "Shortcode"
+
+msgid "Put it on the page of your site where the price list belongs (for example a page Cjenik linked from the footer). It shows today's price list and the downloads of the last 30 days."
+msgstr "Setzen Sie ihn auf die Seite Ihrer Website, wo die Preisliste hingehört (z. B. eine Seite Cjenik mit Link in der Fußzeile). Er zeigt die heutige Preisliste und die Downloads der letzten 30 Tage."
+
+msgid "Croatian law requires the price list to be published on your own website. The plugin takes the price list address from your Kigo.Cloud licence, downloads the price list every morning and deletes the files older than 30 days. Put the [kigo_cjenik] shortcode on your page to show it."
+msgstr "Das kroatische Gesetz verlangt die Preisliste auf Ihrer eigenen Website. Das Plugin nimmt die Adresse aus Ihrer Kigo.Cloud-Lizenz, lädt die Preisliste jeden Morgen herunter und löscht Dateien, die älter als 30 Tage sind. Zur Anzeige setzen Sie den Shortcode [kigo_cjenik] auf Ihre Seite."

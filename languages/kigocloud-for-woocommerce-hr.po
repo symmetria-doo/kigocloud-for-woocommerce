@@ -311,7 +311,7 @@ msgstr "Web Narudžba #"
 
 #: includes/class-kigocloud-for-woocommerce-request.php:207
 msgid "Dostava"
-msgstr ""
+msgstr "Dostava"
 
 #: includes/class-kigocloud-for-woocommerce-request.php:359
 #, php-format
@@ -781,6 +781,476 @@ msgstr "vrijedi do %s"
 
 msgid "yes"
 msgstr "da"
+
+msgid "Shortcode"
+msgstr "Shortcode"
+
+msgid "Put it on the page of your site where the price list belongs (for example a page Cjenik linked from the footer). It shows today's price list and the downloads of the last 30 days."
+msgstr "Stavite ga na stranicu svog weba gdje cjenik pripada (npr. stranica Cjenik s linkom u podnožju). Prikazuje današnji cjenik i preuzimanja zadnjih 30 dana."
+
+msgid "Croatian law requires the price list to be published on your own website. The plugin takes the price list address from your Kigo.Cloud licence, downloads the price list every morning and deletes the files older than 30 days. Put the [kigo_cjenik] shortcode on your page to show it."
+msgstr "Zakon traži da cjenik bude objavljen na vašoj web stranici. Plugin adresu cjenika uzima iz vaše Kigo.Cloud licence, svako jutro skida cjenik i briše datoteke starije od 30 dana. Za prikaz stavite shortcode [kigo_cjenik] na svoju stranicu."
+
+msgid "KigoCloud for WooCommerce"
+msgstr "KigoCloud for WooCommerce"
+
+msgid "Prices"
+msgstr "Cijene"
+
+msgid "Price list"
+msgstr "Cjenik"
+
+msgid "R1"
+msgstr "R1"
+
+msgid "Email"
+msgstr "E-mail"
+
+msgid "Mapping"
+msgstr "Mapiranje"
+
+msgid "Logs"
+msgstr "Zapisi"
+
+msgid "Anchor price"
+msgstr "Sidrena cijena"
+
+msgid "Do not show"
+msgstr "Ne prikazuj"
+
+msgid "Show below the product price"
+msgstr "Prikaži ispod cijene proizvoda"
+
+msgid "Price list on your own website"
+msgstr "Cjenik na vašoj web stranici"
+
+msgid "Enter the API key on the Connection tab and save: the plugin then reads the price list from your Kigo.Cloud licence."
+msgstr "Upišite API ključ na tabu Veza i spremite: plugin tada čita cjenik iz vaše Kigo.Cloud licence."
+
+msgid "The Kigo.Cloud licence could not be read."
+msgstr "Kigo.Cloud licencu nije bilo moguće pročitati."
+
+msgid "not downloaded yet"
+msgstr "još nije preuzeto"
+
+msgid "Last refresh"
+msgstr "Zadnje osvježavanje"
+
+msgid "Refreshed automatically every morning at 7. Save the settings to fetch it right away."
+msgstr "Plugin ga sam osvježava svako jutro u 7. Spremite postavke da se preuzme odmah."
+
+msgid "Order options"
+msgstr "Postavke narudžbi"
+
+msgid "Shipping reference"
+msgstr "Referenca dostave"
+
+msgid "Fill empty SKU"
+msgstr "Popuni prazan SKU"
+
+msgid "Yes - use product ID"
+msgstr "Da - koristi ID proizvoda"
+
+msgid "When enabled, products with missing SKU are sent as sku- followed by the item ID, to avoid KigoCloud lookup failures."
+msgstr "Kad je uključeno, proizvodi bez SKU-a šalju se kao sku- i ID artikla, da KigoCloud ne javi grešku pri traženju."
+
+msgid "Payment gateways"
+msgstr "Načini plaćanja"
+
+msgid "For each enabled gateway, choose the document type, payment method, and the order status that triggers the KigoCloud API call."
+msgstr "Za svaki uključeni način plaćanja odaberite vrstu dokumenta, način plaćanja i status narudžbe na kojem se poziva KigoCloud."
+
+msgid "WooCommerce is not active."
+msgstr "WooCommerce nije aktivan."
+
+msgid "No payment gateways are currently enabled in WooCommerce."
+msgstr "U WooCommerceu trenutno nije uključen nijedan način plaćanja."
+
+msgid "Gateway"
+msgstr "Način plaćanja"
+
+msgid "Payment method"
+msgstr "Plaćanje u KigoCloudu"
+
+msgid "Trigger on"
+msgstr "Pokreni na"
+
+msgid "Send PDF"
+msgstr "Pošalji PDF"
+
+msgid "Order created"
+msgstr "Narudžba kreirana"
+
+msgid "Order completed"
+msgstr "Narudžba dovršena"
+
+msgid "Save gateways"
+msgstr "Spremi načine plaćanja"
+
+msgid "R1 customer fields"
+msgstr "R1 polja kupca"
+
+msgid "Adds company fields to the checkout for B2B invoicing: company name, address, OIB. Works on both classic and block checkout."
+msgstr "Dodaje polja tvrtke na blagajnu za R1 račune: naziv tvrtke, adresu, OIB. Radi na klasičnoj i block blagajni."
+
+msgid "Block checkout support:"
+msgstr "Podrška za block blagajnu:"
+
+msgid "Active (WC 8.6+)"
+msgstr "Aktivno (WC 8.6+)"
+
+msgid "Requires WC 8.6+"
+msgstr "Treba WC 8.6+"
+
+msgid "Mode"
+msgstr "Način"
+
+msgid "Off"
+msgstr "Isključeno"
+
+msgid "Show OIB / VAT field only"
+msgstr "Prikaži samo polje OIB / PDV broj"
+
+msgid "Show full R1 block (company, address, city, postcode, OIB)"
+msgstr "Prikaži cijeli R1 blok (tvrtka, adresa, grad, poštanski broj, OIB)"
+
+msgid "Force billing company required"
+msgstr "Obavezan naziv tvrtke"
+
+msgid "No (use WooCommerce default)"
+msgstr "Ne (zadano u WooCommerceu)"
+
+msgid "Yes (make billing.company a required field)"
+msgstr "Da (billing.company postaje obavezno polje)"
+
+msgid "When R1 mode 2 is on, customers must enter a company name. Enabling this option marks the standard WooCommerce billing.company field as required so the block checkout enforces it everywhere."
+msgstr "Kad je uključen R1 način 2, kupac mora upisati naziv tvrtke. Ova opcija označava standardno WooCommerce polje billing.company kao obavezno, pa ga block blagajna svugdje traži."
+
+msgid "Preview - what the customer will see"
+msgstr "Pregled - što će kupac vidjeti"
+
+msgid "Live preview of the R1 fields that appear on the checkout based on the current mode. Asterisk marks required fields."
+msgstr "Pregled R1 polja koja se pojavljuju na blagajni prema trenutnom načinu. Zvjezdica označava obavezna polja."
+
+msgid "Block checkout diagnostics"
+msgstr "Dijagnostika block blagajne"
+
+msgid "Live status of the Additional Checkout Fields integration for the WooCommerce block checkout. If the R1 fields are missing from the checkout, the row that is red below points to the cause."
+msgstr "Trenutno stanje integracije Additional Checkout Fields za WooCommerce block blagajnu. Ako R1 polja nema na blagajni, crveni redak ispod pokazuje uzrok."
+
+msgid "Test KigoCloud connection"
+msgstr "Test veze s KigoCloudom"
+
+msgid "Sends a test R1 offer to KigoCloud using the saved API credentials and a sample OIB. No order is created and no invoice is issued; the offer appears among the offers in KigoCloud. Shows the KigoCloud response so you can verify credentials, network and endpoint before going live."
+msgstr "Šalje probnu R1 ponudu u KigoCloud sa spremljenom prijavom i primjerom OIB-a. Ne stvara se narudžba ni račun; ponuda se vidi među ponudama u KigoCloudu. Pokazuje odgovor KigoClouda, da prije početka rada provjerite prijavu, mrežu i adresu."
+
+msgid "Sending test offer to KigoCloud..."
+msgstr "Šaljem probnu ponudu u KigoCloud..."
+
+msgid "Send test R1 offer"
+msgstr "Pošalji probnu R1 ponudu"
+
+msgid "WordPress version"
+msgstr "Verzija WordPressa"
+
+msgid "Block checkout works best on WP 6.4+. Older WP may render Gutenberg blocks unreliably."
+msgstr "Block blagajna najbolje radi na WP 6.4+. Stariji WP može nepouzdano prikazivati Gutenberg blokove."
+
+msgid "PHP version"
+msgstr "Verzija PHP-a"
+
+msgid "Plugin requires PHP 7.2 minimum."
+msgstr "Plugin traži najmanje PHP 7.2."
+
+msgid "WooCommerce version"
+msgstr "Verzija WooCommercea"
+
+msgid "not detected"
+msgstr "nije pronađeno"
+
+msgid "Additional Checkout Fields API was officially shipped in WooCommerce 8.9. On 8.6-8.8 the function exists but may not render fields reliably; upgrading WC is the fix."
+msgstr "Additional Checkout Fields API službeno je u WooCommerceu 8.9. Na 8.6-8.8 funkcija postoji, ali polja možda neće pouzdano raditi; rješenje je nadogradnja WC-a."
+
+msgid "Field API function available"
+msgstr "Funkcija Field API postoji"
+
+msgid "missing"
+msgstr "nedostaje"
+
+msgid "If missing, WooCommerce is too old to register checkout fields via PHP; upgrade WC."
+msgstr "Ako nedostaje, WooCommerce je prestar za dodavanje polja blagajne iz PHP-a; nadogradite WC."
+
+msgid "R1 mode"
+msgstr "R1 način"
+
+msgid "OIB only"
+msgstr "Samo OIB"
+
+msgid "Full R1 block"
+msgstr "Cijeli R1 blok"
+
+msgid "When set to Off the plugin registers nothing on the checkout."
+msgstr "Kad je isključeno, plugin na blagajnu ne dodaje ništa."
+
+msgid "Checkout page uses block"
+msgstr "Stranica blagajne koristi blok"
+
+msgid "No (classic [woocommerce_checkout] shortcode)"
+msgstr "Ne (klasični shortcode [woocommerce_checkout])"
+
+#, php-format
+msgid "Block checkout fields only appear if the Checkout page actually contains the WooCommerce checkout block. <a href=\"%s\">Edit checkout page</a>."
+msgstr "Polja block blagajne pojavljuju se samo ako stranica blagajne stvarno sadrži WooCommerce blok blagajne. <a href=\"%s\">Uredi stranicu blagajne</a>."
+
+msgid "Block checkout fields only appear if the Checkout page actually contains the WooCommerce checkout block."
+msgstr "Polja block blagajne pojavljuju se samo ako stranica blagajne stvarno sadrži WooCommerce blok blagajne."
+
+msgid "Hook fired this request"
+msgstr "Hook se izvršio u ovom zahtjevu"
+
+msgid "Yes, register_block_fields() was called"
+msgstr "Da, register_block_fields() je pozvan"
+
+msgid "No - woocommerce_init never reached our handler"
+msgstr "Ne - woocommerce_init nije došao do našeg handlera"
+
+msgid "If No, another plugin or fatal error is preventing woocommerce_init from running through to our handler. Check the WP debug.log."
+msgstr "Ako je Ne, drugi plugin ili fatalna greška sprečava da woocommerce_init dođe do našeg handlera. Pogledajte WP debug.log."
+
+msgid "Registration status"
+msgstr "Stanje registracije"
+
+msgid "not yet attempted"
+msgstr "još nije pokušano"
+
+msgid "\"ok\" means WC accepted both field registrations. Any other value points to the rejection reason."
+msgstr "\"ok\" znači da je WC prihvatio obje registracije polja. Svaka druga vrijednost pokazuje razlog odbijanja."
+
+msgid "Check"
+msgstr "Provjera"
+
+msgid "Result"
+msgstr "Rezultat"
+
+msgid "Field IDs registered"
+msgstr "Registrirani ID-ovi polja"
+
+msgid "Blocks on checkout page"
+msgstr "Blokovi na stranici blagajne"
+
+msgid "No Gutenberg blocks detected on the checkout page. The page is likely using the classic [woocommerce_checkout] shortcode."
+msgstr "Na stranici blagajne nema Gutenberg blokova. Stranica vjerojatno koristi klasični shortcode [woocommerce_checkout]."
+
+msgid "The page has blocks but none of them is woocommerce/checkout. Additional Checkout Fields are rendered only by the canonical checkout block - swap the current block for woocommerce/checkout."
+msgstr "Stranica ima blokove, ali nijedan nije woocommerce/checkout. Additional Checkout Fields prikazuje samo pravi blok blagajne - zamijenite trenutni blok s woocommerce/checkout."
+
+msgid "R1 mode is off. No extra fields are added to the checkout."
+msgstr "R1 način je isključen. Na blagajnu se ne dodaju polja."
+
+msgid "On the checkout, inside the billing address block:"
+msgstr "Na blagajni, unutar bloka adrese za naplatu:"
+
+msgid "The standard WooCommerce billing address (address, city, postcode, country) is shown above these fields and is used as the company address."
+msgstr "Standardna WooCommerce adresa za naplatu (adresa, grad, poštanski broj, država) prikazuje se iznad ovih polja i koristi se kao adresa tvrtke."
+
+#, php-format
+msgid "Network error: %s"
+msgstr "Greška mreže: %s"
+
+#, php-format
+msgid "OK. KigoCloud accepted the test offer: %1$s/%2$s/%3$s"
+msgstr "U redu. KigoCloud je prihvatio probnu ponudu: %1$s/%2$s/%3$s"
+
+#, php-format
+msgid "KigoCloud returned HTTP %1$d. %2$s"
+msgstr "KigoCloud je vratio HTTP %1$d. %2$s"
+
+msgid "Outgoing mail"
+msgstr "Odlazna pošta"
+
+msgid "Overrides the From and Reply-To headers on outgoing WordPress mail. Global, not just KigoCloud emails."
+msgstr "Mijenja zaglavlja From i Reply-To na odlaznoj WordPress pošti. Vrijedi za svu poštu, ne samo KigoCloud."
+
+msgid "From email"
+msgstr "E-mail pošiljatelja"
+
+msgid "Reply-To email"
+msgstr "E-mail za odgovor (Reply-To)"
+
+msgid "Custom meta mapping"
+msgstr "Vlastito mapiranje meta podataka"
+
+msgid "Override billing data with values from other order meta keys. Useful when another plugin already stores R1 data under its own meta names."
+msgstr "Zamjenjuje podatke za naplatu vrijednostima iz drugih meta ključeva narudžbe. Korisno kad drugi plugin već sprema R1 podatke pod svojim imenima."
+
+msgid "Format: source_meta:target.field, comma-separated."
+msgstr "Oblik: izvorni_meta:cilj.polje, odvojeno zarezima."
+
+msgid "Mapping rules"
+msgstr "Pravila mapiranja"
+
+msgid "Example: r1_oib_tvrtke:_billing_vat_number, r1_ime_tvrtke:billing.company, r1_adresa_tvrtke:billing.address_1"
+msgstr "Primjer: r1_oib_tvrtke:_billing_vat_number, r1_ime_tvrtke:billing.company, r1_adresa_tvrtke:billing.address_1"
+
+msgid "Recent API calls"
+msgstr "Zadnji API pozivi"
+
+msgid "Last 50 KigoCloud API calls. Useful for debugging order push failures."
+msgstr "Zadnjih 50 poziva KigoCloud API-ja. Korisno za traženje greške kad narudžba ne prođe."
+
+msgid "No API calls have been logged yet. Once an order triggers KigoCloud, recent attempts will show up here."
+msgstr "Još nema zapisanih API poziva. Kad narudžba pokrene KigoCloud, ovdje se pojave zadnji pokušaji."
+
+msgid "When"
+msgstr "Kada"
+
+msgid "Order"
+msgstr "Narudžba"
+
+msgid "Endpoint"
+msgstr "Adresa"
+
+msgid "OK"
+msgstr "U redu"
+
+msgid "Error"
+msgstr "Greška"
+
+msgid "Clear logs"
+msgstr "Obriši zapise"
+
+msgid "Version"
+msgstr "Verzija"
+
+msgid "Source"
+msgstr "Izvor"
+
+msgid "Releases"
+msgstr "Izdanja"
+
+msgid "Changelog"
+msgstr "Popis promjena"
+
+msgid "API endpoint"
+msgstr "API adresa"
+
+msgid "WooCommerce"
+msgstr "WooCommerce"
+
+msgid "PHP"
+msgstr "PHP"
+
+msgid "WordPress"
+msgstr "WordPress"
+
+msgid "Settings"
+msgstr "Postavke"
+
+msgid "GitHub"
+msgstr "GitHub"
+
+msgid "Company"
+msgstr "Tvrtka"
+
+msgid "Company city"
+msgstr "Grad tvrtke"
+
+msgid "Company postcode"
+msgstr "Poštanski broj tvrtke"
+
+msgid "Company VAT"
+msgstr "OIB tvrtke"
+
+msgid "KigoCloud for WooCommerce has been updated to version"
+msgstr "KigoCloud for WooCommerce ažuriran je na verziju"
+
+msgid "Please review and save your settings to ensure everything works correctly."
+msgstr "Pregledajte i spremite postavke da sve radi kako treba."
+
+msgid "Review and save settings"
+msgstr "Pregledaj i spremi postavke"
+
+msgid "KigoCloud R1 fields require WooCommerce 8.6 or newer for the block checkout."
+msgstr "KigoCloud R1 polja na block blagajni traže WooCommerce 8.6 ili noviji."
+
+msgid "You are using the block checkout on an older WooCommerce version that does not support custom checkout fields. Either upgrade WooCommerce or switch the checkout page back to the [woocommerce_checkout] shortcode."
+msgstr "Koristite block blagajnu na starijem WooCommerceu koji ne podržava vlastita polja blagajne. Nadogradite WooCommerce ili vratite stranicu blagajne na shortcode [woocommerce_checkout]."
+
+msgid "You do not have proper authorization to activate a plugin."
+msgstr "Nemate ovlast za aktiviranje plugina."
+
+#, php-format
+msgid "This plugin requires %s to be active."
+msgstr "Ovaj plugin traži da %s bude aktivan."
+
+msgid "You do not have permission to change plugins."
+msgstr "Nemate dozvolu za mijenjanje plugina."
+
+msgid "The KigoKasa API for WooCommerce plugin is deactivated. Orders are now sent by KigoCloud for WooCommerce."
+msgstr "Plugin KigoKasa API for WooCommerce je isključen. Narudžbe sada šalje KigoCloud for WooCommerce."
+
+msgid "KigoCloud for WooCommerce now keeps its own record of the documents the KigoKasa plugin issued for your orders, so they are never sent again. The KigoKasa API for WooCommerce plugin can be deleted."
+msgstr "KigoCloud for WooCommerce sada sam pamti dokumente koje je KigoKasa plugin izdao za vaše narudžbe, pa se nikad ne šalju ponovno. Plugin KigoKasa API for WooCommerce možete obrisati."
+
+msgid "KigoCloud for WooCommerce is waiting to take over."
+msgstr "KigoCloud for WooCommerce čeka da preuzme."
+
+msgid "The settings were copied from the KigoKasa API for WooCommerce plugin."
+msgstr "Postavke su preuzete iz plugina KigoKasa API for WooCommerce."
+
+msgid "Until you switch, orders are still sent by the KigoKasa plugin, so no order is sent twice. When you click Switch to KigoCloud, the KigoKasa plugin is deactivated (its data stays) and KigoCloud sends the orders from then on."
+msgstr "Dok ne prebacite, narudžbe i dalje šalje KigoKasa plugin, pa se nijedna narudžba ne šalje dvaput. Kad kliknete Prebaci na KigoCloud, KigoKasa plugin se isključi (njegovi podaci ostaju), a narudžbe od tada šalje KigoCloud."
+
+msgid "Switch to KigoCloud"
+msgstr "Prebaci na KigoCloud"
+
+msgid "Review settings first"
+msgstr "Najprije pregledaj postavke"
+
+msgid "The KigoCloud price list address is not set."
+msgstr "Adresa KigoCloud cjenika nije postavljena."
+
+msgid "The price list is already up to date."
+msgstr "Cjenik je već ažuran."
+
+msgid "The price list folder could not be created."
+msgstr "Mapu za cjenik nije bilo moguće napraviti."
+
+#, php-format
+msgid "KigoCloud answered with status %d. Check the address and your plan."
+msgstr "KigoCloud je odgovorio statusom %d. Provjerite adresu i paket."
+
+msgid "KigoCloud returned an empty price list."
+msgstr "KigoCloud je vratio prazan cjenik."
+
+msgid "KigoCloud did not send the prescribed file name. Update KigoCloud or contact support."
+msgstr "KigoCloud nije poslao propisano ime datoteke. Ažurirajte KigoCloud ili se javite podršci."
+
+msgid "The price list has been refreshed."
+msgstr "Cjenik je osvježen."
+
+msgid "The published price list is not from today."
+msgstr "Objavljeni cjenik nije današnji."
+
+msgid "The price list is not available yet."
+msgstr "Cjenik još nije dostupan."
+
+#, php-format
+msgid "Updated: %s"
+msgstr "Ažurirano: %s"
+
+msgid "Published price lists (last 30 days)"
+msgstr "Objavljeni cjenici (zadnjih 30 dana)"
+
+msgid "No document number returned"
+msgstr "Nije vraćen broj dokumenta"
+
+#, php-format
+msgid "Hi %1$s,<br /><br />Thank you for your order.<br /><br />Your %2$s with number <b>%3$s</b> is in the attachment.<br /><br />We look forward to fulfilling your order soon."
+msgstr "Poštovani %1$s,<br /><br />hvala na narudžbi.<br /><br />Vaš dokument %2$s broj <b>%3$s</b> nalazi se u privitku.<br /><br />Radujemo se što ćemo vašu narudžbu uskoro isporučiti."
+
+msgid "Sidrena cijena"
+msgstr "Sidrena cijena"
 
 #~ msgid "Document number"
 #~ msgstr "Broj dokumenta"

@@ -4,6 +4,20 @@ All notable changes to KigoCloud for WooCommerce are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.11] - 2026-11-13
+
+### Fixed
+- A Croatian shop that installed the plugin from wordpress.org saw everything in English: that build dropped the languages folder (translate.wordpress.org has no Croatian for the plugin). `bin/build-wporg.sh` now compiles `languages/*.po` into `.mo` files in the build (`.po`/`.pot` stay out) and fails without `-hr.mo`. The Croatian translation is complete (152 missing strings added).
+- Right after an update the licence was unknown until a Save, so the Price list tab showed the old address field. `Woo_KigoCloud_Licence::maybe_refresh()` reads it when the KigoCloud page opens (never read, or older than 12 hours; once a minute at most).
+
+### Removed
+- The typed price list address (`kigocloud_pricelist_url` is no longer a setting and is not read): the address comes only from the licence. Without it the tab says why (no login, licence not readable, package, module off, publication off).
+- The folding "Today's files" toggle on the Price list tab: the CSV and XML addresses are shown plainly.
+- "Create the Cjenik page" (`Woo_KigoCloud_Pricelist::page_id()`, `create_page_action()`, `admin-post.php?action=kigocloud_pricelist_page`). The Price list tab shows the `[kigo_cjenik]` shortcode and where to put it; the shop places it on its own page. A page made with 2.2.10 stays as it is.
+
+### Changed
+- `[kigo_cjenik]`: the table sits in a box that scrolls sideways (`.kigo-cjenik-scroll`, overflow-x auto) and every cell keeps one line (inline nowrap, 14px, padding), so a narrow theme content column no longer breaks the 19 columns of the decision's price list letter by letter. The Naziv column wraps (220-360px), so one long name does not stretch the table.
+
 ## [2.2.10] - 2026-11-13
 
 ### Added

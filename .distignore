@@ -21,5 +21,9 @@ README.md
 *.tar.gz
 .DS_Store
 Thumbs.db
-# wordpress.org delivers the translations from translate.wordpress.org.
-/languages
+# The translations ship as compiled .mo files (bin/build-wporg.sh builds them):
+# translate.wordpress.org has no Croatian for the plugin, and without them the
+# plugin shows English on a Croatian site.
+languages/*.po
+languages/*.pot
+languages/*.mo

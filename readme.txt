@@ -4,7 +4,7 @@ Tags: fiskalizacija, fiscalization, croatia, invoice, r1
 Requires at least: 5.5
 Tested up to: 7.1
 Requires PHP: 7.2
-Stable tag: 2.2.10
+Stable tag: 2.2.11
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 WC requires at least: 5.0
@@ -112,6 +112,12 @@ Kigo.Cloud privacy policy: https://www.kigocloud.com/zastita-osobnih-podataka
 4. An order with the fiscalized Kigo.Cloud invoice number.
 
 == Changelog ==
+
+= 2.2.11 =
+* Croatian everywhere: the whole admin is translated, and the wordpress.org build now carries the translations (before it had none, so a Croatian shop saw English).
+* The licence is read as soon as the KigoCloud page opens after an update, no Save needed. The price list address is never typed in any more; the Price list tab shows today's files plainly.
+* Price list: the plugin no longer makes a page. The Price list tab shows the [kigo_cjenik] shortcode; put it on your own page.
+* The [kigo_cjenik] table keeps every cell on one line and scrolls sideways in its box, instead of being squeezed letter by letter into a narrow page.
 
 = 2.2.10 =
 * The plugin reads your Kigo.Cloud licence (package, valid until) and shows it on the About tab. What the package allows decides what the plugin does: anchor prices while the Sidrene cijene module is on, the price list on your own website from the Standard package on.
@@ -229,6 +235,9 @@ Kigo.Cloud privacy policy: https://www.kigocloud.com/zastita-osobnih-podataka
 Older versions: https://github.com/symmetria-doo/kigocloud-for-woocommerce/blob/main/CHANGELOG.md
 
 == Upgrade Notice ==
+
+= 2.2.11 =
+The price list table scrolls sideways instead of squeezing; the page button is gone, use the shortcode.
 
 = 2.2.10 =
 The plugin follows your Kigo.Cloud licence; the price list address and the Cjenik page need no typing.

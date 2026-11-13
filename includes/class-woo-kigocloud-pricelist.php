@@ -71,11 +71,8 @@ class Woo_KigoCloud_Pricelist
         add_action(self::CRON_HOOK, array(__CLASS__, 'fetch'));
         add_action('init', array(__CLASS__, 'schedule'));
         add_action('admin_notices', array(__CLASS__, 'admin_notice'));
-        add_action('admin_post_kigocloud_pricelist_page', array(__CLASS__, 'create_page_action'));
         // Saving the address fetches at once, so the shop owner sees straight away
         // whether it works instead of waiting for tomorrow morning.
-        add_action('update_option_' . self::OPTION_URL, array(__CLASS__, 'on_url_saved'), 10, 0);
-        add_action('add_option_' . self::OPTION_URL, array(__CLASS__, 'on_url_saved'), 10, 0);
         self::init_anchor();
     }
 
@@ -116,29 +113,15 @@ class Woo_KigoCloud_Pricelist
      */
     public static function base_url()
     {
-        // The licence gives the address (Standard and above, publication on in
-        // Kigo.Cloud). Once the licence is known nothing typed by hand counts:
-        // without the package or the publication there is no price list.
-        if (class_exists('Woo_KigoCloud_Licence')) {
-            $from_licence = Woo_KigoCloud_Licence::price_list_url();
-            if ($from_licence !== '') {
-                return $from_licence;
-            }
-            if (Woo_KigoCloud_Licence::allows_price_list() !== null) {
-                return '';
-            }
-        }
-        // Licence not read yet (or an older Kigo.Cloud): the address typed in by hand.
-        $url = trim((string) get_option(self::OPTION_URL, ''));
-        if ($url === '' || !filter_var($url, FILTER_VALIDATE_URL)) {
+        // Only from the licence (Standard and above, publication on in
+        // Kigo.Cloud): nothing is typed in by hand.
+        if (!class_exists('Woo_KigoCloud_Licence')) {
             return '';
         }
+        $url = Woo_KigoCloud_Licence::price_list_url();
         $scheme = strtolower((string) wp_parse_url($url, PHP_URL_SCHEME));
-        if ($scheme !== 'http' && $scheme !== 'https') {
-            return '';
-        }
 
-        return rtrim($url, '/');
+        return ($scheme === 'https' || $scheme === 'http') ? $url : '';
     }
 
     /**
@@ -701,67 +684,6 @@ class Woo_KigoCloud_Pricelist
      * letting it age silently: a stale price list is a breach, and nobody would
      * notice.
      */
-    /** ID of the page that shows the price list ([kigo_cjenik]). */
-    const OPTION_PAGE = 'kigocloud_pricelist_page';
-
-    /**
-     * The published page with the [kigo_cjenik] shortcode: the one the plugin
-     * made, otherwise the first page the shop made by hand.
-     *
-     * @return int page ID, 0 when there is none
-     */
-    public static function page_id()
-    {
-        $id = (int) get_option(self::OPTION_PAGE, 0);
-        if ($id > 0) {
-            $post = get_post($id);
-            if ($post && $post->post_status === 'publish' && has_shortcode($post->post_content, 'kigo_cjenik')) {
-                return $id;
-            }
-        }
-        $pages = get_posts(array(
-            'post_type'      => 'page',
-            'post_status'    => 'publish',
-            's'              => 'kigo_cjenik',
-            'posts_per_page' => 5,
-            'fields'         => 'all',
-        ));
-        foreach ($pages as $page) {
-            if (has_shortcode($page->post_content, 'kigo_cjenik')) {
-                update_option(self::OPTION_PAGE, (int) $page->ID, false);
-                return (int) $page->ID;
-            }
-        }
-
-        return 0;
-    }
-
-    /**
-     * "Create the Cjenik page" on the Price list tab: a published page titled
-     * Cjenik with the shortcode, then back to the tab.
-     */
-    public static function create_page_action()
-    {
-        if (!current_user_can('manage_options')) {
-            wp_die(esc_html__('Permission denied.', 'kigocloud-for-woocommerce'), 403);
-        }
-        check_admin_referer('kigocloud_pricelist_page');
-        if (self::page_id() === 0) {
-            $id = wp_insert_post(array(
-                'post_type'    => 'page',
-                'post_status'  => 'publish',
-                'post_title'   => 'Cjenik',
-                'post_name'    => 'cjenik',
-                'post_content' => '[kigo_cjenik]',
-            ), true);
-            if (!is_wp_error($id) && $id > 0) {
-                update_option(self::OPTION_PAGE, (int) $id, false);
-            }
-        }
-        wp_safe_redirect(admin_url('admin.php?page=kigocloud&tab=pricelist'));
-        exit;
-    }
-
     public static function admin_notice()
     {
         if (!current_user_can('manage_options') || !Woo_KigoCloud::is_notice_screen() || self::base_url() === '' || self::is_current()) {
@@ -817,9 +739,18 @@ class Woo_KigoCloud_Pricelist
                 date_i18n(get_option('date_format') . ' ' . get_option('time_format'), filemtime($path))
             ))
             . '</p>';
-        $out .= '<table class="kigo-cjenik-table"><thead><tr>';
-        foreach ((array) $header as $cell) {
-            $out .= '<th>' . esc_html(ucfirst(str_replace('_', ' ', (string) $cell))) . '</th>';
+        // The decision's price list has many columns: the table keeps one line
+        // per cell and scrolls sideways inside its box, so no theme squeezes it
+        // into the content width letter by letter.
+        $cell_style = ' style="white-space:nowrap !important;word-break:normal !important;overflow-wrap:normal !important;padding:6px 10px !important;font-size:14px !important;line-height:1.4 !important;vertical-align:top !important;"';
+        $out .= '<div class="kigo-cjenik-scroll" style="overflow-x:auto !important;max-width:100% !important;-webkit-overflow-scrolling:touch;">';
+        $out .= '<table class="kigo-cjenik-table" style="width:auto !important;min-width:100%;table-layout:auto !important;border-collapse:collapse;margin:0;"><thead><tr>';
+        // The name wraps (a long one would stretch the table), the rest stays on one line.
+        $wrap_style = str_replace('white-space:nowrap !important;word-break:normal !important;overflow-wrap:normal !important;', 'white-space:normal !important;min-width:220px;max-width:360px;', $cell_style);
+        $styles = array();
+        foreach ((array) $header as $i => $cell) {
+            $styles[$i] = strtolower(trim((string) $cell)) === 'naziv' ? $wrap_style : $cell_style;
+            $out .= '<th' . $styles[$i] . '>' . esc_html(ucfirst(str_replace('_', ' ', (string) $cell))) . '</th>';
         }
         $out .= '</tr></thead><tbody>';
         $rows = 0;
@@ -829,8 +760,8 @@ class Woo_KigoCloud_Pricelist
                 continue;
             }
             $out .= '<tr>';
-            foreach ($row as $cell) {
-                $out .= '<td>' . esc_html((string) $cell) . '</td>';
+            foreach ($row as $i => $cell) {
+                $out .= '<td' . (isset($styles[$i]) ? $styles[$i] : $cell_style) . '>' . esc_html((string) $cell) . '</td>';
             }
             $out .= '</tr>';
             $rows++;
@@ -839,7 +770,7 @@ class Woo_KigoCloud_Pricelist
             }
         }
         $csv = null;
-        $out .= '</tbody></table>';
+        $out .= '</tbody></table></div>';
 
         $archive = self::archive();
         if (!empty($archive)) {

@@ -132,7 +132,6 @@ class Woo_KigoCloud_Admin_Page
             'kigocloud_email_from'              => 'sanitize_email',
             'kigocloud_reply_to'                => 'sanitize_email',
             'kigocloud_custom_mapping'          => 'sanitize_textarea_field',
-            Woo_KigoCloud_Pricelist::OPTION_URL => 'esc_url_raw',
         );
     }
 
@@ -319,6 +318,9 @@ class Woo_KigoCloud_Admin_Page
         if (!current_user_can(self::CAPABILITY)) {
             return;
         }
+        // Right after an update nothing has read the licence yet: read it now,
+        // so the tabs show what it allows without a Save first.
+        Woo_KigoCloud_Licence::maybe_refresh();
         $tabs = $this->tabs();
         // phpcs:disable WordPress.Security.NonceVerification.Recommended -- only picks the visible tab and the saved notice.
         $current = isset($_GET['tab']) ? sanitize_key(wp_unslash($_GET['tab'])) : 'connection';
@@ -413,9 +415,6 @@ class Woo_KigoCloud_Admin_Page
             ),
             'kigocloud_prices' => array(
                 'kigocloud_show_anchor_price',
-            ),
-            'kigocloud_pricelist' => array(
-                Woo_KigoCloud_Pricelist::OPTION_URL,
             ),
             'kigocloud_r1' => array(
                 'kigocloud_vat_invoices',
@@ -736,67 +735,50 @@ class Woo_KigoCloud_Admin_Page
         ?>
         <div class="kc-card">
             <h2><?php esc_html_e('Price list on your own website', 'kigocloud-for-woocommerce'); ?></h2>
-            <p class="kc-desc"><?php esc_html_e('Croatian law requires the price list to be published on your own website. You only create the Cjenik page. The plugin takes the price list address from your Kigo.Cloud licence, downloads the price list every morning, shows it on that page, and deletes the files older than 30 days.', 'kigocloud-for-woocommerce'); ?></p>
+            <p class="kc-desc"><?php esc_html_e('Croatian law requires the price list to be published on your own website. The plugin takes the price list address from your Kigo.Cloud licence, downloads the price list every morning and deletes the files older than 30 days. Put the [kigo_cjenik] shortcode on your page to show it.', 'kigocloud-for-woocommerce'); ?></p>
             <table class="form-table" role="presentation">
                 <?php
                 $licence_url = Woo_KigoCloud_Licence::price_list_url();
                 $allowed     = Woo_KigoCloud_Licence::allows_price_list();
-                if ($licence_url !== '') {
-                    ?>
-                    <tr>
-                        <th scope="row"><?php esc_html_e('KigoCloud address', 'kigocloud-for-woocommerce'); ?></th>
-                        <td>
-                            <p><span class="kc-status-ok"><?php esc_html_e('Taken from your Kigo.Cloud licence:', 'kigocloud-for-woocommerce'); ?></span> <code><?php echo esc_html($licence_url); ?></code></p>
-                            <p class="description"><?php esc_html_e('Nothing to type in: the plugin reads it from Kigo.Cloud.', 'kigocloud-for-woocommerce'); ?></p>
-                        </td>
-                    </tr>
-                    <?php
-                } elseif ($allowed !== null) {
+                if ($licence_url === '') {
                     $reasons = array(
                         'package'       => __('The price list on your own website is part of the Standard package and above. Your Kigo.Cloud package does not have it.', 'kigocloud-for-woocommerce'),
                         'not_in_use'    => __('Anchor prices are not switched on in Kigo.Cloud (Moduli > Sidrene cijene).', 'kigocloud-for-woocommerce'),
                         'not_published' => __('Kigo.Cloud does not publish the price list yet: in Kigo.Cloud, Sidrene cijene > Cjenik za objavu, switch on the publication, then click Save all settings here.', 'kigocloud-for-woocommerce'),
                     );
                     $reason = Woo_KigoCloud_Licence::price_list_reason();
+                    if ($allowed === null) {
+                        $read = Woo_KigoCloud_Licence::get();
+                        $text = !Woo_KigoCloud_Request::has_credentials()
+                            ? __('Enter the API key on the Connection tab and save: the plugin then reads the price list from your Kigo.Cloud licence.', 'kigocloud-for-woocommerce')
+                            : trim(__('The Kigo.Cloud licence could not be read.', 'kigocloud-for-woocommerce') . ' ' . (isset($read['message']) ? Woo_KigoCloud_Request::describe_error($read['message']) : ''));
+                    } else {
+                        $text = isset($reasons[$reason]) ? $reasons[$reason] : __('Kigo.Cloud gives no price list address.', 'kigocloud-for-woocommerce');
+                    }
                     ?>
                     <tr>
-                        <th scope="row"><?php esc_html_e('KigoCloud address', 'kigocloud-for-woocommerce'); ?></th>
-                        <td><p><span class="kc-status-bad"><?php echo esc_html(isset($reasons[$reason]) ? $reasons[$reason] : __('Kigo.Cloud gives no price list address.', 'kigocloud-for-woocommerce')); ?></span></p></td>
+                        <th scope="row"><?php esc_html_e('Price list', 'kigocloud-for-woocommerce'); ?></th>
+                        <td><p><span class="kc-status-bad"><?php echo esc_html($text); ?></span></p></td>
                     </tr>
                     <?php
-                } else {
-                    $this->text_field(Woo_KigoCloud_Pricelist::OPTION_URL, __('KigoCloud address', 'kigocloud-for-woocommerce'), array(
-                        'type'        => 'url',
-                        'placeholder' => 'https://app.kigo.cloud/hr/cjenik/...',
-                        'description' => __('Click Save all settings: the plugin then reads the address from your Kigo.Cloud licence. Only if it cannot, copy it from Kigo.Cloud, Sidrene cijene > Cjenik za objavu.', 'kigocloud-for-woocommerce'),
-                    ));
                 }
                 ?>
             </table>
             <?php if ($base !== ''): ?>
                 <table class="form-table" role="presentation">
                     <tr>
-                        <th scope="row"><?php esc_html_e('Cjenik page', 'kigocloud-for-woocommerce'); ?></th>
+                        <th scope="row"><?php esc_html_e('Shortcode', 'kigocloud-for-woocommerce'); ?></th>
                         <td>
-                            <?php $page_id = Woo_KigoCloud_Pricelist::page_id(); ?>
-                            <?php if ($page_id > 0): ?>
-                                <p><span class="kc-status-ok"><?php esc_html_e('Published:', 'kigocloud-for-woocommerce'); ?></span>
-                                    <a href="<?php echo esc_url(get_permalink($page_id)); ?>" target="_blank" rel="noopener"><?php echo esc_html(get_permalink($page_id)); ?></a></p>
-                                <p class="description"><?php esc_html_e('Put a link to this page in the footer of the shop (Appearance > Menus or the footer widget), so visitors find it. The page shows today\'s price list and the downloads of the last 30 days; nothing else needs to be done.', 'kigocloud-for-woocommerce'); ?></p>
-                            <?php else: ?>
-                                <p><a class="button button-primary" href="<?php echo esc_url(wp_nonce_url(admin_url('admin-post.php?action=kigocloud_pricelist_page'), 'kigocloud_pricelist_page')); ?>"><?php esc_html_e('Create the Cjenik page', 'kigocloud-for-woocommerce'); ?></a></p>
-                                <p class="description"><?php esc_html_e('Creates a published page "Cjenik" with the price list. Or put the [kigo_cjenik] shortcode on a page of your own.', 'kigocloud-for-woocommerce'); ?></p>
-                            <?php endif; ?>
+                            <p><code>[kigo_cjenik]</code></p>
+                            <p class="description"><?php esc_html_e('Put it on the page of your site where the price list belongs (for example a page Cjenik linked from the footer). It shows today\'s price list and the downloads of the last 30 days.', 'kigocloud-for-woocommerce'); ?></p>
                         </td>
                     </tr>
                     <tr>
                         <th scope="row"><?php esc_html_e('Files', 'kigocloud-for-woocommerce'); ?></th>
                         <td>
                             <?php if (Woo_KigoCloud_Pricelist::url('csv') !== ''): ?>
-                                <details><summary><?php esc_html_e('Today\'s files (CSV and XML, under the name the decision prescribes)', 'kigocloud-for-woocommerce'); ?></summary>
-                                    <p><code><?php echo esc_html(Woo_KigoCloud_Pricelist::url('csv')); ?></code></p>
-                                    <p><code><?php echo esc_html(Woo_KigoCloud_Pricelist::url('xml')); ?></code></p>
-                                </details>
+                                <p><code><?php echo esc_html(Woo_KigoCloud_Pricelist::url('csv')); ?></code></p>
+                                <p><code><?php echo esc_html(Woo_KigoCloud_Pricelist::url('xml')); ?></code></p>
                             <?php else: ?>
                                 <p><span class="kc-status-bad"><?php esc_html_e('not downloaded yet', 'kigocloud-for-woocommerce'); ?></span></p>
                             <?php endif; ?>

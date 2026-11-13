@@ -8,11 +8,13 @@
 #   - the vendor/plugin-update-checker folder (via .distignore),
 #   - the "Update URI" header,
 #   - the updater bootstrap between the wporg-strip markers in the main file,
-#   - the languages folder and the "Domain Path" header: translate.wordpress.org
-#     delivers the language packs.
+#   - the "Domain Path" header.
+# The translations ship as .mo files compiled from languages/*.po here
+# (Woo_KigoCloud_i18n loads them from the plugin folder): translate.wordpress.org
+# has no Croatian for the plugin, and the shops it serves are Croatian.
 # The GitHub release (.github/workflows/release.yml) is not affected.
 #
-# Needs: bash, rsync, zip. Usage: bin/build-wporg.sh [output dir]
+# Needs: bash, rsync, zip, msgfmt (gettext). Usage: bin/build-wporg.sh [output dir]
 
 set -euo pipefail
 
@@ -27,6 +29,11 @@ mkdir -p "${DEST}"
 
 rsync -a --exclude-from="${SRC}/.distignore" "${SRC}/" "${DEST}/"
 
+mkdir -p "${DEST}/languages"
+for po in "${SRC}"/languages/*.po; do
+    msgfmt -o "${DEST}/languages/$(basename "${po%.po}").mo" "${po}"
+done
+
 find "${DEST}" -type d -exec chmod 755 {} +
 find "${DEST}" -type f -exec chmod 644 {} +
 
@@ -39,8 +46,12 @@ if grep -rniE 'plugin-update-checker|PucFactory|Update URI' "${DEST}" --include=
     echo "Updater code left in the wordpress.org build." >&2
     exit 1
 fi
-if [ -n "$(find "${DEST}" -name '*.po' -o -name '*.mo' -o -name '*.l10n.php')" ]; then
-    echo "Translation files left in the wordpress.org build." >&2
+if [ ! -s "${DEST}/languages/${SLUG}-hr.mo" ]; then
+    echo "The Croatian translation is missing from the wordpress.org build." >&2
+    exit 1
+fi
+if [ -n "$(find "${DEST}" -name '*.po' -o -name '*.pot')" ]; then
+    echo ".po/.pot files left in the wordpress.org build." >&2
     exit 1
 fi
 if [ -d "${DEST}/vendor" ]; then
