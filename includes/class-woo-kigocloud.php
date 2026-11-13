@@ -45,7 +45,7 @@ class Woo_KigoCloud {
      *
      * @since 1.0.0
      */
-    const PLUGIN_VERSION = '2.2.9';
+    const PLUGIN_VERSION = '2.2.10';
 
     /**
      * Admin notices of the plugin appear only on the Dashboard, the Plugins
@@ -147,6 +147,7 @@ class Woo_KigoCloud {
          * The class responsible for API calls.
          */
         require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-woo-kigocloud-request.php';
+        require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-woo-kigocloud-licence.php';
 
         /**
          * The class responsible for custom REST API endpoints.
@@ -187,6 +188,7 @@ class Woo_KigoCloud {
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-woo-kigocloud-pricelist.php';
 		Woo_KigoCloud_Pricelist::init();
 		Woo_KigoCloud_Request::init_login_check();
+		Woo_KigoCloud_Licence::init();
 
 		/**
 		 * Kigo.Cloud gift vouchers in the cart.

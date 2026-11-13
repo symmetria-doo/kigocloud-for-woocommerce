@@ -692,6 +692,96 @@ msgstr "Kigo.Cloud je odbio korisničko ime i lozinku s taba Connection: Kigo.Cl
 msgid "Kigo.Cloud refused the API key from the Connection tab: the Kigo.Cloud account is set to take only the username and password. In Kigo.Cloud, Opcije > Integracije > API ključevi > Postavke, choose API ključ, then click Save all settings here again."
 msgstr "Kigo.Cloud je odbio API ključ s taba Connection: Kigo.Cloud račun je postavljen da prima samo korisničko ime i lozinku. U Kigo.Cloudu, Opcije > Integracije > API ključevi > Postavke, odaberite API ključ, pa ovdje ponovno kliknite Spremi sve postavke."
 
+msgid "Croatian law requires the price list to be published on your own website. You only do two things: paste the KigoCloud address below and create the Cjenik page. From then on the plugin downloads the price list every morning by itself, shows it on that page, and deletes the files older than 30 days."
+msgstr "Zakon traži da cjenik bude objavljen na vašoj web stranici. Vi radite samo dvije stvari: zalijepite KigoCloud adresu ispod i napravite stranicu Cjenik. Dalje plugin sam svako jutro skida cjenik, prikazuje ga na toj stranici i briše datoteke starije od 30 dana."
+
+msgid "Cjenik page"
+msgstr "Stranica Cjenik"
+
+msgid "Published:"
+msgstr "Objavljeno:"
+
+msgid "Put a link to this page in the footer of the shop (Appearance > Menus or the footer widget), so visitors find it. The page shows today's price list and the downloads of the last 30 days; nothing else needs to be done."
+msgstr "Stavite link na ovu stranicu u podnožje trgovine (Izgled > Izbornici ili widget podnožja), da je posjetitelji nađu. Stranica pokazuje današnji cjenik i preuzimanja zadnjih 30 dana; ništa drugo ne treba raditi."
+
+msgid "Create the Cjenik page"
+msgstr "Napravi stranicu Cjenik"
+
+msgid "Creates a published page \"Cjenik\" with the price list. Or put the [kigo_cjenik] shortcode on a page of your own."
+msgstr "Napravi objavljenu stranicu \"Cjenik\" s cjenikom. Ili stavite shortcode [kigo_cjenik] na svoju stranicu."
+
+msgid "Files"
+msgstr "Datoteke"
+
+msgid "Today's files (CSV and XML, under the name the decision prescribes)"
+msgstr "Današnje datoteke (CSV i XML, pod imenom koje propisuje odluka)"
+
+msgid "New files every day, as the decision wants. Files older than 30 days are deleted by the plugin, so they do not pile up."
+msgstr "Nove datoteke svaki dan, kako traži odluka. Datoteke starije od 30 dana plugin sam briše, pa se ne gomilaju."
+
+msgid "Anchor prices are not switched on in Kigo.Cloud (Moduli > Sidrene cijene), so the shop shows none."
+msgstr "Sidrene cijene nisu uključene u Kigo.Cloudu (Moduli > Sidrene cijene), pa ih trgovina ne prikazuje."
+
+msgid "Anchor prices are not switched on in Kigo.Cloud (Moduli > Sidrene cijene)."
+msgstr "Sidrene cijene nisu uključene u Kigo.Cloudu (Moduli > Sidrene cijene)."
+
+msgid "Anchor prices:"
+msgstr "Sidrene cijene:"
+
+msgid "Click Save all settings: the plugin then reads the address from your Kigo.Cloud licence. Only if it cannot, copy it from Kigo.Cloud, Sidrene cijene > Cjenik za objavu."
+msgstr "Kliknite Spremi sve postavke: plugin tada čita adresu iz vaše Kigo.Cloud licence. Samo ako ne uspije, kopirajte je iz Kigo.Clouda, Sidrene cijene > Cjenik za objavu."
+
+msgid "Croatian law requires the price list to be published on your own website. You only create the Cjenik page. The plugin takes the price list address from your Kigo.Cloud licence, downloads the price list every morning, shows it on that page, and deletes the files older than 30 days."
+msgstr "Zakon traži da cjenik bude objavljen na vašoj web stranici. Vi samo napravite stranicu Cjenik. Plugin adresu cjenika uzima iz vaše Kigo.Cloud licence, svako jutro skida cjenik, prikazuje ga na toj stranici i briše datoteke starije od 30 dana."
+
+msgid "Kigo.Cloud does not publish the price list yet: in Kigo.Cloud, Sidrene cijene > Cjenik za objavu, switch on the publication, then click Save all settings here."
+msgstr "Kigo.Cloud još ne objavljuje cjenik: u Kigo.Cloudu, Sidrene cijene > Cjenik za objavu, uključite objavu, pa ovdje kliknite Spremi sve postavke."
+
+msgid "Kigo.Cloud gives no price list address."
+msgstr "Kigo.Cloud ne daje adresu cjenika."
+
+msgid "Kigo.Cloud licence"
+msgstr "Kigo.Cloud licenca"
+
+msgid "KigoCloud address"
+msgstr "KigoCloud adresa"
+
+msgid "Not read yet: click Save all settings."
+msgstr "Još nije pročitano: kliknite Spremi sve postavke."
+
+msgid "Nothing to type in: the plugin reads it from Kigo.Cloud."
+msgstr "Ništa ne treba upisivati: plugin je čita iz Kigo.Clouda."
+
+msgid "Price list on your own website:"
+msgstr "Cjenik na vašoj web stranici:"
+
+#, php-format
+msgid "Read from Kigo.Cloud on %s; again every morning and when the settings are saved."
+msgstr "Pročitano iz Kigo.Clouda %s; ponovno svako jutro i kad se postavke spreme."
+
+msgid "Taken from your Kigo.Cloud licence:"
+msgstr "Uzeto iz vaše Kigo.Cloud licence:"
+
+#, php-format
+msgid "The last read failed: %s"
+msgstr "Zadnje čitanje nije uspjelo: %s"
+
+msgid "The price list on your own website is part of the Standard package and above. Your Kigo.Cloud package does not have it."
+msgstr "Cjenik na vlastitoj web stranici dio je paketa Standard i višeg. Vaš Kigo.Cloud paket ga nema."
+
+msgid "expired"
+msgstr "istekla"
+
+msgid "no"
+msgstr "ne"
+
+#, php-format
+msgid "valid until %s"
+msgstr "vrijedi do %s"
+
+msgid "yes"
+msgstr "da"
+
 #~ msgid "Document number"
 #~ msgstr "Broj dokumenta"
 

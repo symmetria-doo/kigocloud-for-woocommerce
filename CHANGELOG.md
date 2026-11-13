@@ -4,6 +4,15 @@ All notable changes to KigoCloud for WooCommerce are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.10] - 2026-11-13
+
+### Added
+- `Woo_KigoCloud_Licence` reads `GET licence/info` (Kigo.Cloud) daily at 06:45 and at the end of every Save (after the login check, before the anchor prices) into `kigocloud_licence`. The About tab shows the package, valid until, and whether anchor prices and the price list on the own website are allowed. Anchor prices are read only while the licence has them and the Sidrene cijene module is on; the price list address comes from the licence (`price_list.url`, Standard and above, publication on) and a changed address fetches at once. With the licence known the typed address no longer counts and the field is gone; the tab says why there is no price list (package, module off, publication off). Before the first read, or against a Kigo.Cloud without `licence/info`, nothing changes.
+- Price list tab: "Cjenik page" row. `Woo_KigoCloud_Pricelist::page_id()` returns the published page with `[kigo_cjenik]` (the one in `kigocloud_pricelist_page`, otherwise the first page found by search), and `create_page_action()` (`admin-post.php?action=kigocloud_pricelist_page`, nonce) creates a published page "Cjenik" (slug cjenik) with the shortcode. With a page the row shows its link and says to link it from the footer.
+
+### Changed
+- Price list tab text says what the shop does (paste the address, create the page) and what the plugin does by itself (daily download, page, deleting files older than 30 days). The CSV/XML addresses are in a folded "Files" row.
+
 ## [2.2.9] - 2026-11-13
 
 ### Added

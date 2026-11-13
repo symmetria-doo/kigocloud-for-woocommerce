@@ -4,7 +4,7 @@ Tags: fiskalizacija, fiscalization, croatia, invoice, r1
 Requires at least: 5.5
 Tested up to: 7.1
 Requires PHP: 7.2
-Stable tag: 2.2.9
+Stable tag: 2.2.10
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 WC requires at least: 5.0
@@ -94,6 +94,7 @@ What is sent, and when:
 * **Gift voucher check** (`https://app.kigo.cloud/hr/api/v1/giftVoucher/check`): when a buyer types something shaped like a voucher number (XXXX-XXXX) in the cart's coupon field and no shop coupon has that code. Sent: the voucher number and your Kigo.Cloud login. No data about the buyer is sent. The answer (what is left on the voucher) is kept for two minutes.
 * **Order cancelled** (`https://app.kigo.cloud/hr/api/v1/invoice/cancelOrder`): once, when an order that already has a Kigo.Cloud document is set to cancelled or refunded. Sent: the order number, the employee PIN and your Kigo.Cloud login. Kigo.Cloud cancels the invoice, or releases the gift voucher reserved for an offer.
 * **Connection test** (R1 tab button): when you click it. Sends a test offer with made-up buyer data and your Kigo.Cloud login.
+* **Licence** (`https://app.kigo.cloud/hr/api/v1/licence/info`): once a day and when the settings are saved. Sent: your Kigo.Cloud login. The answer is the package, its expiry and the price list address.
 * **Anchor prices** (`https://app.kigo.cloud/hr/api/v1/item/list`): while "Anchor price" is set to show, once a day at 8:15 and when the settings are saved. Sent: your Kigo.Cloud login. The answer is your Kigo.Cloud item list with the anchor prices; the plugin keeps the item code, barcode and anchor price. No data about your shop or customers is sent.
 * **Price list** (the Kigo.Cloud address you enter on the Price list tab): once a day at 7:00, when you save the address, and when a page with the `[kigo_cjenik]` shortcode finds that day's copy missing. Only the CSV and XML files are downloaded; no data about your shop or customers is sent.
 * **Demo account**: if you use the demo login, the same order data goes into the public Kigo.Cloud demo, which anyone can open with that login.
@@ -111,6 +112,11 @@ Kigo.Cloud privacy policy: https://www.kigocloud.com/zastita-osobnih-podataka
 4. An order with the fiscalized Kigo.Cloud invoice number.
 
 == Changelog ==
+
+= 2.2.10 =
+* The plugin reads your Kigo.Cloud licence (package, valid until) and shows it on the About tab. What the package allows decides what the plugin does: anchor prices while the Sidrene cijene module is on, the price list on your own website from the Standard package on.
+* No address to copy: the plugin takes the price list address from the licence.
+* Price list tab: "Create the Cjenik page" makes a published page with the price list in one click (or finds the page that already has the [kigo_cjenik] shortcode) and shows its address, with what to do next. The CSV/XML addresses are folded away; the tab says that files older than 30 days are deleted.
 
 = 2.2.9 =
 * Connection tab: "Test connection" button, and every Save checks whether Kigo.Cloud takes the login. A refused login says what to do (for example: the Kigo.Cloud account is set to the legacy login, so it does not take API keys until it is switched to API ključ).
@@ -223,6 +229,9 @@ Kigo.Cloud privacy policy: https://www.kigocloud.com/zastita-osobnih-podataka
 Older versions: https://github.com/symmetria-doo/kigocloud-for-woocommerce/blob/main/CHANGELOG.md
 
 == Upgrade Notice ==
+
+= 2.2.10 =
+The plugin follows your Kigo.Cloud licence; the price list address and the Cjenik page need no typing.
 
 = 2.2.9 =
 Test connection on the Connection tab; the saved API key is shown by its start.
