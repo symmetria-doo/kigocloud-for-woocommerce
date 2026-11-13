@@ -1245,6 +1245,21 @@ msgstr "Nije vraćen broj dokumenta"
 msgid "Sidrena cijena"
 msgstr "Sidrena cijena"
 
+msgid "Connection check"
+msgstr "Provjera veze"
+
+msgid "Checks the saved login, whichever it is: the API key, or the username and password."
+msgstr "Provjerava spremljenu prijavu, koja god da je: API ključ ili korisničko ime i lozinku."
+
+msgid "Not checked yet."
+msgstr "Još nije provjereno."
+
+msgid "A new login is checked after Save all settings. The plugin also checks it when this page opens and at every save. Whether the key may send orders shows the test on the R1 tab, which sends a test offer."
+msgstr "Novu prijavu najprije spremite (Spremi sve postavke). Plugin je provjerava i kad se ova stranica otvori i pri svakom spremanju. Smije li ključ slati narudžbe pokazuje test na tabu R1, koji šalje probnu ponudu."
+
+msgid "Fine: on the classic checkout the plugin adds the R1 fields itself, in both modes (OIB only and the full R1 block). The rows below are about the block checkout only."
+msgstr "U redu: na klasičnoj blagajni plugin sam dodaje R1 polja, u oba načina (samo OIB i cijeli R1 blok). Retci ispod odnose se samo na block blagajnu."
+
 #~ msgid "Document number"
 #~ msgstr "Broj dokumenta"
 

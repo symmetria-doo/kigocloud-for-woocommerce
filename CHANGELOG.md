@@ -4,6 +4,13 @@ All notable changes to KigoCloud for WooCommerce are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.12] - 2026-11-13
+
+### Changed
+- R1 tab, block checkout diagnostics: a classic checkout ([woocommerce_checkout] shortcode) is no longer marked as a fault ("!" and red text). It says that the plugin adds the R1 fields on the classic checkout itself, in both modes, and that the other rows are about the block checkout only.
+- Connection tab: "Provjera veze" is a card of its own under the login card (it sat as a row under the PIN, so it read as a test of the username and password only). The status line is in `#kigocloud-login-status`; Test connection hides it and shows its own answer, so "not checked yet" no longer stands next to "accepted".
+- `Woo_KigoCloud_Licence::maybe_refresh()` also checks the login when the page opens and it was never checked (right after an update).
+
 ## [2.2.11] - 2026-11-13
 
 ### Fixed

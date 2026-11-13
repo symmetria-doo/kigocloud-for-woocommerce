@@ -111,6 +111,9 @@
             })
                 .then(function (r) { return r.json(); })
                 .then(function (data) {
+                    // "Test connection": the answer is the login status now, no older line next to it.
+                    var status = pair[0] === 'kigocloud-check-login' ? document.getElementById('kigocloud-login-status') : null;
+                    if (status) { status.style.display = 'none'; }
                     if (!resultBox) { return; }
                     if (data && data.success) {
                         resultBox.textContent = data.data && data.data.message ? data.data.message : 'OK';

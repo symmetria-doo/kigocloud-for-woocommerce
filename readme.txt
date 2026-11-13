@@ -4,7 +4,7 @@ Tags: fiskalizacija, fiscalization, croatia, invoice, r1
 Requires at least: 5.5
 Tested up to: 7.1
 Requires PHP: 7.2
-Stable tag: 2.2.11
+Stable tag: 2.2.12
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 WC requires at least: 5.0
@@ -112,6 +112,10 @@ Kigo.Cloud privacy policy: https://www.kigocloud.com/zastita-osobnih-podataka
 4. An order with the fiscalized Kigo.Cloud invoice number.
 
 == Changelog ==
+
+= 2.2.12 =
+* R1 tab: a classic checkout is no longer shown as a fault in the block checkout diagnostics; the full R1 block works on it too.
+* Connection tab: the connection check is a card of its own under the login, so it plainly covers the API key and the username and password alike. Test connection replaces the old status line with its answer, and the login is checked by itself when the page opens after an update.
 
 = 2.2.11 =
 * Croatian everywhere: the whole admin is translated, and the wordpress.org build now carries the translations (before it had none, so a Croatian shop saw English).
@@ -235,6 +239,9 @@ Kigo.Cloud privacy policy: https://www.kigocloud.com/zastita-osobnih-podataka
 Older versions: https://github.com/symmetria-doo/kigocloud-for-woocommerce/blob/main/CHANGELOG.md
 
 == Upgrade Notice ==
+
+= 2.2.12 =
+The connection check has its own card on the Connection tab.
 
 = 2.2.11 =
 The price list table scrolls sideways instead of squeezing; the page button is gone, use the shortcode.

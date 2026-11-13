@@ -114,6 +114,11 @@ class Woo_KigoCloud_Licence
         if (!Woo_KigoCloud_Request::has_credentials() || get_transient('kigocloud_licence_lock')) {
             return;
         }
+        if (Woo_KigoCloud_Request::login_check() === array()) {
+            // Right after an update the login was never checked: check it now.
+            set_transient('kigocloud_licence_lock', 1, 60);
+            Woo_KigoCloud_Request::check_login();
+        }
         $read = self::get();
         if (self::data() !== null && isset($read['time']) && (int) $read['time'] > time() - 12 * HOUR_IN_SECONDS) {
             return;

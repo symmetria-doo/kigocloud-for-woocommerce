@@ -584,11 +584,11 @@ class Woo_KigoCloud_Admin_Page
                         ? __('KigoCloud employee PIN used when creating documents, with the API key and with the username and password alike.', 'kigocloud-for-woocommerce')
                         : __('KigoCloud employee PIN used when creating documents.', 'kigocloud-for-woocommerce'),
                 ));
-                $this->render_login_check();
                 ?>
             </table>
             <?php $this->close_form(); ?>
         </div>
+        <?php $this->render_login_check(); ?>
         <div class="kc-card">
             <h2><?php esc_html_e('Try it with the demo account', 'kigocloud-for-woocommerce'); ?></h2>
             <p class="kc-desc"><?php esc_html_e('The public Kigo.Cloud demo account shows the whole flow before you have your own account: the order becomes an invoice with a ZKI and a JIR, signed with a test certificate, so it is not a real fiscalized invoice.', 'kigocloud-for-woocommerce'); ?></p>
@@ -626,11 +626,12 @@ class Woo_KigoCloud_Admin_Page
         $check = Woo_KigoCloud_Request::login_check();
         $when = isset($check['time']) ? date_i18n(get_option('date_format') . ' ' . get_option('time_format'), (int) $check['time']) : '';
         ?>
-        <tr>
-            <th scope="row"><?php esc_html_e('Kigo.Cloud login', 'kigocloud-for-woocommerce'); ?></th>
-            <td>
+        <div class="kc-card">
+            <h2><?php esc_html_e('Connection check', 'kigocloud-for-woocommerce'); ?></h2>
+            <p class="kc-desc"><?php esc_html_e('Checks the saved login, whichever it is: the API key, or the username and password.', 'kigocloud-for-woocommerce'); ?></p>
+            <div id="kigocloud-login-status">
                 <?php if (empty($check)): ?>
-                    <p><?php esc_html_e('Not checked yet: click Save all settings.', 'kigocloud-for-woocommerce'); ?></p>
+                    <p><?php esc_html_e('Not checked yet.', 'kigocloud-for-woocommerce'); ?></p>
                 <?php elseif (!empty($check['ok'])): ?>
                     <p><span class="kc-status-ok"><?php
                         echo esc_html(sprintf(
@@ -649,17 +650,17 @@ class Woo_KigoCloud_Admin_Page
                     ?></span></p>
                     <p><strong><?php echo esc_html(Woo_KigoCloud_Request::describe_error(isset($check['message']) ? $check['message'] : '')); ?></strong></p>
                 <?php endif; ?>
-                <p>
-                    <button type="button" class="button button-secondary" id="kigocloud-check-login"
-                            data-nonce="<?php echo esc_attr(wp_create_nonce('kigocloud_check_login')); ?>"
-                            data-running-label="<?php esc_attr_e('Asking Kigo.Cloud...', 'kigocloud-for-woocommerce'); ?>">
-                        <?php esc_html_e('Test connection', 'kigocloud-for-woocommerce'); ?>
-                    </button>
-                </p>
-                <div id="kigocloud-check-login-result" class="kc-test-result" style="display:none;"></div>
-                <p class="description"><?php esc_html_e('Tests the saved login (save a new one first). Also checked every time the settings are saved. Whether the key may send orders shows the R1 tab test, which sends a test offer.', 'kigocloud-for-woocommerce'); ?></p>
-            </td>
-        </tr>
+            </div>
+            <p>
+                <button type="button" class="button button-secondary" id="kigocloud-check-login"
+                        data-nonce="<?php echo esc_attr(wp_create_nonce('kigocloud_check_login')); ?>"
+                        data-running-label="<?php esc_attr_e('Asking Kigo.Cloud...', 'kigocloud-for-woocommerce'); ?>">
+                    <?php esc_html_e('Test connection', 'kigocloud-for-woocommerce'); ?>
+                </button>
+            </p>
+            <div id="kigocloud-check-login-result" class="kc-test-result" style="display:none;"></div>
+            <p class="description"><?php esc_html_e('A new login is checked after Save all settings. The plugin also checks it when this page opens and at every save. Whether the key may send orders shows the test on the R1 tab, which sends a test offer.', 'kigocloud-for-woocommerce'); ?></p>
+        </div>
         <?php
     }
 
@@ -1110,8 +1111,11 @@ class Woo_KigoCloud_Admin_Page
             ),
             array(
                 'label'   => __('Checkout page uses block', 'kigocloud-for-woocommerce'),
-                'ok'      => $checkout_uses_block,
+                // The classic checkout is not a fault: the R1 fields reach it
+                // through the classic hooks, in both modes.
+                'ok'      => true,
                 'value'   => $checkout_uses_block ? __('Yes', 'kigocloud-for-woocommerce') : __('No (classic [woocommerce_checkout] shortcode)', 'kigocloud-for-woocommerce'),
+                'note'    => $checkout_uses_block ? '' : __('Fine: on the classic checkout the plugin adds the R1 fields itself, in both modes (OIB only and the full R1 block). The rows below are about the block checkout only.', 'kigocloud-for-woocommerce'),
                 'hint'    => $checkout_edit_link
                     /* translators: %s: link to edit the checkout page */
                     ? sprintf(__('Block checkout fields only appear if the Checkout page actually contains the WooCommerce checkout block. <a href="%s">Edit checkout page</a>.', 'kigocloud-for-woocommerce'), esc_url($checkout_edit_link))
@@ -1150,6 +1154,9 @@ class Woo_KigoCloud_Admin_Page
                             <?php if (!empty($r['hint']) && !$r['ok']): ?>
                                 <div style="color:#50575e;font-size:12px;margin-top:4px;"><?php echo wp_kses_post($r['hint']); ?></div>
                             <?php endif; ?>
+                            <?php if (!empty($r['note'])): ?>
+                                <div style="color:#50575e;font-size:12px;margin-top:4px;"><?php echo esc_html($r['note']); ?></div>
+                            <?php endif; ?>
                         </td>
                     </tr>
                 <?php endforeach; ?>
@@ -1166,7 +1173,6 @@ class Woo_KigoCloud_Admin_Page
                     <td><strong><?php esc_html_e('Blocks on checkout page', 'kigocloud-for-woocommerce'); ?></strong></td>
                     <td>
                         <?php if (empty($checkout_blocks)): ?>
-                            <span class="kc-status-bad">!</span>
                             <?php esc_html_e('No Gutenberg blocks detected on the checkout page. The page is likely using the classic [woocommerce_checkout] shortcode.', 'kigocloud-for-woocommerce'); ?>
                         <?php else: ?>
                             <?php foreach ($checkout_blocks as $bn): ?>
@@ -1175,7 +1181,7 @@ class Woo_KigoCloud_Admin_Page
                                     <code><?php echo esc_html($bn); ?></code>
                                 </span><br>
                             <?php endforeach; ?>
-                            <?php if (!in_array('woocommerce/checkout', $checkout_blocks, true)): ?>
+                            <?php if (!in_array('woocommerce/checkout', $checkout_blocks, true) && $checkout_uses_block): ?>
                                 <div style="color:#d63638;font-size:12px;margin-top:6px;">
                                     <?php esc_html_e('The page has blocks but none of them is woocommerce/checkout. Additional Checkout Fields are rendered only by the canonical checkout block - swap the current block for woocommerce/checkout.', 'kigocloud-for-woocommerce'); ?>
                                 </div>

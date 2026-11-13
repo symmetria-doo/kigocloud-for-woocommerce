@@ -1218,3 +1218,18 @@ msgstr ""
 
 msgid "Croatian law requires the price list to be published on your own website. The plugin takes the price list address from your Kigo.Cloud licence, downloads the price list every morning and deletes the files older than 30 days. Put the [kigo_cjenik] shortcode on your page to show it."
 msgstr ""
+
+msgid "Connection check"
+msgstr ""
+
+msgid "Checks the saved login, whichever it is: the API key, or the username and password."
+msgstr ""
+
+msgid "Not checked yet."
+msgstr ""
+
+msgid "A new login is checked after Save all settings. The plugin also checks it when this page opens and at every save. Whether the key may send orders shows the test on the R1 tab, which sends a test offer."
+msgstr ""
+
+msgid "Fine: on the classic checkout the plugin adds the R1 fields itself, in both modes (OIB only and the full R1 block). The rows below are about the block checkout only."
+msgstr ""
