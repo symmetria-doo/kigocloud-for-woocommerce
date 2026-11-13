@@ -1233,3 +1233,48 @@ msgstr ""
 
 msgid "Fine: on the classic checkout the plugin adds the R1 fields itself, in both modes (OIB only and the full R1 block). The rows below are about the block checkout only."
 msgstr ""
+
+msgid "KigoCloud service code (Šifra) for the shipping line of every order, whatever the shipping method. Leave blank for \"shipping\". The price is always the order's."
+msgstr ""
+
+msgid "PIN of the KigoCloud employee the invoices and offers for the orders are issued under."
+msgstr ""
+
+msgid "Current price list"
+msgstr ""
+
+msgid "Published"
+msgstr ""
+
+msgid "Storage number"
+msgstr ""
+
+msgid "Products"
+msgstr ""
+
+msgid "Services"
+msgstr ""
+
+msgid "Download CSV"
+msgstr ""
+
+msgid "Download XML"
+msgstr ""
+
+msgid "Current"
+msgstr ""
+
+msgid "The price list holds the retail prices of the products and services of this shop, together with the anchor price that applied on the reference day."
+msgstr ""
+
+msgid "The price list is published every day, and every publication stays available for 30 days."
+msgstr ""
+
+msgid "Price list of products and services"
+msgstr ""
+
+msgid "Every part has its own CSS class, so the theme can hide or restyle it: .kc-head (company heading), .kc-logo, .kc-doc-title, .kc-current (current price list), .kc-archive (last 30 days), .kc-note. Example: .kigo-cjenik .kc-logo { display: none; }"
+msgstr ""
+
+msgid "Options, all optional: header=\"no\", logo=\"no\", current=\"no\", archive=\"no\", note=\"no\" hide that part; title=\"...\" own title; limit=\"7\" at most 7 rows of the last 30 days; style=\"none\" leaves the look to the theme; class=\"...\" own CSS class. Example: [kigo_cjenik logo=\"no\" limit=\"7\"]"
+msgstr ""

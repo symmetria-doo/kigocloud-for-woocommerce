@@ -4,6 +4,18 @@ All notable changes to KigoCloud for WooCommerce are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.13] - 2026-11-13
+
+### Changed
+- `[kigo_cjenik]` looks like Kigo.Cloud's public price list page instead of a table of all items: the heading (company, address, OIB, logo, title, sales point from `licence/info` `company` and `sales_point`), the current price list card (published, storage number, products, services, Download CSV / XML) and the publications of the last 30 days (with the counts read from each CSV, kept per file). Every part has its own class (`.kc-head`, `.kc-logo`, `.kc-doc-title`, `.kc-current`, `.kc-archive`, `.kc-note`) for the theme's CSS; attributes `header`, `logo`, `current`, `archive`, `note` (="no" hides), `title`, `limit`, `style="none"`, `class`. The heading needs Kigo.Cloud with the company fields in `licence/info`; without them only the title shows.
+- Employee PIN moved from the Connection tab to the Orders tab: it is not part of the login, it names the employee the documents are issued under.
+
+### Fixed
+- The "has been updated to version, review and save your settings" notice stayed after every Save: nothing cleared `kigocloud_show_migration_notice`. `Woo_KigoCloud_Request::on_settings_form()` deletes it when the settings form is saved.
+
+### Removed
+- The shipping code per shipping method (Orders tab table, `kigocloud_shipping_reference-<instance>` options, added in 2.2.6). One shipping code is enough: the plugin sends the order's shipping amount as the price with no discount, so Kigo.Cloud never uses the service's own price or type. Saved per-method codes are ignored.
+
 ## [2.2.12] - 2026-11-13
 
 ### Changed

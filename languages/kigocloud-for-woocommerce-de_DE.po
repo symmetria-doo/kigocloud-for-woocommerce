@@ -308,3 +308,48 @@ msgstr "Eine neue Anmeldung zuerst speichern. Das Plugin prüft sie auch beim Ö
 
 msgid "Fine: on the classic checkout the plugin adds the R1 fields itself, in both modes (OIB only and the full R1 block). The rows below are about the block checkout only."
 msgstr "In Ordnung: im klassischen Checkout fügt das Plugin die R1-Felder selbst hinzu, in beiden Modi (nur OIB und der volle R1-Block). Die Zeilen darunter betreffen nur den Block-Checkout."
+
+msgid "KigoCloud service code (Šifra) for the shipping line of every order, whatever the shipping method. Leave blank for \"shipping\". The price is always the order's."
+msgstr "KigoCloud-Leistungscode (Šifra) für die Versandposition jeder Bestellung, gleich welche Versandart. Leer bedeutet \"shipping\". Der Preis kommt immer aus der Bestellung."
+
+msgid "PIN of the KigoCloud employee the invoices and offers for the orders are issued under."
+msgstr "PIN des KigoCloud-Mitarbeiters, unter dem die Rechnungen und Angebote für die Bestellungen ausgestellt werden."
+
+msgid "Current price list"
+msgstr "Gültige Preisliste"
+
+msgid "Published"
+msgstr "Veröffentlicht"
+
+msgid "Storage number"
+msgstr "Speichernummer"
+
+msgid "Products"
+msgstr "Produkte"
+
+msgid "Services"
+msgstr "Leistungen"
+
+msgid "Download CSV"
+msgstr "CSV herunterladen"
+
+msgid "Download XML"
+msgstr "XML herunterladen"
+
+msgid "Current"
+msgstr "Gültig"
+
+msgid "The price list holds the retail prices of the products and services of this shop, together with the anchor price that applied on the reference day."
+msgstr "Die Preisliste enthält die Verkaufspreise der Produkte und Leistungen dieses Shops, zusammen mit dem Ankerpreis am Referenztag."
+
+msgid "The price list is published every day, and every publication stays available for 30 days."
+msgstr "Die Preisliste wird täglich veröffentlicht, und jede Veröffentlichung bleibt 30 Tage verfügbar."
+
+msgid "Price list of products and services"
+msgstr "Preisliste der Produkte und Leistungen"
+
+msgid "Every part has its own CSS class, so the theme can hide or restyle it: .kc-head (company heading), .kc-logo, .kc-doc-title, .kc-current (current price list), .kc-archive (last 30 days), .kc-note. Example: .kigo-cjenik .kc-logo { display: none; }"
+msgstr "Jeder Teil hat eine eigene CSS-Klasse, das Theme kann ihn ausblenden oder umgestalten: .kc-head (Firmenkopf), .kc-logo, .kc-doc-title, .kc-current (gültige Preisliste), .kc-archive (letzte 30 Tage), .kc-note. Beispiel: .kigo-cjenik .kc-logo { display: none; }"
+
+msgid "Options, all optional: header=\"no\", logo=\"no\", current=\"no\", archive=\"no\", note=\"no\" hide that part; title=\"...\" own title; limit=\"7\" at most 7 rows of the last 30 days; style=\"none\" leaves the look to the theme; class=\"...\" own CSS class. Example: [kigo_cjenik logo=\"no\" limit=\"7\"]"
+msgstr "Optionen, alle optional: header=\"no\", logo=\"no\", current=\"no\", archive=\"no\", note=\"no\" blenden den Teil aus; title=\"...\" eigener Titel; limit=\"7\" höchstens 7 Zeilen der letzten 30 Tage; style=\"none\" überlässt das Aussehen dem Theme; class=\"...\" eigene CSS-Klasse. Beispiel: [kigo_cjenik logo=\"no\" limit=\"7\"]"

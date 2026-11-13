@@ -57,21 +57,15 @@ if (!class_exists('Woo_KigoCloud_Request')) {
 
         /**
          * Kigo.Cloud item reference for a shipping line: the one set for that
-         * shipping method instance (kigocloud_shipping_reference-<instance id>),
-         * else the general shipping reference, else "shipping".
+         * One code for every shipping method (the price is the order's): the
+         * shipping reference, else "shipping". $instanceId is kept for callers.
          *
          * @param int|string $instanceId shipping method instance id from the order line
          * @return string
          */
         public static function shipping_reference($instanceId)
         {
-            $instanceId = absint($instanceId);
-            if ($instanceId > 0) {
-                $own = trim((string) get_option('kigocloud_shipping_reference-' . $instanceId, ''));
-                if ($own !== '') {
-                    return $own;
-                }
-            }
+            // One code for every shipping method: the price comes from the order.
             $general = trim((string) get_option('kigocloud_shipping_reference', 'shipping'));
 
             return $general === '' ? 'shipping' : $general;
@@ -145,6 +139,10 @@ if (!class_exists('Woo_KigoCloud_Request')) {
          */
         public static function on_settings_form()
         {
+            if (self::is_settings_save()) {
+                // The "updated, review and save your settings" notice is done once they are saved.
+                delete_option('kigocloud_show_migration_notice');
+            }
             if (self::is_settings_save() && !has_action('shutdown', array(__CLASS__, 'check_login'))) {
                 add_action('shutdown', array(__CLASS__, 'check_login'), 5);
             }

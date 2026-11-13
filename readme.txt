@@ -4,7 +4,7 @@ Tags: fiskalizacija, fiscalization, croatia, invoice, r1
 Requires at least: 5.5
 Tested up to: 7.1
 Requires PHP: 7.2
-Stable tag: 2.2.12
+Stable tag: 2.2.13
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 WC requires at least: 5.0
@@ -112,6 +112,12 @@ Kigo.Cloud privacy policy: https://www.kigocloud.com/zastita-osobnih-podataka
 4. An order with the fiscalized Kigo.Cloud invoice number.
 
 == Changelog ==
+
+= 2.2.13 =
+* [kigo_cjenik] looks like the Kigo.Cloud price list page: company heading, current price list with Download CSV / XML, and the last 30 days. Each part can be hidden with CSS or with options (header, logo, current, archive, note, title, limit, style, class).
+* Employee PIN is on the Orders tab (it is not part of the login).
+* The "updated, review and save your settings" notice goes away once the settings are saved (it stayed after every save).
+* One shipping code for all shipping methods: the code per shipping method on the Orders tab is gone. The price of the shipping line is always the order's.
 
 = 2.2.12 =
 * R1 tab: a classic checkout is no longer shown as a fault in the block checkout diagnostics; the full R1 block works on it too.
@@ -239,6 +245,9 @@ Kigo.Cloud privacy policy: https://www.kigocloud.com/zastita-osobnih-podataka
 Older versions: https://github.com/symmetria-doo/kigocloud-for-woocommerce/blob/main/CHANGELOG.md
 
 == Upgrade Notice ==
+
+= 2.2.13 =
+The update notice goes away after Save; one shipping code for all methods.
 
 = 2.2.12 =
 The connection check has its own card on the Connection tab.

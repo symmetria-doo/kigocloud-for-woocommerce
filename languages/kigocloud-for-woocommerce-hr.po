@@ -1260,6 +1260,51 @@ msgstr "Novu prijavu najprije spremite (Spremi sve postavke). Plugin je provjera
 msgid "Fine: on the classic checkout the plugin adds the R1 fields itself, in both modes (OIB only and the full R1 block). The rows below are about the block checkout only."
 msgstr "U redu: na klasičnoj blagajni plugin sam dodaje R1 polja, u oba načina (samo OIB i cijeli R1 blok). Retci ispod odnose se samo na block blagajnu."
 
+msgid "KigoCloud service code (Šifra) for the shipping line of every order, whatever the shipping method. Leave blank for \"shipping\". The price is always the order's."
+msgstr "Šifra usluge u KigoCloudu za stavku dostave svake narudžbe, koji god da je način dostave. Prazno znači \"shipping\". Cijena je uvijek iz narudžbe."
+
+msgid "PIN of the KigoCloud employee the invoices and offers for the orders are issued under."
+msgstr "PIN djelatnika u KigoCloudu na čije se ime izdaju računi i ponude za narudžbe."
+
+msgid "Current price list"
+msgstr "Važeći cjenik"
+
+msgid "Published"
+msgstr "Objavljeno"
+
+msgid "Storage number"
+msgstr "Broj pohrane"
+
+msgid "Products"
+msgstr "Proizvoda"
+
+msgid "Services"
+msgstr "Usluga"
+
+msgid "Download CSV"
+msgstr "Preuzmi CSV"
+
+msgid "Download XML"
+msgstr "Preuzmi XML"
+
+msgid "Current"
+msgstr "Važeći"
+
+msgid "The price list holds the retail prices of the products and services of this shop, together with the anchor price that applied on the reference day."
+msgstr "Cjenik sadrži maloprodajne cijene proizvoda i usluga ove trgovine, zajedno sa sidrenom cijenom koja je vrijedila na referentni dan."
+
+msgid "The price list is published every day, and every publication stays available for 30 days."
+msgstr "Cjenik se objavljuje svaki dan, a svaka objava ostaje dostupna 30 dana."
+
+msgid "Price list of products and services"
+msgstr "Cjenik proizvoda i usluga"
+
+msgid "Every part has its own CSS class, so the theme can hide or restyle it: .kc-head (company heading), .kc-logo, .kc-doc-title, .kc-current (current price list), .kc-archive (last 30 days), .kc-note. Example: .kigo-cjenik .kc-logo { display: none; }"
+msgstr "Svaki dio ima svoju CSS klasu, pa ga tema može sakriti ili preurediti: .kc-head (zaglavlje s tvrtkom), .kc-logo, .kc-doc-title, .kc-current (važeći cjenik), .kc-archive (zadnjih 30 dana), .kc-note. Primjer: .kigo-cjenik .kc-logo { display: none; }"
+
+msgid "Options, all optional: header=\"no\", logo=\"no\", current=\"no\", archive=\"no\", note=\"no\" hide that part; title=\"...\" own title; limit=\"7\" at most 7 rows of the last 30 days; style=\"none\" leaves the look to the theme; class=\"...\" own CSS class. Example: [kigo_cjenik logo=\"no\" limit=\"7\"]"
+msgstr "Mogućnosti, sve neobavezne: header=\"no\", logo=\"no\", current=\"no\", archive=\"no\", note=\"no\" skrivaju taj dio; title=\"...\" vlastiti naslov; limit=\"7\" najviše 7 redaka zadnjih 30 dana; style=\"none\" izgled prepušta temi; class=\"...\" vlastita CSS klasa. Primjer: [kigo_cjenik logo=\"no\" limit=\"7\"]"
+
 #~ msgid "Document number"
 #~ msgstr "Broj dokumenta"
 

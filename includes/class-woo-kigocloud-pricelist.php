@@ -697,8 +697,16 @@ class Woo_KigoCloud_Pricelist
     }
 
     /**
-     * [kigo_cjenik] renders the current price list from the local copy, with
-     * links to the current files and to every publication of the last 30 days.
+     * [kigo_cjenik] shows the price list the way Kigo.Cloud's public page does:
+     * the heading (company, sales point), the current files (CSV, XML) and every
+     * publication of the last 30 days. No table of items: the files are the
+     * publication. Every part has its own class, so the theme hides or restyles
+     * it with CSS (the built-in rules are not !important):
+     *   .kigo-cjenik (wrapper), .kc-head, .kc-company, .kc-company-meta, .kc-logo,
+     *   .kc-doc-title, .kc-doc-sub, .kc-current, .kc-archive, .kc-note
+     * Attributes, all optional: header, logo, current, archive, note ="no" hide
+     * that part; title="..." own title; limit="7" rows of the last 30 days;
+     * style="none" drops the built-in look; class="..." extra wrapper class.
      * No call to KigoCloud happens while a page is being rendered, except the
      * once-a-day refresh of a copy that is not from today.
      *
@@ -707,88 +715,248 @@ class Woo_KigoCloud_Pricelist
      */
     public static function shortcode($atts)
     {
-        $atts = shortcode_atts(array('limit' => 0), $atts, 'kigo_cjenik');
+        $atts = shortcode_atts(array(
+            'header'  => 'yes',
+            'logo'    => 'yes',
+            'title'   => '',
+            'current' => 'yes',
+            'archive' => 'yes',
+            'limit'   => '0',
+            'note'    => 'yes',
+            'style'   => 'kigo',
+            'class'   => '',
+        ), $atts, 'kigo_cjenik');
+        $on = function ($key) use ($atts) {
+            return !in_array(strtolower(trim((string) $atts[$key])), array('no', 'ne', '0', 'false', 'off'), true);
+        };
         self::maybe_refresh();
 
         $path = self::path('csv');
         if ($path === '' || !file_exists($path)) {
             return '<p>' . esc_html__('The price list is not available yet.', 'kigocloud-for-woocommerce') . '</p>';
         }
-        try {
-            $csv = new SplFileObject($path, 'r');
-        } catch (Exception $e) {
-            return '<p>' . esc_html__('The price list is not available yet.', 'kigocloud-for-woocommerce') . '</p>';
-        }
-        $csv->setFlags(SplFileObject::READ_CSV | SplFileObject::SKIP_EMPTY | SplFileObject::READ_AHEAD);
-        $csv->setCsvControl(';', '"', '\\');
+        $archive = self::archive();
+        $current = !empty($archive) ? $archive[0] : null;
+        $facts = $current ? self::publication_facts($current['name'], $path) : array('published' => '', 'number' => '', 'items' => 0, 'services' => 0);
 
-        $limit = max(0, (int) $atts['limit']);
-        $header = $csv->current();
-        $csv->next();
-        if (is_array($header)) {
-            // The first column may carry a UTF-8 BOM written for spreadsheet apps.
-            $header[0] = preg_replace('/^\xEF\xBB\xBF/', '', $header[0]);
+        // The look of Kigo.Cloud's public price list page, scoped to .kigo-cjenik.
+        $out = strtolower(trim((string) $atts['style'])) === 'none' ? '' : '<style>'
+            . '.kigo-cjenik{max-width:940px;color:#1f2430;line-height:1.5;}'
+            . '.kigo-cjenik .kc-head{margin-bottom:26px;}'
+            . '.kigo-cjenik .kc-head-top{display:flex;justify-content:space-between;align-items:flex-start;gap:24px;flex-wrap:wrap;}'
+            . '.kigo-cjenik .kc-company{font-size:22px;font-weight:700;letter-spacing:-0.3px;}'
+            . '.kigo-cjenik .kc-company-meta{color:#5b6270;font-size:14px;margin-top:4px;}'
+            . '.kigo-cjenik .kc-logo img{max-height:70px;max-width:240px;}'
+            . '.kigo-cjenik .kc-rule{border:0;border-top:3px solid #1f2430;margin:18px 0 0 0;}'
+            . '.kigo-cjenik .kc-doc-title{font-size:19px;font-weight:700;text-align:center;margin:16px 0 4px 0;}'
+            . '.kigo-cjenik .kc-doc-sub{text-align:center;color:#5b6270;font-size:14px;padding-bottom:18px;border-bottom:1px solid #e2e5ec;}'
+            . '.kigo-cjenik .kc-h2{font-size:13px;text-transform:uppercase;letter-spacing:1.6px;color:#5b6270;font-weight:700;margin:0 0 12px 0;}'
+            . '.kigo-cjenik .kc-card{border:1px solid #e2e5ec;border-radius:10px;padding:20px 22px;margin-bottom:34px;background:#fbfcfe;}'
+            . '.kigo-cjenik .kc-facts{display:flex;flex-wrap:wrap;gap:26px;margin-bottom:18px;}'
+            . '.kigo-cjenik .kc-fact span{display:block;font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:#8a90a0;font-weight:600;}'
+            . '.kigo-cjenik .kc-fact strong{font-size:17px;font-weight:600;}'
+            . '.kigo-cjenik .kc-buttons{display:flex;flex-wrap:wrap;gap:10px;}'
+            . '.kigo-cjenik a.kc-btn{display:inline-block;padding:11px 22px;border-radius:7px;text-decoration:none;font-weight:600;font-size:14px;background:#1f2430;color:#fff;border:1px solid #1f2430;}'
+            . '.kigo-cjenik a.kc-btn:hover{background:#333a4a;color:#fff;}'
+            . '.kigo-cjenik a.kc-btn-ghost{background:#fff;color:#1f2430;}'
+            . '.kigo-cjenik a.kc-btn-ghost:hover{background:#f1f3f7;color:#1f2430;}'
+            . '.kigo-cjenik .kc-table-wrap{overflow-x:auto;border:1px solid #e2e5ec;border-radius:10px;}'
+            . '.kigo-cjenik table.kc-table{width:100%;border-collapse:collapse;font-size:14px;background:#fff;margin:0;}'
+            . '.kigo-cjenik table.kc-table th{text-align:left;background:#f6f7fa;color:#5b6270;padding:10px 14px;font-size:11px;text-transform:uppercase;letter-spacing:1.1px;border:0;border-bottom:1px solid #e2e5ec;white-space:nowrap;}'
+            . '.kigo-cjenik table.kc-table td{padding:10px 14px;border:0;border-bottom:1px solid #eef0f4;white-space:nowrap;}'
+            . '.kigo-cjenik table.kc-table tr:last-child td{border-bottom:0;}'
+            . '.kigo-cjenik table.kc-table td.kc-num,.kigo-cjenik table.kc-table th.kc-num{text-align:right;}'
+            . '.kigo-cjenik table.kc-table a{color:#1f2430;font-weight:600;text-decoration:none;border-bottom:1px solid #c9cedb;}'
+            . '.kigo-cjenik .kc-now{background:#f3f8f4;}'
+            . '.kigo-cjenik .kc-badge{display:inline-block;font-size:10px;text-transform:uppercase;letter-spacing:1px;font-weight:700;color:#0d7a47;background:#ddf0e5;border-radius:4px;padding:2px 7px;margin-left:8px;}'
+            . '.kigo-cjenik .kc-note{margin-top:30px;padding-top:18px;border-top:1px solid #e2e5ec;color:#6b7280;font-size:13px;}'
+            . '.kigo-cjenik .kc-note p{margin:0 0 8px 0;}'
+            . '@media (max-width:520px){.kigo-cjenik a.kc-btn{display:block;text-align:center;}}'
+            . '</style>';
+        $extra = trim(preg_replace('/[^A-Za-z0-9_ -]/', '', (string) $atts['class']));
+        $out .= '<div class="kigo-cjenik' . ($extra !== '' ? ' ' . esc_attr($extra) : '') . '">';
+        if ($on('header')) {
+            $out .= self::heading_html($on('logo'), (string) $atts['title']);
         }
-        $out = '<div class="kigo-cjenik">';
-        $out .= '<p class="kigo-cjenik-files">'
-            . '<a href="' . esc_url(self::url('csv')) . '">CSV</a> &middot; '
-            . '<a href="' . esc_url(self::url('xml')) . '">XML</a> &middot; '
-            . esc_html(sprintf(
-                /* translators: %s: date and time */
-                __('Updated: %s', 'kigocloud-for-woocommerce'),
-                date_i18n(get_option('date_format') . ' ' . get_option('time_format'), filemtime($path))
-            ))
-            . '</p>';
-        // The decision's price list has many columns: the table keeps one line
-        // per cell and scrolls sideways inside its box, so no theme squeezes it
-        // into the content width letter by letter.
-        $cell_style = ' style="white-space:nowrap !important;word-break:normal !important;overflow-wrap:normal !important;padding:6px 10px !important;font-size:14px !important;line-height:1.4 !important;vertical-align:top !important;"';
-        $out .= '<div class="kigo-cjenik-scroll" style="overflow-x:auto !important;max-width:100% !important;-webkit-overflow-scrolling:touch;">';
-        $out .= '<table class="kigo-cjenik-table" style="width:auto !important;min-width:100%;table-layout:auto !important;border-collapse:collapse;margin:0;"><thead><tr>';
-        // The name wraps (a long one would stretch the table), the rest stays on one line.
-        $wrap_style = str_replace('white-space:nowrap !important;word-break:normal !important;overflow-wrap:normal !important;', 'white-space:normal !important;min-width:220px;max-width:360px;', $cell_style);
-        $styles = array();
-        foreach ((array) $header as $i => $cell) {
-            $styles[$i] = strtolower(trim((string) $cell)) === 'naziv' ? $wrap_style : $cell_style;
-            $out .= '<th' . $styles[$i] . '>' . esc_html(ucfirst(str_replace('_', ' ', (string) $cell))) . '</th>';
-        }
-        $out .= '</tr></thead><tbody>';
-        $rows = 0;
-        for (; $csv->valid(); $csv->next()) {
-            $row = $csv->current();
-            if (!is_array($row) || $row === array(null)) {
+
+        if ($on('current')) {
+        $out .= '<div class="kc-current">';
+        $out .= '<div class="kc-h2">' . esc_html__('Current price list', 'kigocloud-for-woocommerce') . '</div>';
+        $out .= '<div class="kc-card"><div class="kc-facts">';
+        foreach (array(
+            __('Published', 'kigocloud-for-woocommerce')      => $facts['published'],
+            __('Storage number', 'kigocloud-for-woocommerce') => $facts['number'],
+            __('Products', 'kigocloud-for-woocommerce')       => (string) $facts['items'],
+            __('Services', 'kigocloud-for-woocommerce')       => (string) $facts['services'],
+        ) as $label => $value) {
+            if ($value === '') {
                 continue;
             }
-            $out .= '<tr>';
-            foreach ($row as $i => $cell) {
-                $out .= '<td' . (isset($styles[$i]) ? $styles[$i] : $cell_style) . '>' . esc_html((string) $cell) . '</td>';
-            }
-            $out .= '</tr>';
-            $rows++;
-            if ($limit > 0 && $rows >= $limit) {
-                break;
-            }
+            $out .= '<div class="kc-fact"><span>' . esc_html($label) . '</span><strong>' . esc_html($value) . '</strong></div>';
         }
-        $csv = null;
-        $out .= '</tbody></table></div>';
+        $out .= '</div><div class="kc-buttons">'
+            . '<a class="kc-btn" href="' . esc_url(self::url('csv')) . '">' . esc_html__('Download CSV', 'kigocloud-for-woocommerce') . '</a>'
+            . '<a class="kc-btn kc-btn-ghost" href="' . esc_url(self::url('xml')) . '">' . esc_html__('Download XML', 'kigocloud-for-woocommerce') . '</a>'
+            . '</div></div>';
+        $out .= '</div>';
+        }
 
-        $archive = self::archive();
-        if (!empty($archive)) {
-            $out .= '<h3 class="kigo-cjenik-archive-title">' . esc_html__('Published price lists (last 30 days)', 'kigocloud-for-woocommerce') . '</h3>';
-            $out .= '<ul class="kigo-cjenik-archive">';
-            foreach ($archive as $item) {
-                $links = array();
-                foreach (array('csv', 'xml') as $format) {
-                    if ($item[$format] !== '') {
-                        $links[] = '<a href="' . esc_url($item[$format]) . '">' . strtoupper($format) . '</a>';
-                    }
+        $limit = max(0, (int) $atts['limit']);
+        if ($on('archive')) {
+        $out .= '<div class="kc-archive">';
+        $out .= '<div class="kc-h2">' . esc_html__('Published price lists (last 30 days)', 'kigocloud-for-woocommerce') . '</div>';
+        $out .= '<div class="kc-table-wrap"><table class="kc-table"><thead><tr>'
+            . '<th>' . esc_html__('Published', 'kigocloud-for-woocommerce') . '</th>'
+            . '<th>' . esc_html__('Storage number', 'kigocloud-for-woocommerce') . '</th>'
+            . '<th class="kc-num">' . esc_html__('Products', 'kigocloud-for-woocommerce') . '</th>'
+            . '<th class="kc-num">' . esc_html__('Services', 'kigocloud-for-woocommerce') . '</th>'
+            . '<th>' . esc_html__('Files', 'kigocloud-for-woocommerce') . '</th>'
+            . '</tr></thead><tbody>';
+        $first = true;
+        foreach (($limit > 0 ? array_slice($archive, 0, $limit) : $archive) as $item) {
+            $f = self::publication_facts($item['name'], self::archive_path($item['name']));
+            $links = array();
+            foreach (array('csv', 'xml') as $format) {
+                if ($item[$format] !== '') {
+                    $links[] = '<a href="' . esc_url($item[$format]) . '" title="' . esc_attr($item['name'] . '.' . $format) . '">' . strtoupper($format) . '</a>';
                 }
-                $out .= '<li>' . esc_html($item['name']) . ' &middot; ' . implode(' &middot; ', $links) . '</li>';
             }
-            $out .= '</ul>';
+            $out .= '<tr' . ($first ? ' class="kc-now"' : '') . '>'
+                . '<td>' . esc_html($f['published']) . ($first ? '<span class="kc-badge">' . esc_html__('Current', 'kigocloud-for-woocommerce') . '</span>' : '') . '</td>'
+                . '<td>' . esc_html($f['number']) . '</td>'
+                . '<td class="kc-num">' . (int) $f['items'] . '</td>'
+                . '<td class="kc-num">' . (int) $f['services'] . '</td>'
+                . '<td>' . implode(' &middot; ', $links) . '</td>'
+                . '</tr>';
+            $first = false;
+        }
+        $out .= '</tbody></table></div>';
+        $out .= '</div>';
+        }
+
+        if ($on('note')) {
+            $out .= '<div class="kc-note">'
+                . '<p>' . esc_html__('The price list holds the retail prices of the products and services of this shop, together with the anchor price that applied on the reference day.', 'kigocloud-for-woocommerce') . '</p>'
+                . '<p>' . esc_html__('The price list is published every day, and every publication stays available for 30 days.', 'kigocloud-for-woocommerce') . '</p>'
+                . '</div>';
         }
         $out .= '</div>';
 
         return $out;
+    }
+
+    /**
+     * The heading of Kigo.Cloud's public price list page: company, address,
+     * OIB and logo, the title and the sales point, from the licence
+     * (licence/info). Only the title while Kigo.Cloud does not send them.
+     *
+     * @param bool   $show_logo
+     * @param string $title own title, '' for the default
+     * @return string
+     */
+    private static function heading_html($show_logo = true, $title = '')
+    {
+        $data = class_exists('Woo_KigoCloud_Licence') ? Woo_KigoCloud_Licence::data() : null;
+        $company = ($data !== null && isset($data['company']) && is_array($data['company'])) ? $data['company'] : array();
+        $point = ($data !== null && isset($data['sales_point']) && is_array($data['sales_point'])) ? $data['sales_point'] : array();
+        $get = function ($a, $k) {
+            return isset($a[$k]) && is_scalar($a[$k]) ? trim((string) $a[$k]) : '';
+        };
+        $name = $get($company, 'name');
+        $meta = trim($get($company, 'address') . ' ' . $get($company, 'place'));
+        $oib = $get($company, 'oib');
+        $logo = $show_logo ? $get($company, 'logo') : '';
+        $object = trim($get($point, 'shape') . ' ' . $get($point, 'address'));
+        $code = $get($point, 'code');
+
+        $out = '<div class="kc-head">';
+        if ($name !== '' || $logo !== '') {
+            $out .= '<div class="kc-head-top"><div>';
+            if ($name !== '') {
+                $out .= '<div class="kc-company">' . esc_html($name) . '</div>';
+            }
+            if ($meta !== '' || $oib !== '') {
+                $out .= '<div class="kc-company-meta">' . esc_html($meta)
+                    . ($oib !== '' ? ($meta !== '' ? '<br>' : '') . 'OIB: ' . esc_html($oib) : '')
+                    . '</div>';
+            }
+            $out .= '</div>';
+            if ($logo !== '') {
+                $out .= '<div class="kc-logo"><img src="' . esc_url($logo) . '" alt="' . esc_attr($name) . '"></div>';
+            }
+            $out .= '</div><hr class="kc-rule">';
+        }
+        $out .= '<div class="kc-doc-title">' . esc_html(trim($title) !== '' ? trim($title) : __('Price list of products and services', 'kigocloud-for-woocommerce')) . '</div>';
+        if ($object !== '' || $code !== '') {
+            $out .= '<div class="kc-doc-sub">' . esc_html($object) . ($code !== '' ? ' (' . esc_html($code) . ')' : '') . '</div>';
+        }
+        $out .= '</div>';
+
+        return $out;
+    }
+
+    /**
+     * Local path of an archived CSV by its base name, '' when it is not there.
+     *
+     * @param string $name
+     * @return string
+     */
+    private static function archive_path($name)
+    {
+        $file = trailingslashit(self::dir()) . $name . '.csv';
+
+        return is_file($file) ? $file : '';
+    }
+
+    /**
+     * Publication date and storage number from the prescribed file name
+     * (..._000005_20261113_080000), and the number of products and services
+     * in its CSV (column Vrsta). Counts are kept per file, a file never changes.
+     *
+     * @param string $name base name without extension
+     * @param string $csv  path of its CSV, '' when unknown
+     * @return array array('published', 'number', 'items', 'services')
+     */
+    private static function publication_facts($name, $csv)
+    {
+        $facts = array('published' => '', 'number' => '', 'items' => 0, 'services' => 0);
+        if (preg_match('/_(\d{6})_(\d{8})_(\d{6})$/', $name, $m)) {
+            $facts['number'] = $m[1];
+            $time = mktime((int) substr($m[3], 0, 2), (int) substr($m[3], 2, 2), 0, (int) substr($m[2], 4, 2), (int) substr($m[2], 6, 2), (int) substr($m[2], 0, 4));
+            $facts['published'] = date_i18n(get_option('date_format') . ' H:i', $time);
+        } elseif ($csv !== '') {
+            $facts['published'] = date_i18n(get_option('date_format') . ' H:i', filemtime($csv));
+        }
+        if ($csv === '') {
+            return $facts;
+        }
+        $key = 'kigocloud_pl_counts_' . md5($name);
+        $counts = get_transient($key);
+        if (!is_array($counts)) {
+            $counts = array(0, 0);
+            $handle = @fopen($csv, 'r');
+            if ($handle) {
+                $header = fgetcsv($handle, 0, ';', '"', '\\');
+                $col = false;
+                if (is_array($header)) {
+                    $header[0] = preg_replace('/^\xEF\xBB\xBF/', '', (string) $header[0]);
+                    $col = array_search('vrsta', array_map('strtolower', array_map('trim', $header)), true);
+                }
+                while ($col !== false && ($row = fgetcsv($handle, 0, ';', '"', '\\')) !== false) {
+                    $kind = isset($row[$col]) ? strtolower(trim((string) $row[$col])) : '';
+                    if ($kind === 'proizvod') {
+                        $counts[0]++;
+                    } elseif ($kind === 'usluga') {
+                        $counts[1]++;
+                    }
+                }
+                fclose($handle);
+            }
+            set_transient($key, $counts, 31 * DAY_IN_SECONDS);
+        }
+        $facts['items'] = (int) $counts[0];
+        $facts['services'] = (int) $counts[1];
+
+        return $facts;
     }
 }
