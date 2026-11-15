@@ -1,22 +1,24 @@
-=== KigoCloud for WooCommerce ===
+=== KigoCloud for WooCommerce: fiskalizacija i sidrene cijene ===
 Contributors: symmetriahr, dpotocic
-Tags: fiskalizacija, fiscalization, croatia, invoice, r1
+Tags: fiskalizacija, sidrena cijena, cjenik, croatia, fiscalization
 Requires at least: 5.5
 Tested up to: 7.1
 Requires PHP: 7.2
-Stable tag: 2.2.13
+Stable tag: 2.2.14
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 WC requires at least: 5.0
 WC tested up to: 11.2
 
-Fiskalizacija for WooCommerce: every order becomes a fiscalized Croatian invoice in Kigo.Cloud, R1 invoices included, PDF sent to the customer.
+Fiskalizacija of WooCommerce orders in Kigo.Cloud: R1 invoices, anchor price (sidrena / bazna cijena) and the daily price list (cjenik) in CSV, XML.
 
 == Description ==
 
 **Fiskalizacija web trgovine bez prepisivanja.** KigoCloud for WooCommerce connects your shop to [Kigo.Cloud](https://www.kigocloud.com/fiskalizacija-web-trgovine/), the Croatian invoicing and fiscalization service by Symmetria d.o.o. When a customer orders and pays, the order is sent to Kigo.Cloud, which issues the invoice, fiscalizes it (ZKI and JIR from the Tax Administration) and the plugin e-mails the PDF to the customer.
 
 Croatian law requires every sale paid by card, cash or a similar method to be fiscalized, web shops included. With this plugin there is nothing to retype: the items, prices, VAT, shipping and the customer come from the WooCommerce order.
+
+**Sidrena cijena (bazna cijena) i cjenik za objavu.** From 17 November 2026 Croatian shops show the anchor price (sidrena cijena, also called bazna cijena) next to the retail price, and a shop with a website publishes its price list (cjenik) every working day by 8:00 in a machine readable CSV or XML file, each publication kept for 30 days. Kigo.Cloud calculates the anchor price from the price history of your items, and this plugin shows it under the product price in WooCommerce and serves the daily CSV and XML price list from your own domain, with the `[kigo_cjenik]` shortcode for the page your customers open.
 
 = What it does =
 
@@ -25,8 +27,8 @@ Croatian law requires every sale paid by card, cash or a similar method to be fi
 * **Invoice PDF to the customer** by e-mail, straight after the document is created.
 * **Invoices in the customer's language.** A customer outside Croatia can get the invoice and the e-mail in English, or in German for Germany, Austria, Switzerland and Liechtenstein.
 * **Stock and price sync** with Kigo.Cloud (Business plan): Kigo.Cloud finds your products by SKU and keeps the quantities and prices in step.
-* **Anchor price (sidrena cijena)** under the product price, as the Croatian Government decision in force from 1 October 2026 requires, when Kigo.Cloud sends it.
-* **Daily price list on your own domain.** The plugin downloads the price list from Kigo.Cloud once a day and serves the CSV and XML from your uploads folder; the `[kigo_cjenik]` shortcode shows it as a table with the last 30 days.
+* **Anchor price (sidrena cijena, bazna cijena)** under the product price, as the Croatian Government decision in force from 17 November 2026 requires, when Kigo.Cloud sends it.
+* **Daily price list (cjenik) in CSV and XML on your own domain.** The plugin downloads the price list from Kigo.Cloud once a day and serves the CSV and XML from your uploads folder; the `[kigo_cjenik]` shortcode shows it as a table with the last 30 days.
 * **Custom field mapping** for shops that already collect R1 data with another plugin.
 * **Logs tab** with the last 50 calls, and a test button that sends a test offer (never a real invoice).
 * HPOS (custom order tables) compatible.
@@ -79,6 +81,10 @@ Yes. On the Orders tab, Language for foreign customers: English for everyone out
 
 KigoCloud copies its settings on activation and does not send orders while the KigoKasa plugin is active, so no order is fiscalized twice. A notice offers a button that deactivates the old plugin; from then on KigoCloud sends the orders.
 
+= Does it show the anchor price (sidrena / bazna cijena) and publish the price list? =
+
+Yes. Kigo.Cloud keeps the anchor price of every item, calculated from its price history or entered by hand, and publishes the price list in CSV and XML every night before 8:00. The plugin serves that price list from your own domain (Standard plan) and shows the anchor price under the product price in the shop (Business plan). More: [Sidrene cijene u Kigo.Cloudu](https://www.kigocloud.com/sidrene-cijene/).
+
 = Where do I get help? =
 
 Write to the support forum here or to the e-mail address on [www.kigocloud.com](https://www.kigocloud.com/).
@@ -112,6 +118,9 @@ Kigo.Cloud privacy policy: https://www.kigocloud.com/zastita-osobnih-podataka
 4. An order with the fiscalized Kigo.Cloud invoice number.
 
 == Changelog ==
+
+= 2.2.14 =
+* Plugin description only: the anchor price (sidrena / bazna cijena) and the daily price list (cjenik) in the name, tags, short description and a new FAQ answer; the anchor price obligation date is 17 November 2026. No change to the code.
 
 = 2.2.13 =
 * [kigo_cjenik] looks like the Kigo.Cloud price list page: company heading, current price list with Download CSV / XML, and the last 30 days. Each part can be hidden with CSS or with options (header, logo, current, archive, note, title, limit, style, class).
@@ -245,6 +254,9 @@ Kigo.Cloud privacy policy: https://www.kigocloud.com/zastita-osobnih-podataka
 Older versions: https://github.com/symmetria-doo/kigocloud-for-woocommerce/blob/main/CHANGELOG.md
 
 == Upgrade Notice ==
+
+= 2.2.14 =
+Description only, no code change.
 
 = 2.2.13 =
 The update notice goes away after Save; one shipping code for all methods.

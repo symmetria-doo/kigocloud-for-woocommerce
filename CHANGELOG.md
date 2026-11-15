@@ -4,6 +4,11 @@ All notable changes to KigoCloud for WooCommerce are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.14] - 2026-11-15
+
+### Changed
+- WordPress.org listing: name "KigoCloud for WooCommerce: fiskalizacija i sidrene cijene" (readme and the Plugin Name header), tags `fiskalizacija, sidrena cijena, cjenik, croatia, fiscalization`, short description and a description paragraph and FAQ answer on the anchor price (sidrena / bazna cijena) and the daily CSV/XML price list, so the plugin is found when a shop searches for them. The anchor price obligation date in the readme is 17 November 2026 (the Government moved it from 1 October). No code change.
+
 ## [2.2.13] - 2026-11-13
 
 ### Changed
