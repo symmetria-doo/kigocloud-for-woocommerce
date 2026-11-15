@@ -4,7 +4,7 @@
  *
  * - Bails out (and deactivates the plugin) if the user lacks the
  *   activate_plugins capability.
- * - Bails out (and deactivates the plugin) if WooCommerce is not active.
+ * - Activates without WooCommerce too: then only the price list works.
  * - Records the current plugin version into wp_options so the migrator
  *   can detect future version bumps.
  *
@@ -34,18 +34,8 @@ class Woo_KigoCloud_Activator
             wp_die(esc_html__('You do not have proper authorization to activate a plugin.', 'kigocloud-for-woocommerce'));
         }
 
-        if (!class_exists('WooCommerce')) {
-            deactivate_plugins($self);
-            wp_die(
-                wp_kses_post(
-                    sprintf(
-                        /* translators: %s: link to the WooCommerce plugin page */
-                        __('This plugin requires %s to be active.', 'kigocloud-for-woocommerce'),
-                        '<a href="' . esc_url('https://wordpress.org/plugins/woocommerce/') . '">WooCommerce</a>'
-                    )
-                )
-            );
-        }
+        // No WooCommerce check: without it the plugin publishes the price list
+        // only (Woo_KigoCloud::has_woocommerce()).
 
         // Record current version so Woo_KigoCloud_Migrator can detect
         // future upgrades on subsequent loads.

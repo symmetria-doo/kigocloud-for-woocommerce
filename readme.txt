@@ -4,7 +4,7 @@ Tags: fiskalizacija, sidrena cijena, cjenik, croatia, fiscalization
 Requires at least: 5.5
 Tested up to: 7.1
 Requires PHP: 7.2
-Stable tag: 2.2.14
+Stable tag: 2.2.15
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 WC requires at least: 5.0
@@ -29,6 +29,7 @@ Croatian law requires every sale paid by card, cash or a similar method to be fi
 * **Stock and price sync** with Kigo.Cloud (Business plan): Kigo.Cloud finds your products by SKU and keeps the quantities and prices in step.
 * **Anchor price (sidrena cijena, bazna cijena)** under the product price, as the Croatian Government decision in force from 17 November 2026 requires, when Kigo.Cloud sends it.
 * **Daily price list (cjenik) in CSV and XML on your own domain.** The plugin downloads the price list from Kigo.Cloud once a day and serves the CSV and XML from your uploads folder; the `[kigo_cjenik]` shortcode shows it as a table with the last 30 days.
+* **Price list without a web shop.** A WordPress site without WooCommerce (a company presentation, a craftsman's or a service provider's site) installs the plugin only for the price list: without WooCommerce it shows just the Connection and Price list tabs and publishes the daily CSV and XML from Kigo.Cloud with the `[kigo_cjenik]` shortcode.
 * **Custom field mapping** for shops that already collect R1 data with another plugin.
 * **Logs tab** with the last 50 calls, and a test button that sends a test offer (never a real invoice).
 * HPOS (custom order tables) compatible.
@@ -43,7 +44,7 @@ On the Connection tab, the **Try with the demo account** button fills in the log
 
 == Installation ==
 
-1. In WordPress go to Plugins > Add New, search for "KigoCloud" and install and activate **KigoCloud for WooCommerce**. WooCommerce must be active.
+1. In WordPress go to Plugins > Add New, search for "KigoCloud" and install and activate **KigoCloud for WooCommerce**. For orders WooCommerce must be active; without it the plugin publishes the price list only.
 2. Open **KigoCloud** in the admin menu.
 3. On the **Connection** tab enter an API key and the employee PIN, or the username, password and employee PIN of your Kigo.Cloud user, or click **Try with the demo account**.
 4. On the **Orders** tab choose the document type for each payment method you want fiscalized (Disabled leaves that payment method alone).
@@ -52,6 +53,10 @@ On the Connection tab, the **Try with the demo account** button fills in the log
 Nothing is sent to Kigo.Cloud until an API key, or a username and password, are saved and at least one payment method has a document type.
 
 == Frequently Asked Questions ==
+
+= My site has no web shop. Can I publish the price list with this plugin? =
+
+Yes. From 17 November 2026 every trader and service provider with a website publishes the price list in CSV or XML, also when the site only presents the business. Install the plugin without WooCommerce, enter the Kigo.Cloud API key on the Connection tab, switch on the publication in Kigo.Cloud (Sidrene cijene > Cjenik za objavu) and put the `[kigo_cjenik]` shortcode on a page. The price list on your own website is part of the Standard plan and above.
 
 = Do I need a Kigo.Cloud account? =
 
@@ -118,6 +123,9 @@ Kigo.Cloud privacy policy: https://www.kigocloud.com/zastita-osobnih-podataka
 4. An order with the fiscalized Kigo.Cloud invoice number.
 
 == Changelog ==
+
+= 2.2.15 =
+* Works without WooCommerce for the price list: a WordPress site without a web shop can activate the plugin and publish the Kigo.Cloud price list (CSV, XML and the [kigo_cjenik] shortcode). Without WooCommerce the KigoCloud page shows only Connection, Price list, Logs and About, and is open to administrators. Shops with WooCommerce see no change.
 
 = 2.2.14 =
 * Plugin description only: the anchor price (sidrena / bazna cijena) and the daily price list (cjenik) in the name, tags, short description and a new FAQ answer; the anchor price obligation date is 17 November 2026. No change to the code.
@@ -254,6 +262,9 @@ Kigo.Cloud privacy policy: https://www.kigocloud.com/zastita-osobnih-podataka
 Older versions: https://github.com/symmetria-doo/kigocloud-for-woocommerce/blob/main/CHANGELOG.md
 
 == Upgrade Notice ==
+
+= 2.2.15 =
+WooCommerce is no longer required: a site without a web shop can publish the price list.
 
 = 2.2.14 =
 Description only, no code change.

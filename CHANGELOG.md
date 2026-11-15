@@ -4,6 +4,11 @@ All notable changes to KigoCloud for WooCommerce are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.15] - 2026-11-15
+
+### Changed
+- WooCommerce is no longer required. A WordPress site without a web shop must publish its price list too (Ministry of Economy: every trader and service provider with a website, also a presentation site), so the plugin activates without WooCommerce and then only publishes the Kigo.Cloud price list. The `Requires Plugins: woocommerce` header and the activation check are gone. `Woo_KigoCloud::has_woocommerce()`; without WooCommerce the KigoCloud page shows Connection, Price list, Logs and About, needs `manage_options` instead of `manage_woocommerce` (that capability exists only with WooCommerce), registers only the login options (options.php empties every registered option missing from the form, so the shop settings stay untouched) and hides the demo account card, which is about test orders. With WooCommerce nothing changes.
+
 ## [2.2.14] - 2026-11-15
 
 ### Changed

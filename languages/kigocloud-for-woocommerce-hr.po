@@ -455,6 +455,9 @@ msgstr "OIB nije ispravan. Mora imati 11 znamenki i ispravnu kontrolnu znamenku.
 msgid "Nothing is sent to KigoCloud until an API key, or a username and a password, are saved here and a payment method has a document type on the Orders tab."
 msgstr "Ništa se ne šalje u KigoCloud dok ovdje ne spremite API ključ, ili korisničko ime i lozinku, i dok neki način plaćanja nema vrstu dokumenta na kartici Narudžbe."
 
+msgid "WooCommerce is not active, so the plugin only publishes your Kigo.Cloud price list on this site (Price list tab). The login is used to read the price list address from your Kigo.Cloud licence; nothing is sent to Kigo.Cloud."
+msgstr "WooCommerce nije aktivan, pa dodatak na ovoj stranici samo objavljuje vaš Kigo.Cloud cjenik (kartica Cjenik). Prijava služi da se iz Kigo.Cloud licence pročita adresa cjenika; u Kigo.Cloud se ništa ne šalje."
+
 #, php-format
 msgid "No account yet? See %s."
 msgstr "Još nemate račun? Pogledajte %s."
@@ -1256,6 +1259,9 @@ msgstr "Još nije provjereno."
 
 msgid "A new login is checked after Save all settings. The plugin also checks it when this page opens and at every save. Whether the key may send orders shows the test on the R1 tab, which sends a test offer."
 msgstr "Novu prijavu najprije spremite (Spremi sve postavke). Plugin je provjerava i kad se ova stranica otvori i pri svakom spremanju. Smije li ključ slati narudžbe pokazuje test na tabu R1, koji šalje probnu ponudu."
+
+msgid "A new login is checked after Save all settings. The plugin also checks it when this page opens and at every save."
+msgstr "Novu prijavu najprije spremite (Spremi sve postavke). Plugin je provjerava i kad se ova stranica otvori i pri svakom spremanju."
 
 msgid "Fine: on the classic checkout the plugin adds the R1 fields itself, in both modes (OIB only and the full R1 block). The rows below are about the block checkout only."
 msgstr "U redu: na klasičnoj blagajni plugin sam dodaje R1 polja, u oba načina (samo OIB i cijeli R1 blok). Retci ispod odnose se samo na block blagajnu."

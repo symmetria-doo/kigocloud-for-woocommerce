@@ -107,6 +107,9 @@ msgstr ""
 msgid "Nothing is sent to KigoCloud until an API key, or a username and a password, are saved here and a payment method has a document type on the Orders tab."
 msgstr ""
 
+msgid "WooCommerce is not active, so the plugin only publishes your Kigo.Cloud price list on this site (Price list tab). The login is used to read the price list address from your Kigo.Cloud licence; nothing is sent to Kigo.Cloud."
+msgstr ""
+
 #: admin/class-woo-kigocloud-admin-page.php:427
 msgid "API username"
 msgstr ""
@@ -1229,6 +1232,9 @@ msgid "Not checked yet."
 msgstr ""
 
 msgid "A new login is checked after Save all settings. The plugin also checks it when this page opens and at every save. Whether the key may send orders shows the test on the R1 tab, which sends a test offer."
+msgstr ""
+
+msgid "A new login is checked after Save all settings. The plugin also checks it when this page opens and at every save."
 msgstr ""
 
 msgid "Fine: on the classic checkout the plugin adds the R1 fields itself, in both modes (OIB only and the full R1 block). The rows below are about the block checkout only."

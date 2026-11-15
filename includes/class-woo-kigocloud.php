@@ -45,7 +45,21 @@ class Woo_KigoCloud {
      *
      * @since 1.0.0
      */
-    const PLUGIN_VERSION = '2.2.14';
+    const PLUGIN_VERSION = '2.2.15';
+
+    /**
+     * Is WooCommerce active? Without it the plugin only publishes the price
+     * list ([kigo_cjenik]) on the site. Plugins load in alphabetical order and
+     * kigocloud- comes before woocommerce, so this is meaningful only from
+     * `plugins_loaded` on (admin_menu, admin_init, rendering), never while the
+     * plugin file itself loads.
+     *
+     * @return bool
+     */
+    public static function has_woocommerce()
+    {
+        return class_exists('WooCommerce');
+    }
 
     /**
      * Admin notices of the plugin appear only on the Dashboard, the Plugins

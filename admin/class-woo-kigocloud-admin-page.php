@@ -23,12 +23,23 @@ class Woo_KigoCloud_Admin_Page
     const CAPABILITY = 'manage_woocommerce';
     const NONCE      = 'kigocloud_settings_nonce';
 
+    /**
+     * manage_woocommerce exists only with WooCommerce; on a site without it
+     * the page is for whoever manages the site's settings.
+     *
+     * @return string
+     */
+    public static function capability()
+    {
+        return Woo_KigoCloud::has_woocommerce() ? self::CAPABILITY : 'manage_options';
+    }
+
     public function register_menu()
     {
         add_menu_page(
             __('KigoCloud', 'kigocloud-for-woocommerce'),
             __('KigoCloud', 'kigocloud-for-woocommerce'),
-            self::CAPABILITY,
+            self::capability(),
             self::PAGE_SLUG,
             array($this, 'render_page'),
             'dashicons-cloud',
@@ -42,6 +53,12 @@ class Woo_KigoCloud_Admin_Page
         // admin page is a single form with one Save button and one
         // POST to options.php that saves every option in one shot.
         $opts_by_group = $this->settings_map();
+        if (!Woo_KigoCloud::has_woocommerce()) {
+            // Only the login is on the page. options.php empties every registered
+            // option missing from the form, so the shop settings are not registered:
+            // they stay as they are for the day WooCommerce is switched on.
+            $opts_by_group = array('kigocloud_connection' => array_diff($opts_by_group['kigocloud_connection'], array('kigocloud_pin')));
+        }
         $sanitizers    = $this->sanitizers();
         foreach ($opts_by_group as $opts) {
             foreach ($opts as $opt) {
@@ -267,7 +284,7 @@ class Woo_KigoCloud_Admin_Page
 
     public function render_page()
     {
-        if (!current_user_can(self::CAPABILITY)) {
+        if (!current_user_can(self::capability())) {
             return;
         }
         // Right after an update nothing has read the licence yet: read it now,
@@ -336,6 +353,16 @@ class Woo_KigoCloud_Admin_Page
 
     private function tabs()
     {
+        if (!Woo_KigoCloud::has_woocommerce()) {
+            // A site without a shop: login and the price list on the site.
+            return array(
+                'connection' => __('Connection', 'kigocloud-for-woocommerce'),
+                'pricelist'  => __('Price list', 'kigocloud-for-woocommerce'),
+                'logs'       => __('Logs', 'kigocloud-for-woocommerce'),
+                'about'      => __('About', 'kigocloud-for-woocommerce'),
+            );
+        }
+
         return array(
             'connection' => __('Connection', 'kigocloud-for-woocommerce'),
             'orders'     => __('Orders', 'kigocloud-for-woocommerce'),
@@ -471,7 +498,11 @@ class Woo_KigoCloud_Admin_Page
         <div class="kc-card">
             <h2><?php esc_html_e('API credentials', 'kigocloud-for-woocommerce'); ?></h2>
             <p class="kc-desc"><?php esc_html_e('Login used to talk to KigoCloud. The endpoint is fixed and shown on the About tab.', 'kigocloud-for-woocommerce'); ?></p>
+            <?php if (Woo_KigoCloud::has_woocommerce()): ?>
             <p class="kc-desc"><?php esc_html_e('Nothing is sent to KigoCloud until an API key, or a username and a password, are saved here and a payment method has a document type on the Orders tab.', 'kigocloud-for-woocommerce'); ?></p>
+            <?php else: ?>
+            <p class="kc-desc"><?php esc_html_e('WooCommerce is not active, so the plugin only publishes your Kigo.Cloud price list on this site (Price list tab). The login is used to read the price list address from your Kigo.Cloud licence; nothing is sent to Kigo.Cloud.', 'kigocloud-for-woocommerce'); ?></p>
+            <?php endif; ?>
             <?php $this->open_form('kigocloud_connection'); ?>
             <table class="form-table" role="presentation">
                 <?php
@@ -528,6 +559,10 @@ class Woo_KigoCloud_Admin_Page
             <?php $this->close_form(); ?>
         </div>
         <?php $this->render_login_check(); ?>
+        <?php if (!Woo_KigoCloud::has_woocommerce()) {
+            // The demo card is about test orders.
+            return;
+        } ?>
         <div class="kc-card">
             <h2><?php esc_html_e('Try it with the demo account', 'kigocloud-for-woocommerce'); ?></h2>
             <p class="kc-desc"><?php esc_html_e('The public Kigo.Cloud demo account shows the whole flow before you have your own account: the order becomes an invoice with a ZKI and a JIR, signed with a test certificate, so it is not a real fiscalized invoice.', 'kigocloud-for-woocommerce'); ?></p>
@@ -598,7 +633,11 @@ class Woo_KigoCloud_Admin_Page
                 </button>
             </p>
             <div id="kigocloud-check-login-result" class="kc-test-result" style="display:none;"></div>
+            <?php if (Woo_KigoCloud::has_woocommerce()): ?>
             <p class="description"><?php esc_html_e('A new login is checked after Save all settings. The plugin also checks it when this page opens and at every save. Whether the key may send orders shows the test on the R1 tab, which sends a test offer.', 'kigocloud-for-woocommerce'); ?></p>
+            <?php else: ?>
+            <p class="description"><?php esc_html_e('A new login is checked after Save all settings. The plugin also checks it when this page opens and at every save.', 'kigocloud-for-woocommerce'); ?></p>
+            <?php endif; ?>
         </div>
         <?php
     }
@@ -1132,7 +1171,7 @@ class Woo_KigoCloud_Admin_Page
      */
     public function ajax_check_login()
     {
-        if (!current_user_can(self::CAPABILITY)) {
+        if (!current_user_can(self::capability())) {
             wp_send_json_error(array('message' => __('Permission denied.', 'kigocloud-for-woocommerce')), 403);
         }
         check_ajax_referer('kigocloud_check_login', 'nonce');
@@ -1150,7 +1189,7 @@ class Woo_KigoCloud_Admin_Page
 
     public function ajax_test_push()
     {
-        if (!current_user_can(self::CAPABILITY)) {
+        if (!current_user_can(self::capability())) {
             wp_send_json_error(array('message' => __('Permission denied.', 'kigocloud-for-woocommerce')), 403);
         }
         check_ajax_referer('kigocloud_test_push', 'nonce');
@@ -1350,7 +1389,7 @@ class Woo_KigoCloud_Admin_Page
         if (empty($_GET['kigocloud_clear_logs'])) {
             return;
         }
-        if (!current_user_can(self::CAPABILITY)) {
+        if (!current_user_can(self::capability())) {
             return;
         }
         check_admin_referer('kigocloud_clear_logs');
