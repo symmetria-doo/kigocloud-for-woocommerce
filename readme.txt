@@ -4,13 +4,13 @@ Tags: fiskalizacija, sidrena cijena, cjenik, croatia, fiscalization
 Requires at least: 5.5
 Tested up to: 7.1
 Requires PHP: 7.2
-Stable tag: 2.2.16
+Stable tag: 2.2.17
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 WC requires at least: 5.0
 WC tested up to: 11.2
 
-Fiskalizacija of WooCommerce orders in Kigo.Cloud: R1 invoices, anchor price (sidrena / bazna cijena) and the daily price list (cjenik) in CSV, XML.
+Fiskalizacija of WooCommerce orders in Kigo.Cloud: R1 invoices, base price (bazna / sidrena cijena) and the price list (cjenik) in CSV, XML.
 
 == Description ==
 
@@ -18,7 +18,7 @@ Fiskalizacija of WooCommerce orders in Kigo.Cloud: R1 invoices, anchor price (si
 
 Croatian law requires every sale paid by card, cash or a similar method to be fiscalized, web shops included. With this plugin there is nothing to retype: the items, prices, VAT, shipping and the customer come from the WooCommerce order.
 
-**Sidrena cijena (bazna cijena) i cjenik za objavu.** From 17 November 2026 Croatian shops show the anchor price (sidrena cijena, also called bazna cijena) next to the retail price, and a shop with a website publishes its price list (cjenik) every working day by 8:00 in a machine readable CSV or XML file, each publication kept for 30 days. Kigo.Cloud calculates the anchor price from the price history of your items, and this plugin shows it under the product price in WooCommerce and serves the daily CSV and XML price list from your own domain, with the `[kigo_cjenik]` shortcode for the page your customers open.
+**Bazna cijena (sidrena cijena) i cjenik za objavu.** From 17 November 2026 Croatian shops show the base price (bazna cijena, also called sidrena cijena or anchor price) next to the retail price, and a shop with a website publishes its price list (cjenik) of goods and of services in a machine readable CSV or XML file, a changed price list by 11:00 on the day of the change, and keeps a replaced price list available for 15 days. Kigo.Cloud calculates the base price from the price history of your items, and this plugin shows it under the product price in WooCommerce and serves the CSV and XML price lists from your own domain, with the `[kigo_cjenik]` shortcode for the page your customers open.
 
 = What it does =
 
@@ -27,9 +27,9 @@ Croatian law requires every sale paid by card, cash or a similar method to be fi
 * **Invoice PDF to the customer** by e-mail, straight after the document is created.
 * **Invoices in the customer's language.** A customer outside Croatia can get the invoice and the e-mail in English, or in German for Germany, Austria, Switzerland and Liechtenstein.
 * **Stock and price sync** with Kigo.Cloud (Business plan): Kigo.Cloud finds your products by SKU and keeps the quantities and prices in step.
-* **Anchor price (sidrena cijena, bazna cijena)** under the product price, as the Croatian Government decision in force from 17 November 2026 requires, when Kigo.Cloud sends it.
-* **Daily price list (cjenik) in CSV and XML on your own domain.** The plugin downloads the price list from Kigo.Cloud once a day and serves the CSV and XML from your uploads folder; the `[kigo_cjenik]` shortcode shows it as a table with the last 30 days.
-* **Price list without a web shop.** A WordPress site without WooCommerce (a company presentation, a craftsman's or a service provider's site) installs the plugin only for the price list: without WooCommerce it shows just the Connection and Price list tabs and publishes the daily CSV and XML from Kigo.Cloud with the `[kigo_cjenik]` shortcode.
+* **Base price (bazna cijena, sidrena cijena)** under the product price, as "Bazna cijena (10. 9. 2026.): 12,00 €", as the Pravilnik o isticanju bazne cijene proizvoda in force from 17 November 2026 requires, when Kigo.Cloud sends it.
+* **Price list (cjenik) of goods and of services in CSV and XML on your own domain.** The plugin checks Kigo.Cloud every hour, downloads a changed price list as soon as Kigo.Cloud publishes it and serves the CSV and XML from your uploads folder under the prescribed file names; the `[kigo_cjenik]` shortcode shows the current files and those replaced in the last 30 days.
+* **Price list without a web shop.** A WordPress site without WooCommerce (a company presentation, a craftsman's or a service provider's site) installs the plugin only for the price list: without WooCommerce it shows just the Connection and Price list tabs and publishes the CSV and XML price lists from Kigo.Cloud with the `[kigo_cjenik]` shortcode.
 * **Custom field mapping** for shops that already collect R1 data with another plugin.
 * **Logs tab** with the last 50 calls, and a test button that sends a test offer (never a real invoice).
 * HPOS (custom order tables) compatible.
@@ -88,7 +88,11 @@ KigoCloud copies its settings on activation and does not send orders while the K
 
 = Does it show the anchor price (sidrena / bazna cijena) and publish the price list? =
 
-Yes. Kigo.Cloud keeps the anchor price of every item, calculated from its price history or entered by hand, and publishes the price list in CSV and XML every night before 8:00. The plugin serves that price list from your own domain (Standard plan) and shows the anchor price under the product price in the shop (Business plan). More: [Sidrene cijene u Kigo.Cloudu](https://www.kigocloud.com/sidrene-cijene/).
+Yes. Kigo.Cloud keeps the anchor price of every item, calculated from its price history or entered by hand, and publishes the price lists of goods and of services in CSV and XML, a changed one on the day of the change. The plugin serves that price list from your own domain (Standard plan) and shows the anchor price under the product price in the shop (Business plan). More: [Sidrene cijene u Kigo.Cloudu](https://www.kigocloud.com/sidrene-cijene/).
+
+= Which price list address do I give to the inspection or to price crawlers? =
+
+The stable addresses on your own domain: `/wp-content/uploads/kigo-cjenik/cjenik-roba.csv` and `cjenik-roba.xml` for goods, `cjenik-usluge.csv` and `cjenik-usluge.xml` for services (only when you sell services). They always hold the current price list, and a changed price list comes to the same address, as the Pravilnik o načinu objave cjenika proizvoda requires. Downloaded from the `[kigo_cjenik]` page, the file keeps its prescribed name (OIB, sales point, ROBA or USLUGE, storage number, time). The Price list tab shows these addresses.
 
 = Does the plugin put a link to Kigo.Cloud on my site? =
 
@@ -111,7 +115,7 @@ What is sent, and when:
 * **Connection test** (R1 tab button): when you click it. Sends a test offer with made-up buyer data and your Kigo.Cloud login.
 * **Licence** (`https://app.kigo.cloud/hr/api/v1/licence/info`): once a day and when the settings are saved. Sent: your Kigo.Cloud login. The answer is the package, its expiry and the price list address.
 * **Anchor prices** (`https://app.kigo.cloud/hr/api/v1/item/list`): while "Anchor price" is set to show, once a day at 8:15 and when the settings are saved. Sent: your Kigo.Cloud login. The answer is your Kigo.Cloud item list with the anchor prices; the plugin keeps the item code, barcode and anchor price. No data about your shop or customers is sent.
-* **Price list** (the Kigo.Cloud address you enter on the Price list tab): once a day at 7:00, when you save the address, and when a page with the `[kigo_cjenik]` shortcode finds that day's copy missing. Only the CSV and XML files are downloaded; no data about your shop or customers is sent.
+* **Price list** (the addresses of the price list files in the Kigo.Cloud licence): every hour, when the settings are saved, and when a page with the `[kigo_cjenik]` shortcode finds a copy not checked in the last hour. Each check is a conditional request; only the CSV and XML files of a changed price list are downloaded; no data about your shop or customers is sent.
 * **Demo account**: if you use the demo login, the same order data goes into the public Kigo.Cloud demo, which anyone can open with that login.
 
 In the other direction, Kigo.Cloud reads products from your shop through the WooCommerce REST API (and this plugin's SKU lookup route, `/wp-json/wc/v3/kigocloud/...`) only if you create WooCommerce REST API keys and enter them in Kigo.Cloud.
@@ -127,6 +131,11 @@ Kigo.Cloud privacy policy: https://www.kigocloud.com/zastita-osobnih-podataka
 4. An order with the fiscalized Kigo.Cloud invoice number.
 
 == Changelog ==
+
+= 2.2.17 =
+* Price list as the Pravilnik o načinu objave cjenika proizvoda (NN 132/2026, in force 17 November 2026) wants it: a price list of goods and, when you sell services, one of services, each in CSV and XML under the new prescribed file names. The plugin checks Kigo.Cloud every hour and downloads a changed price list as soon as Kigo.Cloud publishes it, so it is on your site before 11:00 on the day of the change. A replaced price list stays available for 30 days from its replacement.
+* Stable addresses of the current price list on your own domain: cjenik-roba.csv, cjenik-roba.xml, cjenik-usluge.csv and cjenik-usluge.xml in wp-content/uploads/kigo-cjenik. A changed price list comes to the same address; the [kigo_cjenik] buttons link them and the download keeps the prescribed file name.
+* The line under the product price is now "Bazna cijena (10. 9. 2026.): 12,00 €" (Pravilnik o isticanju bazne cijene proizvoda); in English "Base price", in German "Basispreis".
 
 = 2.2.16 =
 * Price list tab: an optional line "Price list made with Kigo.Cloud" with a link to www.kigocloud.com under the [kigo_cjenik] price list. Off by default; it shows only when you tick "Link to Kigo.Cloud".
@@ -269,6 +278,9 @@ Kigo.Cloud privacy policy: https://www.kigocloud.com/zastita-osobnih-podataka
 Older versions: https://github.com/symmetria-doo/kigocloud-for-woocommerce/blob/main/CHANGELOG.md
 
 == Upgrade Notice ==
+
+= 2.2.17 =
+Price list of goods and of services, checked every hour, and "Bazna cijena" under the product price, as the rules in force from 17 November 2026 require.
 
 = 2.2.16 =
 Optional link to Kigo.Cloud under the price list, off by default.

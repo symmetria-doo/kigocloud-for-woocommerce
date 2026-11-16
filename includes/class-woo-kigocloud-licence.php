@@ -34,8 +34,8 @@ class Woo_KigoCloud_Licence
     }
 
     /**
-     * Hooked on `init`: daily at 06:45, before the price list (07:00) and the
-     * anchor prices (08:15).
+     * Hooked on `init`: daily at 06:45, before the anchor prices (08:15). The
+     * price list itself is checked every hour with the files read here.
      */
     public static function schedule()
     {
@@ -64,7 +64,7 @@ class Woo_KigoCloud_Licence
 
     /**
      * Reads the licence from Kigo.Cloud. A failed read keeps the licence read
-     * before. A changed price list address fetches the price list at once.
+     * before. Changed price list addresses fetch the price list at once.
      *
      * @return array the stored read
      */
@@ -79,7 +79,7 @@ class Woo_KigoCloud_Licence
             // The login was just refused: no second refused call in Kigo.Cloud's log.
             return self::get();
         }
-        $before = self::price_list_url();
+        $before = self::price_list_files();
         $old = self::get();
         $answer = Woo_KigoCloud_Request::call('GET', 'licence/info');
         if (is_wp_error($answer)) {
@@ -98,7 +98,7 @@ class Woo_KigoCloud_Licence
         $read = array('time' => time(), 'ok' => is_array($data), 'message' => is_array($data) ? '' : 'Invalid answer', 'data' => is_array($data) ? $data : (isset($old['data']) ? $old['data'] : null));
         update_option(self::OPTION, $read, false);
 
-        if (class_exists('Woo_KigoCloud_Pricelist') && self::price_list_url() !== $before) {
+        if (class_exists('Woo_KigoCloud_Pricelist') && self::price_list_files() !== $before) {
             Woo_KigoCloud_Pricelist::on_url_saved();
         }
 
@@ -189,6 +189,49 @@ class Woo_KigoCloud_Licence
         $url = (string) $data['price_list']['url'];
 
         return filter_var($url, FILTER_VALIDATE_URL) ? rtrim($url, '/') : '';
+    }
+
+    /**
+     * The files of the published price list. Since the Pravilnik o nacinu objave
+     * cjenika proizvoda (NN 132/2026, in force 17 November 2026) Kigo.Cloud
+     * publishes a price list of goods (roba) and, when the sales point has
+     * services, one of services (usluge), each as CSV and XML, and lists them in
+     * price_list.files. A Kigo.Cloud that does not send files yet has one
+     * price list at url/csv and url/xml, taken as the goods.
+     *
+     * @return array list of array('kind' => roba|usluge, 'format' => csv|xml, 'url' => address)
+     */
+    public static function price_list_files()
+    {
+        $base = self::price_list_url();
+        if ($base === '') {
+            return array();
+        }
+        $data = self::data();
+        $files = array();
+        if (isset($data['price_list']['files']) && is_array($data['price_list']['files'])) {
+            foreach ($data['price_list']['files'] as $file) {
+                if (!is_array($file) || !isset($file['kind'], $file['format'], $file['url'])) {
+                    continue;
+                }
+                $kind = strtolower((string) $file['kind']);
+                $format = strtolower((string) $file['format']);
+                $url = (string) $file['url'];
+                $scheme = strtolower((string) wp_parse_url($url, PHP_URL_SCHEME));
+                if (!in_array($kind, array('roba', 'usluge'), true) || !in_array($format, array('csv', 'xml'), true)
+                    || !filter_var($url, FILTER_VALIDATE_URL) || ($scheme !== 'https' && $scheme !== 'http')) {
+                    continue;
+                }
+                $files[$kind . '.' . $format] = array('kind' => $kind, 'format' => $format, 'url' => $url);
+            }
+        }
+        if (empty($files)) {
+            foreach (array('csv', 'xml') as $format) {
+                $files['roba.' . $format] = array('kind' => 'roba', 'format' => $format, 'url' => $base . '/' . $format);
+            }
+        }
+
+        return array_values($files);
     }
 
     /**

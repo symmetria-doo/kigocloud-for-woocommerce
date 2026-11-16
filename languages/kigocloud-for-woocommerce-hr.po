@@ -600,17 +600,17 @@ msgid "KigoCloud item reference used for the shipping line. Leave blank for \"sh
 msgstr "Šifra artikla u KigoCloudu za stavku dostave. Prazno znači \"shipping\". Način dostave koji ispod ima svoju šifru koristi nju."
 
 #, php-format
-msgid "Sidrena cijena (%s)"
-msgstr "Sidrena cijena (%s)"
+msgid "Bazna cijena (%s)"
+msgstr "Bazna cijena (%s)"
 
 msgid "Kigo.Cloud has no anchor prices: switch on a reference day in Opcije > Šifrarnici > Sidrene cijene and fill in its prices."
-msgstr "Kigo.Cloud nema sidrenih cijena: uključite referentni dan u Opcije > Šifrarnici > Sidrene cijene i popunite mu cijene."
+msgstr "Kigo.Cloud nema baznih (sidrenih) cijena: uključite referentni dan u Opcije > Šifrarnici > Sidrene cijene i popunite mu cijene."
 
 msgid "Save the settings: the plugin then reads the anchor prices from Kigo.Cloud."
-msgstr "Spremite postavke: plugin tada čita sidrene cijene iz Kigo.Clouda."
+msgstr "Spremite postavke: plugin tada čita bazne (sidrene) cijene iz Kigo.Clouda."
 
-msgid "Anchor prices"
-msgstr "Sidrene cijene"
+msgid "Base prices (anchor prices)"
+msgstr "Bazne cijene (sidrene cijene)"
 
 #, php-format
 msgid "%1$d items, read from Kigo.Cloud (Sidrene cijene, newest reference day) on %2$s."
@@ -620,10 +620,10 @@ msgid "Read again every morning and when these settings are saved."
 msgstr "Čita se ponovno svako jutro i kad se ove postavke spreme."
 
 msgid "The anchor prices could not be read from Kigo.Cloud."
-msgstr "Sidrene cijene nije bilo moguće pročitati iz Kigo.Clouda."
+msgstr "Bazne (sidrene) cijene nije bilo moguće pročitati iz Kigo.Clouda."
 
-msgid "Croatian Government decision: the price that applied on the reference day is shown next to the retail price. The plugin reads it from Kigo.Cloud (Sidrene cijene, newest reference day) every morning, by itself."
-msgstr "Odluka Vlade RH: uz maloprodajnu cijenu ističe se cijena s referentnog dana. Plugin je sam čita iz Kigo.Clouda (Sidrene cijene, najnoviji referentni dan) svako jutro."
+msgid "Pravilnik o isticanju bazne cijene proizvoda (NN 132/2026): the base price (bazna cijena, also called anchor price), the price that applied on the reference day, is shown under the retail price as \"Bazna cijena (10. 9. 2026.): 12,00 €\". The plugin reads it from Kigo.Cloud (Sidrene cijene, newest reference day) every morning, by itself."
+msgstr "Pravilnik o isticanju bazne cijene proizvoda (NN 132/2026): bazna cijena (sidrena cijena), cijena s referentnog dana, ističe se ispod maloprodajne cijene kao \"Bazna cijena (10. 9. 2026.): 12,00 €\". Plugin je sam čita iz Kigo.Clouda (Sidrene cijene, najnoviji referentni dan) svako jutro."
 
 msgid "Asking Kigo.Cloud..."
 msgstr "Pitam Kigo.Cloud..."
@@ -719,17 +719,17 @@ msgstr "Datoteke"
 msgid "Today's files (CSV and XML, under the name the decision prescribes)"
 msgstr "Današnje datoteke (CSV i XML, pod imenom koje propisuje odluka)"
 
-msgid "New files every day, as the decision wants. Files older than 30 days are deleted by the plugin, so they do not pile up."
-msgstr "Nove datoteke svaki dan, kako traži odluka. Datoteke starije od 30 dana plugin sam briše, pa se ne gomilaju."
+msgid "A new file only when Kigo.Cloud publishes a changed price list, under the name the Pravilnik prescribes. A replaced file stays available for 30 days (the Pravilnik asks for 15) and is then deleted by the plugin."
+msgstr "Nova datoteka samo kad Kigo.Cloud objavi izmijenjeni cjenik, pod nazivom koji propisuje Pravilnik. Zamijenjena datoteka ostaje dostupna 30 dana (Pravilnik traži 15), a zatim je plugin briše."
 
 msgid "Anchor prices are not switched on in Kigo.Cloud (Moduli > Sidrene cijene), so the shop shows none."
-msgstr "Sidrene cijene nisu uključene u Kigo.Cloudu (Moduli > Sidrene cijene), pa ih trgovina ne prikazuje."
+msgstr "Bazne (sidrene) cijene nisu uključene u Kigo.Cloudu (Moduli > Sidrene cijene), pa ih trgovina ne prikazuje."
 
 msgid "Anchor prices are not switched on in Kigo.Cloud (Moduli > Sidrene cijene)."
-msgstr "Sidrene cijene nisu uključene u Kigo.Cloudu (Moduli > Sidrene cijene)."
+msgstr "Bazne (sidrene) cijene nisu uključene u Kigo.Cloudu (Moduli > Sidrene cijene)."
 
-msgid "Anchor prices:"
-msgstr "Sidrene cijene:"
+msgid "Base prices (anchor prices):"
+msgstr "Bazne cijene (sidrene cijene):"
 
 msgid "Click Save all settings: the plugin then reads the address from your Kigo.Cloud licence. Only if it cannot, copy it from Kigo.Cloud, Sidrene cijene > Cjenik za objavu."
 msgstr "Kliknite Spremi sve postavke: plugin tada čita adresu iz vaše Kigo.Cloud licence. Samo ako ne uspije, kopirajte je iz Kigo.Clouda, Sidrene cijene > Cjenik za objavu."
@@ -788,11 +788,11 @@ msgstr "da"
 msgid "Shortcode"
 msgstr "Shortcode"
 
-msgid "Put it on the page of your site where the price list belongs (for example a page Cjenik linked from the footer). It shows today's price list and the downloads of the last 30 days."
-msgstr "Stavite ga na stranicu svog weba gdje cjenik pripada (npr. stranica Cjenik s linkom u podnožju). Prikazuje današnji cjenik i preuzimanja zadnjih 30 dana."
+msgid "Put it on the page of your site where the price list belongs (for example a page Cjenik linked from the footer). It shows the current price lists of goods and services and those replaced in the last 30 days."
+msgstr "Stavite ga na stranicu svog weba gdje cjenik pripada (npr. stranica Cjenik s linkom u podnožju). Prikazuje važeći cjenik robe i usluga te one zamijenjene u zadnjih 30 dana."
 
-msgid "Croatian law requires the price list to be published on your own website. The plugin takes the price list address from your Kigo.Cloud licence, downloads the price list every morning and deletes the files older than 30 days. Put the [kigo_cjenik] shortcode on your page to show it."
-msgstr "Zakon traži da cjenik bude objavljen na vašoj web stranici. Plugin adresu cjenika uzima iz vaše Kigo.Cloud licence, svako jutro skida cjenik i briše datoteke starije od 30 dana. Za prikaz stavite shortcode [kigo_cjenik] na svoju stranicu."
+msgid "Croatian law requires the price list to be published on your own website: a price list of goods and, if you sell services, a price list of services, and a changed price list by 11:00 on the day of the change. The plugin takes the price list addresses from your Kigo.Cloud licence, checks them every hour, downloads a price list as soon as Kigo.Cloud publishes a changed one, and keeps every replaced price list for 30 days. Put the [kigo_cjenik] shortcode on your page to show it."
+msgstr "Zakon traži da cjenik bude objavljen na vašoj web stranici: cjenik robe i, ako prodajete usluge, cjenik usluga, a izmijenjeni cjenik do 11:00 na dan izmjene. Plugin adrese cjenika uzima iz vaše Kigo.Cloud licence, provjerava ih svaki sat, preuzima cjenik čim Kigo.Cloud objavi izmijenjeni i svaki zamijenjeni cjenik čuva 30 dana. Za prikaz stavite shortcode [kigo_cjenik] na svoju stranicu."
 
 msgid "KigoCloud for WooCommerce"
 msgstr "KigoCloud for WooCommerce"
@@ -815,8 +815,8 @@ msgstr "Mapiranje"
 msgid "Logs"
 msgstr "Zapisi"
 
-msgid "Anchor price"
-msgstr "Sidrena cijena"
+msgid "Base price (anchor price)"
+msgstr "Bazna cijena (sidrena cijena)"
 
 msgid "Do not show"
 msgstr "Ne prikazuj"
@@ -836,11 +836,11 @@ msgstr "Kigo.Cloud licencu nije bilo moguće pročitati."
 msgid "not downloaded yet"
 msgstr "još nije preuzeto"
 
-msgid "Last refresh"
-msgstr "Zadnje osvježavanje"
+msgid "Last check"
+msgstr "Zadnja provjera"
 
-msgid "Refreshed automatically every morning at 7. Save the settings to fetch it right away."
-msgstr "Plugin ga sam osvježava svako jutro u 7. Spremite postavke da se preuzme odmah."
+msgid "Checked with Kigo.Cloud automatically every hour, and on a visit to the price list page after an hour without a check. Save the settings to check right away."
+msgstr "Plugin ga sam provjerava s Kigo.Cloudom svaki sat, i pri posjetu stranici cjenika nakon sata bez provjere. Spremite postavke da se provjeri odmah."
 
 msgid "Order options"
 msgstr "Postavke narudžbi"
@@ -1229,8 +1229,8 @@ msgstr "KigoCloud nije poslao propisano ime datoteke. Ažurirajte KigoCloud ili 
 msgid "The price list has been refreshed."
 msgstr "Cjenik je osvježen."
 
-msgid "The published price list is not from today."
-msgstr "Objavljeni cjenik nije današnji."
+msgid "The published price list has not been checked with Kigo.Cloud for more than three hours, so a changed price list may be missing from the site."
+msgstr "Objavljeni cjenik nije provjeren s Kigo.Cloudom više od tri sata, pa izmijenjeni cjenik možda nije na stranici."
 
 msgid "Link to Kigo.Cloud"
 msgstr "Poveznica na Kigo.Cloud"
@@ -1253,14 +1253,14 @@ msgstr "Cjenik još nije dostupan."
 msgid "Updated: %s"
 msgstr "Ažurirano: %s"
 
-msgid "Published price lists (last 30 days)"
-msgstr "Objavljeni cjenici (zadnjih 30 dana)"
+msgid "Published price lists"
+msgstr "Objavljeni cjenici"
 
 msgid "No document number returned"
 msgstr "Nije vraćen broj dokumenta"
 
-msgid "Sidrena cijena"
-msgstr "Sidrena cijena"
+msgid "Bazna cijena"
+msgstr "Bazna cijena"
 
 msgid "Connection check"
 msgstr "Provjera veze"
@@ -1310,20 +1310,20 @@ msgstr "Preuzmi XML"
 msgid "Current"
 msgstr "Važeći"
 
-msgid "The price list holds the retail prices of the products and services of this shop, together with the anchor price that applied on the reference day."
-msgstr "Cjenik sadrži maloprodajne cijene proizvoda i usluga ove trgovine, zajedno sa sidrenom cijenom koja je vrijedila na referentni dan."
+msgid "The price list holds the retail prices of the goods and services of this shop, together with the base price (bazna cijena) that applied on the reference day."
+msgstr "Cjenik sadrži maloprodajne cijene robe i usluga ove trgovine, zajedno s baznom cijenom koja je vrijedila na referentni dan."
 
-msgid "The price list is published every day, and every publication stays available for 30 days."
-msgstr "Cjenik se objavljuje svaki dan, a svaka objava ostaje dostupna 30 dana."
+msgid "A changed price list is published on the day of the change, and every replaced price list stays available for 30 days."
+msgstr "Izmijenjeni cjenik objavljuje se na dan izmjene, a svaki zamijenjeni cjenik ostaje dostupan 30 dana."
 
 msgid "Price list of products and services"
 msgstr "Cjenik proizvoda i usluga"
 
-msgid "Every part has its own CSS class, so the theme can hide or restyle it: .kc-head (company heading), .kc-logo, .kc-doc-title, .kc-current (current price list), .kc-archive (last 30 days), .kc-note. Example: .kigo-cjenik .kc-logo { display: none; }"
-msgstr "Svaki dio ima svoju CSS klasu, pa ga tema može sakriti ili preurediti: .kc-head (zaglavlje s tvrtkom), .kc-logo, .kc-doc-title, .kc-current (važeći cjenik), .kc-archive (zadnjih 30 dana), .kc-note. Primjer: .kigo-cjenik .kc-logo { display: none; }"
+msgid "Every part has its own CSS class, so the theme can hide or restyle it: .kc-head (company heading), .kc-logo, .kc-doc-title, .kc-current (current price list), .kc-archive (published price lists), .kc-note. Example: .kigo-cjenik .kc-logo { display: none; }"
+msgstr "Svaki dio ima svoju CSS klasu, pa ga tema može sakriti ili preurediti: .kc-head (zaglavlje s tvrtkom), .kc-logo, .kc-doc-title, .kc-current (važeći cjenik), .kc-archive (objavljeni cjenici), .kc-note. Primjer: .kigo-cjenik .kc-logo { display: none; }"
 
-msgid "Options, all optional: header=\"no\", logo=\"no\", current=\"no\", archive=\"no\", note=\"no\" hide that part; title=\"...\" own title; limit=\"7\" at most 7 rows of the last 30 days; style=\"none\" leaves the look to the theme; class=\"...\" own CSS class. Example: [kigo_cjenik logo=\"no\" limit=\"7\"]"
-msgstr "Mogućnosti, sve neobavezne: header=\"no\", logo=\"no\", current=\"no\", archive=\"no\", note=\"no\" skrivaju taj dio; title=\"...\" vlastiti naslov; limit=\"7\" najviše 7 redaka zadnjih 30 dana; style=\"none\" izgled prepušta temi; class=\"...\" vlastita CSS klasa. Primjer: [kigo_cjenik logo=\"no\" limit=\"7\"]"
+msgid "Options, all optional: header=\"no\", logo=\"no\", current=\"no\", archive=\"no\", note=\"no\" hide that part; title=\"...\" own title; limit=\"7\" at most 7 rows of published price lists; style=\"none\" leaves the look to the theme; class=\"...\" own CSS class. Example: [kigo_cjenik logo=\"no\" limit=\"7\"]"
+msgstr "Mogućnosti, sve neobavezne: header=\"no\", logo=\"no\", current=\"no\", archive=\"no\", note=\"no\" skrivaju taj dio; title=\"...\" vlastiti naslov; limit=\"7\" najviše 7 redaka objavljenih cjenika; style=\"none\" izgled prepušta temi; class=\"...\" vlastita CSS klasa. Primjer: [kigo_cjenik logo=\"no\" limit=\"7\"]"
 
 #~ msgid "Document number"
 #~ msgstr "Broj dokumenta"
@@ -1339,3 +1339,12 @@ msgstr "Mogućnosti, sve neobavezne: header=\"no\", logo=\"no\", current=\"no\",
 
 #~ msgid "Payment type for "
 #~ msgstr "Tip plaćanja za"
+
+msgid "Price list of goods"
+msgstr "Cjenik robe"
+
+msgid "Price list of services"
+msgstr "Cjenik usluga"
+
+msgid "Give these addresses to inspectors and price crawlers: they always hold the current price list, a changed price list comes to the same address, as the Pravilnik wants. In brackets the prescribed name of the current file."
+msgstr "Ove adrese dajte inspekciji i alatima za prikupljanje cijena: na njima je uvijek važeći cjenik, a izmijenjeni cjenik dolazi na istu adresu, kako traži Pravilnik. U zagradi je propisani naziv važeće datoteke."

@@ -86,7 +86,8 @@ JS;
     }
 
     /**
-     * Anchor price (Croatian Government decision, in force 1 October 2026):
+     * Base price (bazna cijena, also called anchor price; Pravilnik o isticanju
+     * bazne cijene proizvoda, NN 132/2026, in force 17 November 2026):
      * prints the price that applied on the reference day under the product or
      * variation price. KigoCloud sends it with the product as the
      * _kigo_anchor_price and _kigo_anchor_price_date meta. Without that meta the
@@ -120,14 +121,15 @@ JS;
         if ((float) $anchor < 0) {
             return $price_html;
         }
-        // "Sidrena cijena (10. 9. 2026.): 12,00 €", as Kigo.Cloud prints it on
-        // shelf labels and declarations (ItemAnchorDate::getLabelWithDate).
-        $label = esc_html__('Sidrena cijena', 'kigocloud-for-woocommerce');
+        // "Bazna cijena (10. 9. 2026.): 12,00 €", the name the Pravilnik o
+        // isticanju bazne cijene proizvoda (NN 132/2026) gives it and Kigo.Cloud
+        // prints on shelf labels and declarations (ItemAnchorDate::getLabelWithDate).
+        $label = esc_html__('Bazna cijena', 'kigocloud-for-woocommerce');
         if (!empty($date)) {
             $timestamp = strtotime($date);
             if ($timestamp) {
                 /* translators: %s: reference day, for example 10. 9. 2026. */
-                $label = esc_html(sprintf(__('Sidrena cijena (%s)', 'kigocloud-for-woocommerce'), date_i18n('j. n. Y.', $timestamp)));
+                $label = esc_html(sprintf(__('Bazna cijena (%s)', 'kigocloud-for-woocommerce'), date_i18n('j. n. Y.', $timestamp)));
             }
         }
         // Plain text amount: the theme's rules for .amount (colour, size, weight)

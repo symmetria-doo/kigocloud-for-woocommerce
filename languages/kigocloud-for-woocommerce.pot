@@ -159,7 +159,7 @@ msgid "The documents can be seen in the demo at %s (username and password admin_
 msgstr ""
 
 #: admin/class-woo-kigocloud-admin-page.php:477
-msgid "Anchor price"
+msgid "Base price (anchor price)"
 msgstr ""
 
 #: admin/class-woo-kigocloud-admin-page.php:478
@@ -204,11 +204,11 @@ msgid "The current files, under the name the decision prescribes. Every day brin
 msgstr ""
 
 #: admin/class-woo-kigocloud-admin-page.php:522
-msgid "Last refresh"
+msgid "Last check"
 msgstr ""
 
 #: admin/class-woo-kigocloud-admin-page.php:532
-msgid "Refreshed automatically every morning at 7. Save the settings to fetch it right away."
+msgid "Checked with Kigo.Cloud automatically every hour, and on a visit to the price list page after an hour without a check. Save the settings to check right away."
 msgstr ""
 
 #: admin/class-woo-kigocloud-admin-page.php:545
@@ -861,7 +861,7 @@ msgid "The price list has been refreshed."
 msgstr ""
 
 #: includes/class-woo-kigocloud-pricelist.php:427
-msgid "The published price list is not from today."
+msgid "The published price list has not been checked with Kigo.Cloud for more than three hours, so a changed price list may be missing from the site."
 msgstr ""
 
 #: includes/class-woo-kigocloud-pricelist.php:447
@@ -890,7 +890,7 @@ msgid "Updated: %s"
 msgstr ""
 
 #: includes/class-woo-kigocloud-pricelist.php:500
-msgid "Published price lists (last 30 days)"
+msgid "Published price lists"
 msgstr ""
 
 #: includes/class-woo-kigocloud-r1.php:177
@@ -968,7 +968,7 @@ msgid "No document number returned"
 msgstr ""
 
 #: public/class-woo-kigocloud-public.php:59
-msgid "Sidrena cijena"
+msgid "Bazna cijena"
 msgstr ""
 
 msgid "API key"
@@ -1048,7 +1048,7 @@ msgid "KigoCloud item reference used for the shipping line. Leave blank for \"sh
 msgstr ""
 
 #, php-format
-msgid "Sidrena cijena (%s)"
+msgid "Bazna cijena (%s)"
 msgstr ""
 
 msgid "Kigo.Cloud has no anchor prices: switch on a reference day in Opcije > Šifrarnici > Sidrene cijene and fill in its prices."
@@ -1057,7 +1057,7 @@ msgstr ""
 msgid "Save the settings: the plugin then reads the anchor prices from Kigo.Cloud."
 msgstr ""
 
-msgid "Anchor prices"
+msgid "Base prices (anchor prices)"
 msgstr ""
 
 #, php-format
@@ -1070,7 +1070,7 @@ msgstr ""
 msgid "The anchor prices could not be read from Kigo.Cloud."
 msgstr ""
 
-msgid "Croatian Government decision: the price that applied on the reference day is shown next to the retail price. The plugin reads it from Kigo.Cloud (Sidrene cijene, newest reference day) every morning, by itself."
+msgid "Pravilnik o isticanju bazne cijene proizvoda (NN 132/2026): the base price (bazna cijena, also called anchor price), the price that applied on the reference day, is shown under the retail price as \"Bazna cijena (10. 9. 2026.): 12,00 €\". The plugin reads it from Kigo.Cloud (Sidrene cijene, newest reference day) every morning, by itself."
 msgstr ""
 
 msgid "Asking Kigo.Cloud..."
@@ -1164,7 +1164,7 @@ msgstr ""
 msgid "Today's files (CSV and XML, under the name the decision prescribes)"
 msgstr ""
 
-msgid "New files every day, as the decision wants. Files older than 30 days are deleted by the plugin, so they do not pile up."
+msgid "A new file only when Kigo.Cloud publishes a changed price list, under the name the Pravilnik prescribes. A replaced file stays available for 30 days (the Pravilnik asks for 15) and is then deleted by the plugin."
 msgstr ""
 
 msgid "Anchor prices are not switched on in Kigo.Cloud (Moduli > Sidrene cijene), so the shop shows none."
@@ -1173,7 +1173,7 @@ msgstr ""
 msgid "Anchor prices are not switched on in Kigo.Cloud (Moduli > Sidrene cijene)."
 msgstr ""
 
-msgid "Anchor prices:"
+msgid "Base prices (anchor prices):"
 msgstr ""
 
 msgid "Click Save all settings: the plugin then reads the address from your Kigo.Cloud licence. Only if it cannot, copy it from Kigo.Cloud, Sidrene cijene > Cjenik za objavu."
@@ -1230,10 +1230,10 @@ msgstr ""
 msgid "Shortcode"
 msgstr ""
 
-msgid "Put it on the page of your site where the price list belongs (for example a page Cjenik linked from the footer). It shows today's price list and the downloads of the last 30 days."
+msgid "Put it on the page of your site where the price list belongs (for example a page Cjenik linked from the footer). It shows the current price lists of goods and services and those replaced in the last 30 days."
 msgstr ""
 
-msgid "Croatian law requires the price list to be published on your own website. The plugin takes the price list address from your Kigo.Cloud licence, downloads the price list every morning and deletes the files older than 30 days. Put the [kigo_cjenik] shortcode on your page to show it."
+msgid "Croatian law requires the price list to be published on your own website: a price list of goods and, if you sell services, a price list of services, and a changed price list by 11:00 on the day of the change. The plugin takes the price list addresses from your Kigo.Cloud licence, checks them every hour, downloads a price list as soon as Kigo.Cloud publishes a changed one, and keeps every replaced price list for 30 days. Put the [kigo_cjenik] shortcode on your page to show it."
 msgstr ""
 
 msgid "Connection check"
@@ -1284,17 +1284,26 @@ msgstr ""
 msgid "Current"
 msgstr ""
 
-msgid "The price list holds the retail prices of the products and services of this shop, together with the anchor price that applied on the reference day."
+msgid "The price list holds the retail prices of the goods and services of this shop, together with the base price (bazna cijena) that applied on the reference day."
 msgstr ""
 
-msgid "The price list is published every day, and every publication stays available for 30 days."
+msgid "A changed price list is published on the day of the change, and every replaced price list stays available for 30 days."
 msgstr ""
 
 msgid "Price list of products and services"
 msgstr ""
 
-msgid "Every part has its own CSS class, so the theme can hide or restyle it: .kc-head (company heading), .kc-logo, .kc-doc-title, .kc-current (current price list), .kc-archive (last 30 days), .kc-note. Example: .kigo-cjenik .kc-logo { display: none; }"
+msgid "Every part has its own CSS class, so the theme can hide or restyle it: .kc-head (company heading), .kc-logo, .kc-doc-title, .kc-current (current price list), .kc-archive (published price lists), .kc-note. Example: .kigo-cjenik .kc-logo { display: none; }"
 msgstr ""
 
-msgid "Options, all optional: header=\"no\", logo=\"no\", current=\"no\", archive=\"no\", note=\"no\" hide that part; title=\"...\" own title; limit=\"7\" at most 7 rows of the last 30 days; style=\"none\" leaves the look to the theme; class=\"...\" own CSS class. Example: [kigo_cjenik logo=\"no\" limit=\"7\"]"
+msgid "Options, all optional: header=\"no\", logo=\"no\", current=\"no\", archive=\"no\", note=\"no\" hide that part; title=\"...\" own title; limit=\"7\" at most 7 rows of published price lists; style=\"none\" leaves the look to the theme; class=\"...\" own CSS class. Example: [kigo_cjenik logo=\"no\" limit=\"7\"]"
+msgstr ""
+
+msgid "Price list of goods"
+msgstr ""
+
+msgid "Price list of services"
+msgstr ""
+
+msgid "Give these addresses to inspectors and price crawlers: they always hold the current price list, a changed price list comes to the same address, as the Pravilnik wants. In brackets the prescribed name of the current file."
 msgstr ""

@@ -2,31 +2,41 @@
 /**
  * Price list published on the shop's own domain.
  *
- * The Croatian decision on price list publication (NN 101/2026, in force
- * 1 October 2026) requires the trader to publish the price list, in CSV or XML,
- * on the trader's own website. A link to a third party address is arguable; a
- * file on the trader's own domain is not. So the plugin pulls the files from
- * KigoCloud once a day and writes them into the uploads folder, where the shop's
- * own web server serves them statically.
+ * The Pravilnik o nacinu objave cjenika proizvoda (NN 132/2026, in force
+ * 17 November 2026) requires the trader to publish the price list, in CSV or
+ * XML, on the trader's own website. A link to a third party address is
+ * arguable; a file on the trader's own domain is not. So the plugin pulls the
+ * files from KigoCloud and writes them into the uploads folder, where the
+ * shop's own web server serves them statically.
  *
- * What the decision asks for, and where it is handled:
- * - "najkasnije do 8:00 sati ujutro za tekuci radni dan": WP-Cron fetches at
- *   07:00, and a page view refreshes a copy that is not from today. KigoCloud
- *   builds the day's publication on the first request of the day.
- * - "Nazivi datoteka ukljucuju oblik prodajnog objekta, adresu prodajnog
- *   objekta, oznaku prodajnog objekta, broj pohrane te vremensku oznaku":
- *   KigoCloud sends that name with the file (Content-Disposition) and the file
- *   is stored under it.
- * - "pohranjuje i cuva objavljene cjenike na mreznim stranicama te osigurava
- *   dostupnost istih 30 dana": every day's files stay in the folder for 30 days
- *   and the shortcode links to them.
- * - automated price collection (point VII): the files are plain static files on
+ * What the Pravilnik asks for, and where it is handled:
+ * - a price list of goods and a price list of services (cl. 3 st. 2 and 3,
+ *   cl. 6 st. 3 "naznaku radi li se o cjeniku robe ili usluge"): KigoCloud
+ *   publishes a ROBA file and, when the sales point has services, a USLUGE
+ *   file, each as CSV and XML, listed in licence/info price_list.files. The
+ *   plugin downloads every one of them.
+ * - "objaviti izmijenjen cjenik najkasnije do 11.00 sati na dan izmjene"
+ *   (cl. 3 st. 5): WP-Cron checks every hour at :50, and a page view checks a
+ *   copy that was not checked in the last hour. The checks are conditional
+ *   requests (If-None-Match, If-Modified-Since): KigoCloud answers 304 until it
+ *   publishes a changed price list, so a new file appears only then.
+ * - the file name with OIB, sales point, ROBA/USLUGE, storage number and
+ *   GGGGMMDD_HHMM (cl. 6 st. 3): KigoCloud sends that name with the file
+ *   (Content-Disposition) and the file is stored under it.
+ * - a changed price list at the same URL (cl. 6 st. 2): a copy of the current
+ *   file of each kind and format is kept as cjenik-roba.csv, cjenik-roba.xml,
+ *   cjenik-usluge.csv and cjenik-usluge.xml, overwritten when a changed price
+ *   list comes; these are the addresses for inspectors and price crawlers.
+ * - "dostupnost arhivskog cjenika 15 dana od njegove zamjene" (cl. 3 st. 6):
+ *   a replaced file stays in the folder for 30 days from its replacement and
+ *   the shortcode links to it.
+ * - automated price collection (cl. 5): the files are plain static files on
  *   the shop's domain.
  *
  * Consequences of that design, on purpose:
  * - the shop's visitors and price crawlers never touch KigoCloud
- * - KigoCloud sees at most two conditional requests per shop per day
- * - a KigoCloud outage does not put the trader out of compliance
+ * - KigoCloud sees at most four small conditional requests per shop per hour
+ * - a KigoCloud outage does not take the published price list down
  *
  * @package Woo_KigoCloud
  */
@@ -43,7 +53,15 @@ class Woo_KigoCloud_Pricelist
     /** Last fetch result, kept for the admin screen: array(time, status, message). */
     const OPTION_STATUS = 'kigocloud_pricelist_status';
 
-    /** Current files: array('csv' => file name, 'xml' => file name, 'day' => Y-m-d). */
+    /**
+     * Current files and what the next check needs:
+     * array('files' => array(roba|usluge => array(csv|xml => file name)),
+     * 'tags' => array('roba.csv' => array('etag' => ..., 'modified' => ...)),
+     * 'checked' => time of the last check without an error,
+     * 'replaced' => array(file name => time it stopped being current)).
+     * Up to 2.2.16: array('csv' => file name, 'xml' => file name, 'day' => Y-m-d),
+     * read as the goods.
+     */
     const OPTION_CURRENT = 'kigocloud_pricelist_current';
 
     /**
@@ -59,8 +77,17 @@ class Woo_KigoCloud_Pricelist
     /** Folder inside wp-content/uploads. */
     const DIR = 'kigo-cjenik';
 
-    /** Every published version stays available this many days. */
+    /** A replaced file stays available this many days from its replacement (the Pravilnik asks for 15). */
     const KEEP_DAYS = 30;
+
+    /** A copy checked longer ago than this is checked again on a page view. */
+    const CHECK_EVERY = 3600;
+
+    /** The admin screens warn when the last good check is older than this. */
+    const STALE_AFTER = 10800;
+
+    /** Kinds of price list, in the order they are shown. */
+    private static $kinds = array('roba', 'usluge');
 
     /** Where the optional "Price list made with Kigo.Cloud" line links to (option kigocloud_pricelist_credit). */
     const CREDIT_URL = 'https://www.kigocloud.com/sidrene-cijene-woocommerce/';
@@ -71,40 +98,63 @@ class Woo_KigoCloud_Pricelist
     public static function init()
     {
         add_shortcode('kigo_cjenik', array(__CLASS__, 'shortcode'));
-        add_action(self::CRON_HOOK, array(__CLASS__, 'fetch'));
+        add_action(self::CRON_HOOK, array(__CLASS__, 'cron_fetch'));
         add_action('init', array(__CLASS__, 'schedule'));
         add_action('admin_notices', array(__CLASS__, 'admin_notice'));
         // Saving the address fetches at once, so the shop owner sees straight away
-        // whether it works instead of waiting for tomorrow morning.
+        // whether it works instead of waiting for the next hourly check.
         self::init_anchor();
     }
 
     /**
-     * Daily fetch at 07:00 local time, before the 8:00 deadline. WP-Cron only
-     * runs when the site gets a visit, so maybe_refresh() covers quiet sites.
+     * Hourly check at :50, so a price list KigoCloud changed before 10:50 is on
+     * the site before the 11:00 deadline. WP-Cron only runs when the site gets
+     * a visit, so maybe_refresh() covers quiet sites. The daily event of 2.2.16
+     * and earlier is replaced.
      */
     public static function schedule()
     {
         if (self::base_url() === '') {
-            $timestamp = wp_next_scheduled(self::CRON_HOOK);
-            if ($timestamp) {
-                wp_unschedule_event($timestamp, self::CRON_HOOK);
-            }
+            wp_clear_scheduled_hook(self::CRON_HOOK);
             return;
         }
-        if (!wp_next_scheduled(self::CRON_HOOK)) {
-            $seven = strtotime('tomorrow 07:00');
-            wp_schedule_event($seven, 'daily', self::CRON_HOOK);
+        if (wp_next_scheduled(self::CRON_HOOK) && wp_get_schedule(self::CRON_HOOK) === 'hourly') {
+            return;
         }
+        wp_clear_scheduled_hook(self::CRON_HOOK);
+        // Croatian time differs from UTC by whole hours, so :50 UTC is :50 there.
+        $now = time();
+        $next = $now - ($now % HOUR_IN_SECONDS) + 50 * MINUTE_IN_SECONDS;
+        if ($next <= $now) {
+            $next += HOUR_IN_SECONDS;
+        }
+        wp_schedule_event($next, 'hourly', self::CRON_HOOK);
     }
 
     /**
-     * The address changed: the next fetch starts a new current version. Files
-     * already published stay, the decision wants them available for 30 days.
+     * The hourly event: always asks KigoCloud (a conditional request, answered
+     * 304 while nothing changed), whatever a page view checked meanwhile.
+     */
+    public static function cron_fetch()
+    {
+        self::fetch(true);
+    }
+
+    /**
+     * The addresses changed: the next fetch starts a new current version. Files
+     * already published stay and count as replaced now, the Pravilnik wants them
+     * available after their replacement.
      */
     public static function on_url_saved()
     {
-        delete_option(self::OPTION_CURRENT);
+        $current = self::current();
+        foreach (self::current_names() as $name) {
+            $current['replaced'][$name] = time();
+        }
+        $current['files'] = array();
+        $current['tags'] = array();
+        $current['checked'] = 0;
+        update_option(self::OPTION_CURRENT, $current, false);
         self::schedule();
         self::fetch(true);
     }
@@ -140,47 +190,181 @@ class Woo_KigoCloud_Pricelist
     }
 
     /**
-     * Current files as stored by the last fetch.
+     * Current state as stored by the last fetch, with the layout of 2.2.16 and
+     * earlier (one csv and xml) read as the goods.
      *
      * @return array
      */
     private static function current()
     {
         $current = get_option(self::OPTION_CURRENT, array());
+        if (!is_array($current)) {
+            $current = array();
+        }
+        if (!isset($current['files']) || !is_array($current['files'])) {
+            $current['files'] = array();
+            foreach (array('csv', 'xml') as $format) {
+                if (!empty($current[$format])) {
+                    $current['files']['roba'][$format] = (string) $current[$format];
+                }
+            }
+        }
+        unset($current['csv'], $current['xml'], $current['day']);
+        foreach (array('tags', 'replaced') as $key) {
+            if (!isset($current[$key]) || !is_array($current[$key])) {
+                $current[$key] = array();
+            }
+        }
+        $current['checked'] = isset($current['checked']) ? (int) $current['checked'] : 0;
 
-        return is_array($current) ? $current : array();
+        return $current;
+    }
+
+    /**
+     * File names (with extension) of the current files.
+     *
+     * @return array
+     */
+    private static function current_names()
+    {
+        $names = array();
+        foreach (self::current()['files'] as $formats) {
+            foreach ((array) $formats as $name) {
+                if ($name !== '') {
+                    $names[] = (string) $name;
+                }
+            }
+        }
+
+        return $names;
+    }
+
+    /**
+     * Kinds with a current file, in the order they are shown.
+     *
+     * @return array roba and/or usluge
+     */
+    public static function current_kinds()
+    {
+        $files = self::current()['files'];
+
+        return array_values(array_filter(self::$kinds, function ($kind) use ($files) {
+            return !empty($files[$kind]['csv']) || !empty($files[$kind]['xml']);
+        }));
     }
 
     /**
      * Absolute path of the current file of a format, or '' when there is none.
      *
      * @param string $format csv|xml
+     * @param string $kind   roba (goods) or usluge (services)
      * @return string
      */
-    public static function path($format)
+    public static function path($format, $kind = 'roba')
     {
-        $current = self::current();
-        if (empty($current[$format])) {
+        $files = self::current()['files'];
+        if (empty($files[$kind][$format])) {
             return '';
         }
 
-        return trailingslashit(self::dir()) . $current[$format];
+        return trailingslashit(self::dir()) . $files[$kind][$format];
     }
 
     /**
      * Public address of the current file of a format, on the shop's own domain.
      *
      * @param string $format csv|xml
+     * @param string $kind   roba (goods) or usluge (services)
      * @return string
      */
-    public static function url($format)
+    public static function url($format, $kind = 'roba')
     {
-        $current = self::current();
-        if (empty($current[$format])) {
+        $files = self::current()['files'];
+        if (empty($files[$kind][$format])) {
             return '';
         }
 
-        return self::file_url($current[$format]);
+        return self::file_url($files[$kind][$format]);
+    }
+
+    /**
+     * Stable name of the current file of a kind and format (cjenik-roba.csv,
+     * cjenik-roba.xml, cjenik-usluge.csv, cjenik-usluge.xml). The Pravilnik
+     * (cl. 6 st. 2) wants a changed price list at the same URL as the one it
+     * replaces, while its file name carries the storage number and the time,
+     * so every publication has a new name. The plugin keeps a copy of the
+     * current file under this name, overwritten when a changed price list
+     * comes; the named files stay for the archive.
+     *
+     * @param string $format csv|xml
+     * @param string $kind   roba|usluge
+     * @return string
+     */
+    public static function stable_name($format, $kind = 'roba')
+    {
+        return 'cjenik-' . $kind . '.' . $format;
+    }
+
+    /**
+     * @return array every stable name, current or not
+     */
+    private static function stable_names()
+    {
+        $names = array();
+        foreach (self::$kinds as $kind) {
+            foreach (array('csv', 'xml') as $format) {
+                $names[] = self::stable_name($format, $kind);
+            }
+        }
+
+        return $names;
+    }
+
+    /**
+     * Stable public address of the current file of a kind and format, '' when
+     * the copy is not there (yet).
+     *
+     * @param string $format csv|xml
+     * @param string $kind   roba|usluge
+     * @return string
+     */
+    public static function stable_url($format, $kind = 'roba')
+    {
+        $file = trailingslashit(self::dir()) . self::stable_name($format, $kind);
+
+        return (self::url($format, $kind) !== '' && is_file($file)) ? self::file_url(self::stable_name($format, $kind)) : '';
+    }
+
+    /**
+     * Brings the stable copies in line with the current files: a copy that
+     * differs from its current file is written aside and renamed into place
+     * (a visitor never gets half a file), a copy of a kind that is not current
+     * any more (services the server no longer lists) is removed.
+     */
+    private static function sync_stable()
+    {
+        $dir = trailingslashit(self::dir());
+        $files = self::current()['files'];
+        foreach (self::$kinds as $kind) {
+            foreach (array('csv', 'xml') as $format) {
+                $stable = $dir . self::stable_name($format, $kind);
+                $source = empty($files[$kind][$format]) ? '' : $dir . $files[$kind][$format];
+                if ($source === '' || !is_file($source)) {
+                    if (is_file($stable)) {
+                        wp_delete_file($stable);
+                    }
+                    continue;
+                }
+                if (is_file($stable) && filesize($stable) === filesize($source) && md5_file($stable) === md5_file($source)) {
+                    continue;
+                }
+                $fs = self::filesystem();
+                $body = file_get_contents($source);
+                if ($body === false || !$fs->put_contents($stable . '.tmp', $body, FS_CHMOD_FILE) || !$fs->move($stable . '.tmp', $stable, true)) {
+                    self::store_status('error', __('The price list could not be saved in the uploads folder.', 'kigocloud-for-woocommerce'));
+                }
+            }
+        }
     }
 
     /**
@@ -195,18 +379,43 @@ class Woo_KigoCloud_Pricelist
     }
 
     /**
-     * Is the current copy from today (site time zone)? The decision asks for the
-     * day's price list, so yesterday's copy is stale even when it is a few hours old.
+     * Time of the last check with KigoCloud that ended without an error, 0 before the first one.
+     *
+     * @return int
+     */
+    public static function checked()
+    {
+        return self::current()['checked'];
+    }
+
+    /**
+     * Was the copy checked with KigoCloud in the last hour, and is the goods
+     * price list on disk? A changed price list must be on the site by 11:00 of
+     * the day of the change, so the copy is checked every hour.
+     *
+     * @param int $age seconds, CHECK_EVERY by default
+     * @return bool
+     */
+    public static function is_current($age = self::CHECK_EVERY)
+    {
+        return self::checked() > time() - $age && self::has_files();
+    }
+
+    /**
+     * Is at least one current price list (goods or services) on disk as CSV?
      *
      * @return bool
      */
-    public static function is_current()
+    public static function has_files()
     {
-        $current = self::current();
-        $path = self::path('csv');
+        foreach (self::current_kinds() as $kind) {
+            $path = self::path('csv', $kind);
+            if ($path !== '' && file_exists($path)) {
+                return true;
+            }
+        }
 
-        return isset($current['day']) && $current['day'] === current_time('Y-m-d')
-            && $path !== '' && file_exists($path);
+        return false;
     }
 
     /**
@@ -233,9 +442,15 @@ class Woo_KigoCloud_Pricelist
     }
 
     /**
-     * Downloads both formats when today's copy is missing.
+     * Asks KigoCloud for every file of the price list (goods and services, CSV
+     * and XML, from licence/info price_list.files) with a conditional request.
+     * KigoCloud answers 304 while the publication did not change; a changed
+     * one comes with its new prescribed name and replaces the current file of
+     * its kind and format. A kind KigoCloud no longer lists (the services price
+     * list of a sales point without services) or answers 404 for stops being
+     * current; its files stay in the archive.
      *
-     * @param bool $force ignore the day check (admin button)
+     * @param bool $force ask KigoCloud even when the copy was checked in the last hour (cron, admin)
      * @return array status array as stored in OPTION_STATUS
      */
     public static function fetch($force = false)
@@ -244,7 +459,7 @@ class Woo_KigoCloud_Pricelist
         if ($base === '') {
             return self::store_status('error', __('The KigoCloud price list address is not set.', 'kigocloud-for-woocommerce'));
         }
-        if (!$force && self::is_current() && file_exists(self::path('xml'))) {
+        if (!$force && self::is_current()) {
             return self::store_status('ok', __('The price list is already up to date.', 'kigocloud-for-woocommerce'));
         }
 
@@ -254,49 +469,98 @@ class Woo_KigoCloud_Pricelist
         }
 
         $current = self::current();
+        $listed = array();
         $fetched = 0;
-        foreach (array('csv', 'xml') as $format) {
-            $path = self::path($format);
-            $args = array('timeout' => 30);
+        $error = '';
+        foreach (Woo_KigoCloud_Licence::price_list_files() as $file) {
+            $kind = $file['kind'];
+            $format = $file['format'];
+            $slot = $kind . '.' . $format;
+            $listed[$slot] = true;
+            $old = isset($current['files'][$kind][$format]) ? (string) $current['files'][$kind][$format] : '';
+            $path = $old !== '' ? trailingslashit($dir) . $old : '';
+            $args = array('timeout' => 30, 'headers' => array());
             if ($path !== '' && file_exists($path)) {
                 // Nothing changed since our copy: KigoCloud answers 304 with no body.
-                $args['headers'] = array('If-Modified-Since' => gmdate('D, d M Y H:i:s', filemtime($path)) . ' GMT');
+                $tag = isset($current['tags'][$slot]) ? (array) $current['tags'][$slot] : array();
+                if (!empty($tag['etag'])) {
+                    $args['headers']['If-None-Match'] = (string) $tag['etag'];
+                }
+                $args['headers']['If-Modified-Since'] = !empty($tag['modified'])
+                    ? (string) $tag['modified']
+                    : gmdate('D, d M Y H:i:s', filemtime($path)) . ' GMT';
             }
-            $response = wp_remote_get($base . '/' . $format, $args);
+            $response = wp_remote_get($file['url'], $args);
             if (is_wp_error($response)) {
-                return self::store_status('error', $response->get_error_message());
+                $error = $response->get_error_message();
+                continue;
             }
             $code = (int) wp_remote_retrieve_response_code($response);
             if ($code === 304) {
                 continue;
             }
+            if ($code === 404 && $kind === 'usluge') {
+                // No services price list (any more): the sales point has no services.
+                unset($listed[$slot]);
+                continue;
+            }
             if ($code !== 200) {
-                return self::store_status('error', sprintf(
+                $error = sprintf(
                     /* translators: %d: HTTP status code */
                     __('KigoCloud answered with status %d. Check the address and your plan.', 'kigocloud-for-woocommerce'),
                     $code
-                ));
+                );
+                continue;
             }
             $body = wp_remote_retrieve_body($response);
             if ($body === '') {
-                return self::store_status('error', __('KigoCloud returned an empty price list.', 'kigocloud-for-woocommerce'));
+                $error = __('KigoCloud returned an empty price list.', 'kigocloud-for-woocommerce');
+                continue;
             }
             $name = self::file_name($response, $format);
             if ($name === '') {
-                return self::store_status('error', __('KigoCloud did not send the prescribed file name. Update KigoCloud or contact support.', 'kigocloud-for-woocommerce'));
+                $error = __('KigoCloud did not send the prescribed file name. Update KigoCloud or contact support.', 'kigocloud-for-woocommerce');
+                continue;
             }
             $target = trailingslashit($dir) . $name;
             // Written aside and moved into place, so a visitor never gets half a file.
             $fs = self::filesystem();
             if (!$fs->put_contents($target . '.tmp', $body, FS_CHMOD_FILE) || !$fs->move($target . '.tmp', $target, true)) {
-                return self::store_status('error', __('The price list could not be saved in the uploads folder.', 'kigocloud-for-woocommerce'));
+                $error = __('The price list could not be saved in the uploads folder.', 'kigocloud-for-woocommerce');
+                continue;
             }
-            $current[$format] = $name;
+            if ($old !== '' && $old !== $name) {
+                $current['replaced'][$old] = time();
+            }
+            $current['files'][$kind][$format] = $name;
+            $current['tags'][$slot] = array(
+                'etag'     => (string) wp_remote_retrieve_header($response, 'etag'),
+                'modified' => (string) wp_remote_retrieve_header($response, 'last-modified'),
+            );
             $fetched++;
         }
-        $current['day'] = current_time('Y-m-d');
+        // Kinds KigoCloud does not publish any more stop being current.
+        foreach ($current['files'] as $kind => $formats) {
+            foreach ((array) $formats as $format => $name) {
+                if ($error === '' && !isset($listed[$kind . '.' . $format])) {
+                    $current['replaced'][(string) $name] = time();
+                    unset($current['files'][$kind][$format], $current['tags'][$kind . '.' . $format]);
+                }
+            }
+            if (empty($current['files'][$kind])) {
+                unset($current['files'][$kind]);
+            }
+        }
+        if ($error === '') {
+            $current['checked'] = time();
+        }
         update_option(self::OPTION_CURRENT, $current, false);
+        self::sync_stable();
         self::purge();
+
+        if ($error !== '') {
+            return self::store_status('error', $error);
+        }
 
         return self::store_status('ok', $fetched > 0
             ? __('The price list has been refreshed.', 'kigocloud-for-woocommerce')
@@ -556,22 +820,39 @@ class Woo_KigoCloud_Pricelist
     }
 
     /**
-     * Removes files older than 30 days, never the current ones. Also removes the
-     * cjenik.csv and cjenik.xml that version 2.1.17 wrote without the prescribed
-     * name.
+     * Removes files replaced more than 30 days ago, never the current ones. The
+     * Pravilnik counts the 15 days from the replacement, and a price list can
+     * stay current for months, so the time of its replacement counts, not the
+     * time it was published. Files replaced before 2.2.17 (one a day, no time
+     * of replacement kept) count from their file time. Also removes the
+     * cjenik.csv and cjenik.xml that version 2.1.17 wrote without the
+     * prescribed name.
      */
     private static function purge()
     {
-        $keep = array_filter(array(basename(self::path('csv')), basename(self::path('xml'))));
+        $current = self::current();
+        // The stable copies are kept in line by sync_stable(), never purged here.
+        $keep = array_merge(self::current_names(), self::stable_names());
         $limit = time() - self::KEEP_DAYS * DAY_IN_SECONDS;
+        $present = array();
         foreach ((array) glob(trailingslashit(self::dir()) . '*') as $file) {
-            if (!is_file($file) || in_array(basename($file), $keep, true)) {
+            $name = basename($file);
+            if (!is_file($file) || in_array($name, $keep, true)) {
                 continue;
             }
-            $legacy = in_array(basename($file), array('cjenik.csv', 'cjenik.xml'), true);
-            if ($legacy || filemtime($file) < $limit) {
+            $legacy = in_array($name, array('cjenik.csv', 'cjenik.xml'), true);
+            $since = isset($current['replaced'][$name]) ? (int) $current['replaced'][$name] : filemtime($file);
+            if ($legacy || $since < $limit) {
                 wp_delete_file($file);
+                continue;
             }
+            $present[$name] = true;
+        }
+        // Forget the replacement times of files that are gone.
+        $replaced = array_intersect_key($current['replaced'], $present);
+        if (count($replaced) !== count($current['replaced'])) {
+            $current['replaced'] = $replaced;
+            update_option(self::OPTION_CURRENT, $current, false);
         }
     }
 
@@ -601,13 +882,40 @@ class Woo_KigoCloud_Pricelist
     }
 
     /**
-     * Published files of the last 30 days, newest first, grouped by the name
-     * without its extension (the CSV and the XML of one publication).
+     * What the prescribed file name says, for both formats KigoCloud used:
+     * - since 17 November 2026 (Pravilnik, cl. 6 st. 3):
+     *   {OIB}_{oblik}_{adresa}_{oznaka}_{ROBA|USLUGE}_{nnnnnn}_{YYYYMMDD_HHMM}
+     * - up to 16 November 2026: {...}_{nnnnnn}_{YYYYMMDD_HHMMSS}, goods and
+     *   services in one file (kind '').
+     * The goods and services files of one publication carry the same storage
+     * number and are one publication ('group').
      *
-     * @return array list of array('name' => base name, 'time' => timestamp, 'csv' => url|'', 'xml' => url|'')
+     * @param string $name base name without extension
+     * @return array array('kind' => roba|usluge|'', 'number' => nnnnnn|'', 'stamp' => YmdHis|'', 'group' => key)
+     */
+    private static function parse_name($name)
+    {
+        if (preg_match('/^(.*)_(ROBA|USLUGE)_(\d{6})_(\d{8})_(\d{4})$/', $name, $m)) {
+            return array('kind' => strtolower($m[2]), 'number' => $m[3], 'stamp' => $m[4] . $m[5] . '00', 'group' => $m[1] . '_' . $m[3]);
+        }
+        if (preg_match('/_(\d{6})_(\d{8})_(\d{6})$/', $name, $m)) {
+            return array('kind' => '', 'number' => $m[1], 'stamp' => $m[2] . $m[3], 'group' => $name);
+        }
+
+        return array('kind' => '', 'number' => '', 'stamp' => '', 'group' => $name);
+    }
+
+    /**
+     * Published files still in the folder (the current ones and those replaced
+     * in the last 30 days), one entry per publication, newest first. The goods
+     * and services files of a publication, each as CSV and XML, are one entry.
+     *
+     * @return array list of array('number', 'sort', 'time', 'current' => bool,
+     *               'files' => array(roba|usluge|'' => array('name' => base name, 'csv' => url|'', 'xml' => url|'')))
      */
     public static function archive()
     {
+        $current = self::current_names();
         $list = array();
         foreach ((array) glob(trailingslashit(self::dir()) . '*') as $file) {
             if (!is_file($file)) {
@@ -615,35 +923,58 @@ class Woo_KigoCloud_Pricelist
             }
             $name = basename($file);
             $format = strtolower(pathinfo($name, PATHINFO_EXTENSION));
-            if (($format !== 'csv' && $format !== 'xml') || $name === 'cjenik.csv' || $name === 'cjenik.xml') {
+            if (($format !== 'csv' && $format !== 'xml') || $name === 'cjenik.csv' || $name === 'cjenik.xml' || in_array($name, self::stable_names(), true)) {
                 continue;
             }
-            $key = substr($name, 0, -strlen($format) - 1);
-            if (!isset($list[$key])) {
-                $list[$key] = array('name' => $key, 'time' => filemtime($file), 'csv' => '', 'xml' => '');
+            $base = substr($name, 0, -strlen($format) - 1);
+            $parsed = self::parse_name($base);
+            $group = $parsed['group'];
+            if (!isset($list[$group])) {
+                // A name without the storage number and time falls back to the file time.
+                $list[$group] = array(
+                    'number'  => $parsed['number'],
+                    'sort'    => $parsed['stamp'] !== '' ? $parsed['stamp'] : gmdate('YmdHis', filemtime($file)),
+                    'time'    => filemtime($file),
+                    'current' => false,
+                    'files'   => array(),
+                );
             }
-            $list[$key][$format] = self::file_url($name);
+            $kind = $parsed['kind'];
+            if (!isset($list[$group]['files'][$kind])) {
+                $list[$group]['files'][$kind] = array('name' => $base, 'csv' => '', 'xml' => '');
+            }
+            $list[$group]['files'][$kind][$format] = self::file_url($name);
+            if ($parsed['stamp'] > $list[$group]['sort']) {
+                $list[$group]['sort'] = $parsed['stamp'];
+            }
+            if (in_array($name, $current, true)) {
+                $list[$group]['current'] = true;
+            }
         }
-        // The prescribed name ends with the storage number, date and time
-        // (..._000014_20261001_080000); that time orders the publications, also
-        // across a change of the outlet's address. A name without it falls back
-        // to the file time.
-        foreach ($list as $key => $item) {
-            $list[$key]['sort'] = preg_match('/_(\d{8})_(\d{6})$/', $item['name'], $m)
-                ? $m[1] . $m[2]
-                : gmdate('YmdHis', $item['time']);
-        }
+        // The time in the name orders the publications, also across a change
+        // of the outlet's address; the storage number breaks a tie.
         uasort($list, function ($a, $b) {
-            return strcmp($b['sort'], $a['sort']);
+            $order = strcmp($b['sort'], $a['sort']);
+
+            return $order !== 0 ? $order : strcmp($b['number'], $a['number']);
         });
+        foreach ($list as $group => $item) {
+            $files = array();
+            foreach (array('roba', 'usluge', '') as $kind) {
+                if (isset($item['files'][$kind])) {
+                    $files[$kind] = $item['files'][$kind];
+                }
+            }
+            $list[$group]['files'] = $files;
+        }
 
         return array_values($list);
     }
 
     /**
-     * Refreshes a copy that is not from today on a normal page view, so sites
-     * with little traffic (where WP-Cron rarely fires) still publish the day's
-     * price list.
+     * Checks a copy that was not checked in the last hour on a normal page
+     * view, so sites with little traffic (where WP-Cron rarely fires) still
+     * publish a changed price list on the day of the change.
      */
     public static function maybe_refresh()
     {
@@ -683,35 +1014,74 @@ class Woo_KigoCloud_Pricelist
     }
 
     /**
-     * Warns in wp-admin when the published copy is not from today, instead of
-     * letting it age silently: a stale price list is a breach, and nobody would
-     * notice.
+     * Warns in wp-admin when the copy was not checked with KigoCloud for three
+     * hours, instead of letting it age silently: a changed price list that is
+     * not on the site by 11:00 is a breach, and nobody would notice.
      */
     public static function admin_notice()
     {
-        if (!current_user_can('manage_options') || !Woo_KigoCloud::is_notice_screen() || self::base_url() === '' || self::is_current()) {
+        if (!current_user_can('manage_options') || !Woo_KigoCloud::is_notice_screen() || self::base_url() === '' || self::is_current(self::STALE_AFTER)) {
             return;
         }
         $status = self::status();
         $detail = isset($status['message']) ? $status['message'] : '';
         echo '<div class="notice notice-warning"><p><strong>KigoCloud</strong> '
-            . esc_html__('The published price list is not from today.', 'kigocloud-for-woocommerce')
+            . esc_html__('The published price list has not been checked with Kigo.Cloud for more than three hours, so a changed price list may be missing from the site.', 'kigocloud-for-woocommerce')
             . ' ' . esc_html($detail) . '</p></div>';
     }
 
     /**
+     * Label of a kind of price list.
+     *
+     * @param string $kind roba|usluge
+     * @return string
+     */
+    private static function kind_label($kind)
+    {
+        return $kind === 'usluge'
+            ? __('Price list of services', 'kigocloud-for-woocommerce')
+            : __('Price list of goods', 'kigocloud-for-woocommerce');
+    }
+
+    /**
+     * Facts of a publication made of one or more files: the newest time and
+     * its storage number, the goods and the services counted together.
+     *
+     * @param array $files roba|usluge|'' => array('name' => base name, ...)
+     * @return array array('published', 'number', 'items', 'services')
+     */
+    private static function publication_summary(array $files)
+    {
+        $summary = array('published' => '', 'number' => '', 'items' => 0, 'services' => 0);
+        $newest = '';
+        foreach ($files as $file) {
+            $facts = self::publication_facts($file['name'], self::archive_path($file['name']));
+            $summary['items'] += $facts['items'];
+            $summary['services'] += $facts['services'];
+            if ($summary['published'] === '' || $facts['sort'] > $newest) {
+                $newest = $facts['sort'];
+                $summary['published'] = $facts['published'];
+                $summary['number'] = $facts['number'];
+            }
+        }
+
+        return $summary;
+    }
+
+    /**
      * [kigo_cjenik] shows the price list the way Kigo.Cloud's public page does:
-     * the heading (company, sales point), the current files (CSV, XML) and every
-     * publication of the last 30 days. No table of items: the files are the
-     * publication. Every part has its own class, so the theme hides or restyles
-     * it with CSS (the built-in rules are not !important):
+     * the heading (company, sales point), the current files (goods and, when
+     * the sales point has services, services, each CSV and XML) and every
+     * publication still kept (replaced in the last 30 days). No table of items:
+     * the files are the publication. Every part has its own class, so the theme
+     * hides or restyles it with CSS (the built-in rules are not !important):
      *   .kigo-cjenik (wrapper), .kc-head, .kc-company, .kc-company-meta, .kc-logo,
      *   .kc-doc-title, .kc-doc-sub, .kc-current, .kc-archive, .kc-note
      * Attributes, all optional: header, logo, current, archive, note ="no" hide
-     * that part; title="..." own title; limit="7" rows of the last 30 days;
+     * that part; title="..." own title; limit="7" rows of the archive;
      * style="none" drops the built-in look; class="..." extra wrapper class.
      * No call to KigoCloud happens while a page is being rendered, except the
-     * once-a-day refresh of a copy that is not from today.
+     * check of a copy that was not checked in the last hour.
      *
      * @param array $atts
      * @return string
@@ -734,13 +1104,16 @@ class Woo_KigoCloud_Pricelist
         };
         self::maybe_refresh();
 
-        $path = self::path('csv');
-        if ($path === '' || !file_exists($path)) {
+        if (!self::has_files()) {
             return '<p>' . esc_html__('The price list is not available yet.', 'kigocloud-for-woocommerce') . '</p>';
         }
         $archive = self::archive();
-        $current = !empty($archive) ? $archive[0] : null;
-        $facts = $current ? self::publication_facts($current['name'], $path) : array('published' => '', 'number' => '', 'items' => 0, 'services' => 0);
+        $current_files = array();
+        foreach (self::current_kinds() as $kind) {
+            $name = self::path('csv', $kind) !== '' ? basename(self::path('csv', $kind)) : basename(self::path('xml', $kind));
+            $current_files[$kind] = array('name' => substr($name, 0, -4));
+        }
+        $facts = self::publication_summary($current_files);
 
         // The look of Kigo.Cloud's public price list page, scoped to .kigo-cjenik.
         $out = strtolower(trim((string) $atts['style'])) === 'none' ? '' : '<style>'
@@ -759,6 +1132,7 @@ class Woo_KigoCloud_Pricelist
             . '.kigo-cjenik .kc-fact span{display:block;font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:#8a90a0;font-weight:600;}'
             . '.kigo-cjenik .kc-fact strong{font-size:17px;font-weight:600;}'
             . '.kigo-cjenik .kc-buttons{display:flex;flex-wrap:wrap;gap:10px;}'
+            . '.kigo-cjenik .kc-buttons + .kc-buttons{margin-top:10px;}'
             . '.kigo-cjenik a.kc-btn{display:inline-block;padding:11px 22px;border-radius:7px;text-decoration:none;font-weight:600;font-size:14px;background:#1f2430;color:#fff;border:1px solid #1f2430;}'
             . '.kigo-cjenik a.kc-btn:hover{background:#333a4a;color:#fff;}'
             . '.kigo-cjenik a.kc-btn-ghost{background:#fff;color:#1f2430;}'
@@ -770,6 +1144,7 @@ class Woo_KigoCloud_Pricelist
             . '.kigo-cjenik table.kc-table tr:last-child td{border-bottom:0;}'
             . '.kigo-cjenik table.kc-table td.kc-num,.kigo-cjenik table.kc-table th.kc-num{text-align:right;}'
             . '.kigo-cjenik table.kc-table a{color:#1f2430;font-weight:600;text-decoration:none;border-bottom:1px solid #c9cedb;}'
+            . '.kigo-cjenik .kc-kind{color:#5b6270;}'
             . '.kigo-cjenik .kc-now{background:#f3f8f4;}'
             . '.kigo-cjenik .kc-badge{display:inline-block;font-size:10px;text-transform:uppercase;letter-spacing:1px;font-weight:700;color:#0d7a47;background:#ddf0e5;border-radius:4px;padding:2px 7px;margin-left:8px;}'
             . '.kigo-cjenik .kc-note{margin-top:30px;padding-top:18px;border-top:1px solid #e2e5ec;color:#6b7280;font-size:13px;}'
@@ -799,17 +1174,36 @@ class Woo_KigoCloud_Pricelist
             }
             $out .= '<div class="kc-fact"><span>' . esc_html($label) . '</span><strong>' . esc_html($value) . '</strong></div>';
         }
-        $out .= '</div><div class="kc-buttons">'
-            . '<a class="kc-btn" href="' . esc_url(self::url('csv')) . '">' . esc_html__('Download CSV', 'kigocloud-for-woocommerce') . '</a>'
-            . '<a class="kc-btn kc-btn-ghost" href="' . esc_url(self::url('xml')) . '">' . esc_html__('Download XML', 'kigocloud-for-woocommerce') . '</a>'
-            . '</div></div>';
+        $out .= '</div>';
+        foreach (array_keys($current_files) as $kind) {
+            // A file of before 17 November 2026 holds goods and services together.
+            $legacy = self::parse_name($current_files[$kind]['name'])['kind'] === '';
+            $out .= '<div class="kc-buttons">';
+            $ghost = '';
+            foreach (array('csv', 'xml') as $format) {
+                if (self::url($format, $kind) === '') {
+                    continue;
+                }
+                $text = $legacy
+                    ? ($format === 'csv' ? __('Download CSV', 'kigocloud-for-woocommerce') : __('Download XML', 'kigocloud-for-woocommerce'))
+                    : self::kind_label($kind) . ' (' . strtoupper($format) . ')';
+                // The stable address (the same URL for every publication, cl. 6
+                // st. 2); download keeps the prescribed name for the saved file.
+                $stable = self::stable_url($format, $kind);
+                $out .= '<a class="kc-btn' . $ghost . '" href="' . esc_url($stable !== '' ? $stable : self::url($format, $kind)) . '"'
+                    . ' download="' . esc_attr(basename(self::path($format, $kind))) . '">' . esc_html($text) . '</a>';
+                $ghost = ' kc-btn-ghost';
+            }
+            $out .= '</div>';
+        }
+        $out .= '</div>';
         $out .= '</div>';
         }
 
         $limit = max(0, (int) $atts['limit']);
         if ($on('archive')) {
         $out .= '<div class="kc-archive">';
-        $out .= '<div class="kc-h2">' . esc_html__('Published price lists (last 30 days)', 'kigocloud-for-woocommerce') . '</div>';
+        $out .= '<div class="kc-h2">' . esc_html__('Published price lists', 'kigocloud-for-woocommerce') . '</div>';
         $out .= '<div class="kc-table-wrap"><table class="kc-table"><thead><tr>'
             . '<th>' . esc_html__('Published', 'kigocloud-for-woocommerce') . '</th>'
             . '<th>' . esc_html__('Storage number', 'kigocloud-for-woocommerce') . '</th>'
@@ -817,23 +1211,25 @@ class Woo_KigoCloud_Pricelist
             . '<th class="kc-num">' . esc_html__('Services', 'kigocloud-for-woocommerce') . '</th>'
             . '<th>' . esc_html__('Files', 'kigocloud-for-woocommerce') . '</th>'
             . '</tr></thead><tbody>';
-        $first = true;
         foreach (($limit > 0 ? array_slice($archive, 0, $limit) : $archive) as $item) {
-            $f = self::publication_facts($item['name'], self::archive_path($item['name']));
-            $links = array();
-            foreach (array('csv', 'xml') as $format) {
-                if ($item[$format] !== '') {
-                    $links[] = '<a href="' . esc_url($item[$format]) . '" title="' . esc_attr($item['name'] . '.' . $format) . '">' . strtoupper($format) . '</a>';
+            $f = self::publication_summary($item['files']);
+            $groups = array();
+            foreach ($item['files'] as $kind => $file) {
+                $links = array();
+                foreach (array('csv', 'xml') as $format) {
+                    if ($file[$format] !== '') {
+                        $links[] = '<a href="' . esc_url($file[$format]) . '" title="' . esc_attr($file['name'] . '.' . $format) . '">' . strtoupper($format) . '</a>';
+                    }
                 }
+                $groups[] = ($kind !== '' ? '<span class="kc-kind">' . esc_html(self::kind_label($kind)) . ':</span> ' : '') . implode(' &middot; ', $links);
             }
-            $out .= '<tr' . ($first ? ' class="kc-now"' : '') . '>'
-                . '<td>' . esc_html($f['published']) . ($first ? '<span class="kc-badge">' . esc_html__('Current', 'kigocloud-for-woocommerce') . '</span>' : '') . '</td>'
+            $out .= '<tr' . ($item['current'] ? ' class="kc-now"' : '') . '>'
+                . '<td>' . esc_html($f['published']) . ($item['current'] ? '<span class="kc-badge">' . esc_html__('Current', 'kigocloud-for-woocommerce') . '</span>' : '') . '</td>'
                 . '<td>' . esc_html($f['number']) . '</td>'
                 . '<td class="kc-num">' . (int) $f['items'] . '</td>'
                 . '<td class="kc-num">' . (int) $f['services'] . '</td>'
-                . '<td>' . implode(' &middot; ', $links) . '</td>'
+                . '<td>' . implode('<br>', $groups) . '</td>'
                 . '</tr>';
-            $first = false;
         }
         $out .= '</tbody></table></div>';
         $out .= '</div>';
@@ -841,8 +1237,8 @@ class Woo_KigoCloud_Pricelist
 
         if ($on('note')) {
             $out .= '<div class="kc-note">'
-                . '<p>' . esc_html__('The price list holds the retail prices of the products and services of this shop, together with the anchor price that applied on the reference day.', 'kigocloud-for-woocommerce') . '</p>'
-                . '<p>' . esc_html__('The price list is published every day, and every publication stays available for 30 days.', 'kigocloud-for-woocommerce') . '</p>'
+                . '<p>' . esc_html__('The price list holds the retail prices of the goods and services of this shop, together with the base price (bazna cijena) that applied on the reference day.', 'kigocloud-for-woocommerce') . '</p>'
+                . '<p>' . esc_html__('A changed price list is published on the day of the change, and every replaced price list stays available for 30 days.', 'kigocloud-for-woocommerce') . '</p>'
                 . '</div>';
         }
         // Only when the site owner ticked it on the Price list tab (off by default).
@@ -923,23 +1319,29 @@ class Woo_KigoCloud_Pricelist
     }
 
     /**
-     * Publication date and storage number from the prescribed file name
-     * (..._000005_20261113_080000), and the number of products and services
-     * in its CSV (column Vrsta). Counts are kept per file, a file never changes.
+     * Publication date and storage number from the prescribed file name, and
+     * the number of products and services in its CSV. A ROBA file holds goods
+     * only and a USLUGE file services only, so their data rows are counted; a
+     * file of before 17 November 2026 holds both and is counted by its column
+     * Vrsta. Counts are kept per file, a file never changes.
      *
      * @param string $name base name without extension
      * @param string $csv  path of its CSV, '' when unknown
-     * @return array array('published', 'number', 'items', 'services')
+     * @return array array('published', 'number', 'items', 'services', 'sort' => YmdHis|'')
      */
     private static function publication_facts($name, $csv)
     {
-        $facts = array('published' => '', 'number' => '', 'items' => 0, 'services' => 0);
-        if (preg_match('/_(\d{6})_(\d{8})_(\d{6})$/', $name, $m)) {
-            $facts['number'] = $m[1];
-            $time = mktime((int) substr($m[3], 0, 2), (int) substr($m[3], 2, 2), 0, (int) substr($m[2], 4, 2), (int) substr($m[2], 6, 2), (int) substr($m[2], 0, 4));
+        $facts = array('published' => '', 'number' => '', 'items' => 0, 'services' => 0, 'sort' => '');
+        $parsed = self::parse_name($name);
+        if ($parsed['stamp'] !== '') {
+            $stamp = $parsed['stamp'];
+            $facts['number'] = $parsed['number'];
+            $facts['sort'] = $stamp;
+            $time = mktime((int) substr($stamp, 8, 2), (int) substr($stamp, 10, 2), 0, (int) substr($stamp, 4, 2), (int) substr($stamp, 6, 2), (int) substr($stamp, 0, 4));
             $facts['published'] = date_i18n(get_option('date_format') . ' H:i', $time);
         } elseif ($csv !== '') {
             $facts['published'] = date_i18n(get_option('date_format') . ' H:i', filemtime($csv));
+            $facts['sort'] = gmdate('YmdHis', filemtime($csv));
         }
         if ($csv === '') {
             return $facts;
@@ -956,8 +1358,16 @@ class Woo_KigoCloud_Pricelist
                     $header[0] = preg_replace('/^\xEF\xBB\xBF/', '', (string) $header[0]);
                     $col = array_search('vrsta', array_map('strtolower', array_map('trim', $header)), true);
                 }
-                while ($col !== false && ($row = fgetcsv($handle, 0, ';', '"', '\\')) !== false) {
-                    $kind = isset($row[$col]) ? strtolower(trim((string) $row[$col])) : '';
+                $slot = $parsed['kind'] === 'usluge' ? 1 : 0;
+                while (is_array($header) && ($row = fgetcsv($handle, 0, ';', '"', '\\')) !== false) {
+                    if ($row === array(null)) {
+                        continue; // empty line
+                    }
+                    if ($parsed['kind'] !== '') {
+                        $counts[$slot]++;
+                        continue;
+                    }
+                    $kind = ($col !== false && isset($row[$col])) ? strtolower(trim((string) $row[$col])) : '';
                     if ($kind === 'proizvod') {
                         $counts[0]++;
                     } elseif ($kind === 'usluga') {
@@ -966,7 +1376,7 @@ class Woo_KigoCloud_Pricelist
                 }
                 fclose($handle);
             }
-            set_transient($key, $counts, 31 * DAY_IN_SECONDS);
+            set_transient($key, $counts, (self::KEEP_DAYS + 1) * DAY_IN_SECONDS);
         }
         $facts['items'] = (int) $counts[0];
         $facts['services'] = (int) $counts[1];

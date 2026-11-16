@@ -666,12 +666,12 @@ class Woo_KigoCloud_Admin_Page
         <h2><?php esc_html_e('Prices', 'kigocloud-for-woocommerce'); ?></h2>
         <table class="form-table" role="presentation">
             <?php
-            $this->select_field('kigocloud_show_anchor_price', __('Anchor price', 'kigocloud-for-woocommerce'), array(
+            $this->select_field('kigocloud_show_anchor_price', __('Base price (anchor price)', 'kigocloud-for-woocommerce'), array(
                 '0' => __('Do not show', 'kigocloud-for-woocommerce'),
                 '1' => __('Show below the product price', 'kigocloud-for-woocommerce'),
             ), array(
                 'default'     => '0',
-                'description' => __('Croatian Government decision: the price that applied on the reference day is shown next to the retail price. The plugin reads it from Kigo.Cloud (Sidrene cijene, newest reference day) every morning, by itself.', 'kigocloud-for-woocommerce'),
+                'description' => __('Pravilnik o isticanju bazne cijene proizvoda (NN 132/2026): the base price (bazna cijena, also called anchor price), the price that applied on the reference day, is shown under the retail price as "Bazna cijena (10. 9. 2026.): 12,00 €". The plugin reads it from Kigo.Cloud (Sidrene cijene, newest reference day) every morning, by itself.', 'kigocloud-for-woocommerce'),
             ));
             $this->render_anchor_source();
             ?>
@@ -701,7 +701,7 @@ class Woo_KigoCloud_Admin_Page
         );
         ?>
         <tr>
-            <th scope="row"><?php esc_html_e('Anchor prices', 'kigocloud-for-woocommerce'); ?></th>
+            <th scope="row"><?php esc_html_e('Base prices (anchor prices)', 'kigocloud-for-woocommerce'); ?></th>
             <td>
                 <?php if ($reason === ''): ?>
                     <p><span class="kc-status-ok"><?php
@@ -728,11 +728,11 @@ class Woo_KigoCloud_Admin_Page
     {
         $base = Woo_KigoCloud_Pricelist::base_url();
         $status = Woo_KigoCloud_Pricelist::status();
-        $csv = Woo_KigoCloud_Pricelist::path('csv');
+        $checked = Woo_KigoCloud_Pricelist::checked();
         ?>
         <div class="kc-card">
             <h2><?php esc_html_e('Price list on your own website', 'kigocloud-for-woocommerce'); ?></h2>
-            <p class="kc-desc"><?php esc_html_e('Croatian law requires the price list to be published on your own website. The plugin takes the price list address from your Kigo.Cloud licence, downloads the price list every morning and deletes the files older than 30 days. Put the [kigo_cjenik] shortcode on your page to show it.', 'kigocloud-for-woocommerce'); ?></p>
+            <p class="kc-desc"><?php esc_html_e('Croatian law requires the price list to be published on your own website: a price list of goods and, if you sell services, a price list of services, and a changed price list by 11:00 on the day of the change. The plugin takes the price list addresses from your Kigo.Cloud licence, checks them every hour, downloads a price list as soon as Kigo.Cloud publishes a changed one, and keeps every replaced price list for 30 days. Put the [kigo_cjenik] shortcode on your page to show it.', 'kigocloud-for-woocommerce'); ?></p>
             <table class="form-table" role="presentation">
                 <?php
                 $licence_url = Woo_KigoCloud_Licence::price_list_url();
@@ -778,35 +778,43 @@ class Woo_KigoCloud_Admin_Page
                         <th scope="row"><?php esc_html_e('Shortcode', 'kigocloud-for-woocommerce'); ?></th>
                         <td>
                             <p><code>[kigo_cjenik]</code></p>
-                            <p class="description"><?php esc_html_e('Options, all optional: header="no", logo="no", current="no", archive="no", note="no" hide that part; title="..." own title; limit="7" at most 7 rows of the last 30 days; style="none" leaves the look to the theme; class="..." own CSS class. Example: [kigo_cjenik logo="no" limit="7"]', 'kigocloud-for-woocommerce'); ?></p>
-                            <p class="description"><?php esc_html_e('Every part has its own CSS class, so the theme can hide or restyle it: .kc-head (company heading), .kc-logo, .kc-doc-title, .kc-current (current price list), .kc-archive (last 30 days), .kc-note. Example: .kigo-cjenik .kc-logo { display: none; }', 'kigocloud-for-woocommerce'); ?></p>
-                            <p class="description"><?php esc_html_e('Put it on the page of your site where the price list belongs (for example a page Cjenik linked from the footer). It shows today\'s price list and the downloads of the last 30 days.', 'kigocloud-for-woocommerce'); ?></p>
+                            <p class="description"><?php esc_html_e('Options, all optional: header="no", logo="no", current="no", archive="no", note="no" hide that part; title="..." own title; limit="7" at most 7 rows of published price lists; style="none" leaves the look to the theme; class="..." own CSS class. Example: [kigo_cjenik logo="no" limit="7"]', 'kigocloud-for-woocommerce'); ?></p>
+                            <p class="description"><?php esc_html_e('Every part has its own CSS class, so the theme can hide or restyle it: .kc-head (company heading), .kc-logo, .kc-doc-title, .kc-current (current price list), .kc-archive (published price lists), .kc-note. Example: .kigo-cjenik .kc-logo { display: none; }', 'kigocloud-for-woocommerce'); ?></p>
+                            <p class="description"><?php esc_html_e('Put it on the page of your site where the price list belongs (for example a page Cjenik linked from the footer). It shows the current price lists of goods and services and those replaced in the last 30 days.', 'kigocloud-for-woocommerce'); ?></p>
                         </td>
                     </tr>
                     <tr>
                         <th scope="row"><?php esc_html_e('Files', 'kigocloud-for-woocommerce'); ?></th>
                         <td>
-                            <?php if (Woo_KigoCloud_Pricelist::url('csv') !== ''): ?>
-                                <p><code><?php echo esc_html(Woo_KigoCloud_Pricelist::url('csv')); ?></code></p>
-                                <p><code><?php echo esc_html(Woo_KigoCloud_Pricelist::url('xml')); ?></code></p>
+                            <?php if (Woo_KigoCloud_Pricelist::current_kinds()): ?>
+                                <?php foreach (Woo_KigoCloud_Pricelist::current_kinds() as $kind): ?>
+                                    <p><strong><?php echo esc_html($kind === 'usluge' ? __('Price list of services', 'kigocloud-for-woocommerce') : __('Price list of goods', 'kigocloud-for-woocommerce')); ?></strong></p>
+                                    <?php foreach (array('csv', 'xml') as $format): ?>
+                                        <?php if (Woo_KigoCloud_Pricelist::stable_url($format, $kind) !== ''): ?>
+                                            <p><code><?php echo esc_html(Woo_KigoCloud_Pricelist::stable_url($format, $kind)); ?></code>
+                                                <span class="description">(<?php echo esc_html(basename(Woo_KigoCloud_Pricelist::path($format, $kind))); ?>)</span></p>
+                                        <?php endif; ?>
+                                    <?php endforeach; ?>
+                                <?php endforeach; ?>
                             <?php else: ?>
                                 <p><span class="kc-status-bad"><?php esc_html_e('not downloaded yet', 'kigocloud-for-woocommerce'); ?></span></p>
                             <?php endif; ?>
-                            <p class="description"><?php esc_html_e('New files every day, as the decision wants. Files older than 30 days are deleted by the plugin, so they do not pile up.', 'kigocloud-for-woocommerce'); ?></p>
+                            <p class="description"><?php esc_html_e('Give these addresses to inspectors and price crawlers: they always hold the current price list, a changed price list comes to the same address, as the Pravilnik wants. In brackets the prescribed name of the current file.', 'kigocloud-for-woocommerce'); ?></p>
+                            <p class="description"><?php esc_html_e('A new file only when Kigo.Cloud publishes a changed price list, under the name the Pravilnik prescribes. A replaced file stays available for 30 days (the Pravilnik asks for 15) and is then deleted by the plugin.', 'kigocloud-for-woocommerce'); ?></p>
                         </td>
                     </tr>
                     <tr>
-                        <th scope="row"><?php esc_html_e('Last refresh', 'kigocloud-for-woocommerce'); ?></th>
+                        <th scope="row"><?php esc_html_e('Last check', 'kigocloud-for-woocommerce'); ?></th>
                         <td>
-                            <?php if ($csv !== '' && file_exists($csv)): ?>
-                                <span class="kc-status-ok"><?php echo esc_html(date_i18n(get_option('date_format') . ' ' . get_option('time_format'), filemtime($csv))); ?></span>
+                            <?php if ($checked > 0 && Woo_KigoCloud_Pricelist::has_files()): ?>
+                                <span class="<?php echo Woo_KigoCloud_Pricelist::is_current(Woo_KigoCloud_Pricelist::STALE_AFTER) ? 'kc-status-ok' : 'kc-status-bad'; ?>"><?php echo esc_html(date_i18n(get_option('date_format') . ' ' . get_option('time_format'), $checked)); ?></span>
                             <?php else: ?>
                                 <span class="kc-status-bad"><?php esc_html_e('not downloaded yet', 'kigocloud-for-woocommerce'); ?></span>
                             <?php endif; ?>
                             <?php if (!empty($status['message'])): ?>
                                 <p class="description"><?php echo esc_html($status['message']); ?></p>
                             <?php endif; ?>
-                            <p class="description"><?php esc_html_e('Refreshed automatically every morning at 7. Save the settings to fetch it right away.', 'kigocloud-for-woocommerce'); ?></p>
+                            <p class="description"><?php esc_html_e('Checked with Kigo.Cloud automatically every hour, and on a visit to the price list page after an hour without a check. Save the settings to check right away.', 'kigocloud-for-woocommerce'); ?></p>
                         </td>
                     </tr>
                 </table>
@@ -1457,7 +1465,7 @@ class Woo_KigoCloud_Admin_Page
                         <?php if (isset($data['active']) && !$data['active']): ?>
                             <span class="kc-status-bad"><?php esc_html_e('expired', 'kigocloud-for-woocommerce'); ?></span>
                         <?php endif; ?></p>
-                    <p><?php esc_html_e('Anchor prices:', 'kigocloud-for-woocommerce'); ?> <?php echo esc_html(Woo_KigoCloud_Licence::allows_anchor() ? $yes : $no); ?>
+                    <p><?php esc_html_e('Base prices (anchor prices):', 'kigocloud-for-woocommerce'); ?> <?php echo esc_html(Woo_KigoCloud_Licence::allows_anchor() ? $yes : $no); ?>
                         &middot; <?php esc_html_e('Price list on your own website:', 'kigocloud-for-woocommerce'); ?> <?php echo esc_html(Woo_KigoCloud_Licence::allows_price_list() ? $yes : $no); ?></p>
                     <p class="description"><?php
                         echo esc_html(sprintf(

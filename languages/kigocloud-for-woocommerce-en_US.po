@@ -365,3 +365,10 @@ msgstr ""
 #: public/class-kigocloud-for-woocommerce-public.php:213
 msgid "Invalid VAT."
 msgstr ""
+
+msgid "Bazna cijena"
+msgstr "Base price"
+
+#, php-format
+msgid "Bazna cijena (%s)"
+msgstr "Base price (%s)"
