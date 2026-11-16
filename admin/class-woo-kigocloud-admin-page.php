@@ -57,7 +57,10 @@ class Woo_KigoCloud_Admin_Page
             // Only the login is on the page. options.php empties every registered
             // option missing from the form, so the shop settings are not registered:
             // they stay as they are for the day WooCommerce is switched on.
-            $opts_by_group = array('kigocloud_connection' => array_diff($opts_by_group['kigocloud_connection'], array('kigocloud_pin')));
+            $opts_by_group = array(
+                'kigocloud_connection' => array_diff($opts_by_group['kigocloud_connection'], array('kigocloud_pin')),
+                'kigocloud_pricelist'  => $opts_by_group['kigocloud_pricelist'],
+            );
         }
         $sanitizers    = $this->sanitizers();
         foreach ($opts_by_group as $opts) {
@@ -101,7 +104,19 @@ class Woo_KigoCloud_Admin_Page
             'kigocloud_email_from'              => 'sanitize_email',
             'kigocloud_reply_to'                => 'sanitize_email',
             'kigocloud_custom_mapping'          => 'sanitize_textarea_field',
+            'kigocloud_pricelist_credit'        => array(__CLASS__, 'sanitize_yes_no'),
         );
+    }
+
+    /**
+     * A checkbox: '1' when ticked, '0' otherwise (an unticked box is not in the POST).
+     *
+     * @param mixed $value
+     * @return string
+     */
+    public static function sanitize_yes_no($value)
+    {
+        return ('1' === (string) $value) ? '1' : '0';
     }
 
     /**
@@ -406,6 +421,9 @@ class Woo_KigoCloud_Admin_Page
             ),
             'kigocloud_mapping' => array(
                 'kigocloud_custom_mapping',
+            ),
+            'kigocloud_pricelist' => array(
+                'kigocloud_pricelist_credit',
             ),
         );
     }
@@ -742,6 +760,17 @@ class Woo_KigoCloud_Admin_Page
                     <?php
                 }
                 ?>
+                <tr>
+                    <th scope="row"><?php esc_html_e('Link to Kigo.Cloud', 'kigocloud-for-woocommerce'); ?></th>
+                    <td>
+                        <input type="hidden" name="kigocloud_pricelist_credit" value="0" />
+                        <label for="kigocloud_pricelist_credit">
+                            <input type="checkbox" id="kigocloud_pricelist_credit" name="kigocloud_pricelist_credit" value="1"<?php checked('1', (string) get_option('kigocloud_pricelist_credit', '0')); ?> />
+                            <?php esc_html_e('Show "Price list made with Kigo.Cloud" with a link to kigocloud.com below the price list', 'kigocloud-for-woocommerce'); ?>
+                        </label>
+                        <p class="description"><?php esc_html_e('Off by default. When ticked, a small line with a link to www.kigocloud.com appears under the [kigo_cjenik] price list on your public page. The price list works the same either way.', 'kigocloud-for-woocommerce'); ?></p>
+                    </td>
+                </tr>
             </table>
             <?php if ($base !== ''): ?>
                 <table class="form-table" role="presentation">

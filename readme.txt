@@ -4,7 +4,7 @@ Tags: fiskalizacija, sidrena cijena, cjenik, croatia, fiscalization
 Requires at least: 5.5
 Tested up to: 7.1
 Requires PHP: 7.2
-Stable tag: 2.2.15
+Stable tag: 2.2.16
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 WC requires at least: 5.0
@@ -90,6 +90,10 @@ KigoCloud copies its settings on activation and does not send orders while the K
 
 Yes. Kigo.Cloud keeps the anchor price of every item, calculated from its price history or entered by hand, and publishes the price list in CSV and XML every night before 8:00. The plugin serves that price list from your own domain (Standard plan) and shows the anchor price under the product price in the shop (Business plan). More: [Sidrene cijene u Kigo.Cloudu](https://www.kigocloud.com/sidrene-cijene/).
 
+= Does the plugin put a link to Kigo.Cloud on my site? =
+
+Only if you ask for it. On the Price list tab there is a box "Link to Kigo.Cloud", unticked by default. When you tick it, a small line "Price list made with Kigo.Cloud" with a link to www.kigocloud.com appears under the `[kigo_cjenik]` price list. Untick it and the line is gone. Nothing else on your public pages links to Kigo.Cloud, and the plugin works the same whether the box is ticked or not.
+
 = Where do I get help? =
 
 Write to the support forum here or to the e-mail address on [www.kigocloud.com](https://www.kigocloud.com/).
@@ -123,6 +127,9 @@ Kigo.Cloud privacy policy: https://www.kigocloud.com/zastita-osobnih-podataka
 4. An order with the fiscalized Kigo.Cloud invoice number.
 
 == Changelog ==
+
+= 2.2.16 =
+* Price list tab: an optional line "Price list made with Kigo.Cloud" with a link to www.kigocloud.com under the [kigo_cjenik] price list. Off by default; it shows only when you tick "Link to Kigo.Cloud".
 
 = 2.2.15 =
 * Works without WooCommerce for the price list: a WordPress site without a web shop can activate the plugin and publish the Kigo.Cloud price list (CSV, XML and the [kigo_cjenik] shortcode). Without WooCommerce the KigoCloud page shows only Connection, Price list, Logs and About, and is open to administrators. Shops with WooCommerce see no change.
@@ -262,6 +269,9 @@ Kigo.Cloud privacy policy: https://www.kigocloud.com/zastita-osobnih-podataka
 Older versions: https://github.com/symmetria-doo/kigocloud-for-woocommerce/blob/main/CHANGELOG.md
 
 == Upgrade Notice ==
+
+= 2.2.16 =
+Optional link to Kigo.Cloud under the price list, off by default.
 
 = 2.2.15 =
 WooCommerce is no longer required: a site without a web shop can publish the price list.

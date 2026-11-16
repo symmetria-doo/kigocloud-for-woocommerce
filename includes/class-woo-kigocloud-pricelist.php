@@ -62,6 +62,9 @@ class Woo_KigoCloud_Pricelist
     /** Every published version stays available this many days. */
     const KEEP_DAYS = 30;
 
+    /** Where the optional "Price list made with Kigo.Cloud" line links to (option kigocloud_pricelist_credit). */
+    const CREDIT_URL = 'https://www.kigocloud.com/sidrene-cijene-woocommerce/';
+
     /**
      * Cron registration and the shortcode. Called from the plugin bootstrap.
      */
@@ -771,6 +774,8 @@ class Woo_KigoCloud_Pricelist
             . '.kigo-cjenik .kc-badge{display:inline-block;font-size:10px;text-transform:uppercase;letter-spacing:1px;font-weight:700;color:#0d7a47;background:#ddf0e5;border-radius:4px;padding:2px 7px;margin-left:8px;}'
             . '.kigo-cjenik .kc-note{margin-top:30px;padding-top:18px;border-top:1px solid #e2e5ec;color:#6b7280;font-size:13px;}'
             . '.kigo-cjenik .kc-note p{margin:0 0 8px 0;}'
+            . '.kigo-cjenik .kc-credit{margin-top:14px;color:#8a90a0;font-size:12px;}'
+            . '.kigo-cjenik .kc-credit a{color:inherit;}'
             . '@media (max-width:520px){.kigo-cjenik a.kc-btn{display:block;text-align:center;}}'
             . '</style>';
         $extra = trim(preg_replace('/[^A-Za-z0-9_ -]/', '', (string) $atts['class']));
@@ -839,6 +844,15 @@ class Woo_KigoCloud_Pricelist
                 . '<p>' . esc_html__('The price list holds the retail prices of the products and services of this shop, together with the anchor price that applied on the reference day.', 'kigocloud-for-woocommerce') . '</p>'
                 . '<p>' . esc_html__('The price list is published every day, and every publication stays available for 30 days.', 'kigocloud-for-woocommerce') . '</p>'
                 . '</div>';
+        }
+        // Only when the site owner ticked it on the Price list tab (off by default).
+        if ('1' === (string) get_option('kigocloud_pricelist_credit', '0')) {
+            $out .= '<div class="kc-credit">' . sprintf(
+                /* translators: %1$s and %2$s: start and end of the link to Kigo.Cloud */
+                esc_html__('Price list made with %1$sKigo.Cloud%2$s', 'kigocloud-for-woocommerce'),
+                '<a href="' . esc_url(self::CREDIT_URL) . '">',
+                '</a>'
+            ) . '</div>';
         }
         $out .= '</div>';
 

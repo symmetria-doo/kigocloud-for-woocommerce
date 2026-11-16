@@ -4,6 +4,11 @@ All notable changes to KigoCloud for WooCommerce are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.16] - 2026-11-16
+
+### Added
+- Optional credit line under the `[kigo_cjenik]` price list: "Price list made with Kigo.Cloud", linking to https://www.kigocloud.com/sidrene-cijene-woocommerce/. Option `kigocloud_pricelist_credit` (checkbox "Link to Kigo.Cloud" on the Price list tab), off by default, as WordPress.org plugin guideline 10 requires (no credits or links on the public site without the user's explicit opt-in). Registered with and without WooCommerce; the checkbox is on the tab whatever the licence says, so saving never clears it. Class `.kc-credit`.
+
 ## [2.2.15] - 2026-11-15
 
 ### Changed
