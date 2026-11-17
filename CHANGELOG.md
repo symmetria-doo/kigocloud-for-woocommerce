@@ -4,6 +4,11 @@ All notable changes to KigoCloud for WooCommerce are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.23] - 2026-11-17
+
+### Fixed
+- `shop_suffix()` leaves out the shop price suffix (for example "+ PDV") for a product that is not taxable, the parent deciding for a variation, as WooCommerce does in `get_price_suffix()`. A product with tax status none showed "Bazna cijena: 37,50 € + PDV" under a price without the suffix.
+
 ## [2.2.22] - 2026-11-17
 
 ### Fixed

@@ -145,7 +145,7 @@ JS;
         if ($highest !== null && (float) $highest !== (float) $anchor) {
             $amount .= ' – ' . trim(wp_strip_all_tags(wc_price($this->shop_amount($product, (float) $highest))));
         }
-        $amount .= $this->shop_suffix();
+        $amount .= $this->shop_suffix($product);
 
         // Themes lay the price out as flex rows, absolutely positioned boxes of a
         // fixed height and so on, so the line carries its own style with
@@ -295,14 +295,21 @@ JS;
 
     /**
      * The shop's price suffix ("+ PDV", "s PDV-om"), plain text, so the base
-     * price says the same as the price above it. Placeholders are left out.
+     * price says the same as the price above it. Placeholders are left out,
+     * and so is the suffix of a product without tax (the parent decides for a
+     * variation), as WooCommerce does for the product price.
      *
+     * @param WC_Product $product
      * @return string
      */
-    private function shop_suffix()
+    private function shop_suffix($product)
     {
         $suffix = trim((string) get_option('woocommerce_price_display_suffix', ''));
         if ($suffix === '' || !wc_tax_enabled() || strpos($suffix, '{') !== false) {
+            return '';
+        }
+        $taxed = $product->get_parent_id() ? wc_get_product($product->get_parent_id()) : $product;
+        if ($taxed && !$taxed->is_taxable()) {
             return '';
         }
 

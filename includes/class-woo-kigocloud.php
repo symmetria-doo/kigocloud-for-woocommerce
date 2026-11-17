@@ -45,7 +45,7 @@ class Woo_KigoCloud {
      *
      * @since 1.0.0
      */
-    const PLUGIN_VERSION = '2.2.22';
+    const PLUGIN_VERSION = '2.2.23';
 
     /**
      * Is WooCommerce active? Without it the plugin only publishes the price
