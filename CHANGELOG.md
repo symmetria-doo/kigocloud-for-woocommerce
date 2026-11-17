@@ -4,6 +4,11 @@ All notable changes to KigoCloud for WooCommerce are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.21] - 2026-11-17
+
+### Fixed
+- `shop_amount()` takes VAT out only for a taxable product (for a variation the parent decides, `is_taxable()`): a product with tax status none was shown below its base price in a shop that shows prices without VAT.
+
 ## [2.2.20] - 2026-11-17
 
 ### Fixed

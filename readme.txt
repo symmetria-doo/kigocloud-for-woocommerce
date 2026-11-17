@@ -4,7 +4,7 @@ Tags: fiskalizacija, sidrena cijena, cjenik, croatia, fiscalization
 Requires at least: 5.5
 Tested up to: 7.1
 Requires PHP: 7.2
-Stable tag: 2.2.20
+Stable tag: 2.2.21
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 WC requires at least: 5.0
@@ -131,6 +131,9 @@ Kigo.Cloud privacy policy: https://www.kigocloud.com/zastita-osobnih-podataka
 4. An order with the fiscalized Kigo.Cloud invoice number.
 
 == Changelog ==
+
+= 2.2.21 =
+* A product without tax keeps its full base price in a shop that shows prices without VAT, as WooCommerce shows its price.
 
 = 2.2.20 =
 * Bazna cijena is shown the way the shop shows its prices: a shop that shows prices without VAT gets the base price without VAT and with the same suffix (for example "+ PDV"), so the two are no longer 25 % apart for the same price.
@@ -288,6 +291,9 @@ Kigo.Cloud privacy policy: https://www.kigocloud.com/zastita-osobnih-podataka
 Older versions: https://github.com/symmetria-doo/kigocloud-for-woocommerce/blob/main/CHANGELOG.md
 
 == Upgrade Notice ==
+
+= 2.2.21 =
+Base price of products without tax shown in full.
 
 = 2.2.20 =
 Bazna cijena with or without VAT like the shop price, and the right date for products that were in the shop before Kigo.Cloud.

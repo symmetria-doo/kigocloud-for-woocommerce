@@ -281,6 +281,12 @@ JS;
         if (!wc_tax_enabled() || 'excl' !== get_option('woocommerce_tax_display_shop')) {
             return $gross;
         }
+        // A product without tax (tax status none; for a variation the parent's
+        // status counts) is shown as it is, like WooCommerce shows its price.
+        $taxed = $product->get_parent_id() ? wc_get_product($product->get_parent_id()) : $product;
+        if ($taxed && !$taxed->is_taxable()) {
+            return $gross;
+        }
         $rates = WC_Tax::get_base_tax_rates($product->get_tax_class('unfiltered'));
         $taxes = WC_Tax::calc_tax($gross, $rates, true);
 
