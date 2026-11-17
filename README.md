@@ -20,6 +20,10 @@ WordPress plugin that sends WooCommerce orders to the KigoCloud service. Handles
 - Custom REST endpoints for SKU lookup (product + variation)
 - Updates through wordpress.org; installs from the GitHub release zip update in place from GitHub Releases
 
+## Live demo
+
+[KigoCloud Demo Webshop](https://webshop.symmetria.hr/) is a WooCommerce shop in Croatian running this plugin, connected to the public Kigo.Cloud demo. Order a product and pay with the Stripe test card `4242 4242 4242 4242` (any future expiry date, any CVC); the order becomes an invoice in Kigo.Cloud. To see it, log in at [app.kigo.cloud](https://app.kigo.cloud/hr/site/login) with username and password `admin_demo`. The shop also shows the anchor price (bazna cijena) under the product price and a [price list page](https://webshop.symmetria.hr/cjenik/) made with the `[kigo_cjenik]` shortcode. The demo is public, so use made-up customer details.
+
 ## Installation
 
 KigoCloud for WooCommerce is the official plugin in the WordPress Plugin Directory: [wordpress.org/plugins/kigocloud-for-woocommerce](https://wordpress.org/plugins/kigocloud-for-woocommerce/). Install it straight from WordPress, with no file to download:

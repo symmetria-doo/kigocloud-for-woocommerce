@@ -38,6 +38,10 @@ Croatian law requires every sale paid by card, cash or a similar method to be fi
 
 Kigo.Cloud is an online program for issuing and fiscalizing invoices, eRačun (Fiscalization 2.0), stock and price lists, developed in Zagreb since 2013. Connecting a web shop and fiscalizing its orders is available from the Standard plan; two-way sync of items, stock and prices and the anchor price in the shop from the Business plan. Registration is free and needs no card. Plans and prices: [www.kigocloud.com](https://www.kigocloud.com/cijene/).
 
+= Live demo =
+
+See the plugin at work in [KigoCloud Demo Webshop](https://webshop.symmetria.hr/), a WooCommerce shop in Croatian connected to the public Kigo.Cloud demo. Order a product and pay with the Stripe test card 4242 4242 4242 4242 (any future expiry date, any CVC): the order becomes an invoice in Kigo.Cloud. To see it, log in at [app.kigo.cloud](https://app.kigo.cloud/hr/site/login) with username and password admin_demo. The shop also shows the anchor price (bazna cijena) under the product price and a [price list page](https://webshop.symmetria.hr/cjenik/) made with the [kigo_cjenik] shortcode. The demo is public, so use made-up customer details.
+
 = Try it without an account =
 
 On the Connection tab, the **Try with the demo account** button fills in the login of the public Kigo.Cloud demo. Orders then become invoices in the demo, signed with a test certificate, so you can see the whole flow before you register. Anyone can log in to the demo, so use it only with test orders.
