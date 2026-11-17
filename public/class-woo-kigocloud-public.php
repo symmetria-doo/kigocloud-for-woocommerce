@@ -95,6 +95,11 @@ JS;
      * every day (Price list tab), matched by SKU or GTIN; without either the price
      * HTML is returned unchanged.
      *
+     * A variable product shows the base prices of its variations: one amount
+     * when they are all the same (WooCommerce then shows no variation price
+     * when one is selected, so this is the only line on the page), otherwise
+     * the lowest and the highest, like the price range above it.
+     *
      * @param string     $price_html
      * @param WC_Product $product
      * @return string
@@ -108,19 +113,17 @@ JS;
         if (!($product instanceof WC_Product)) {
             return $price_html;
         }
-        $anchor = $product->get_meta('_kigo_anchor_price', true);
-        $date   = $product->get_meta('_kigo_anchor_price_date', true);
-        if ($anchor === '' || $anchor === null || !is_numeric($anchor)) {
-            $listed = class_exists('Woo_KigoCloud_Pricelist') ? Woo_KigoCloud_Pricelist::anchor_for($product) : null;
-            if ($listed === null) {
-                return $price_html;
-            }
-            $anchor = $listed[0];
-            $date   = $listed[1];
+        $found = null;
+        if ($product->is_type('variable')) {
+            $found = $this->variations_anchor($product);
         }
-        if ((float) $anchor < 0) {
+        if ($found === null) {
+            $found = $this->own_anchor($product);
+        }
+        if ($found === null) {
             return $price_html;
         }
+        list($anchor, $date, $highest) = $found;
         // "Bazna cijena (10. 9. 2026.): 12,00 €", the name the Pravilnik o
         // isticanju bazne cijene proizvoda (NN 132/2026) gives it and Kigo.Cloud
         // prints on shelf labels and declarations (ItemAnchorDate::getLabelWithDate).
@@ -135,6 +138,9 @@ JS;
         // Plain text amount: the theme's rules for .amount (colour, size, weight)
         // must not reach the anchor price, only the line's own style does.
         $amount = trim(wp_strip_all_tags(wc_price((float) $anchor)));
+        if ($highest !== null && (float) $highest !== (float) $anchor) {
+            $amount .= ' – ' . trim(wp_strip_all_tags(wc_price((float) $highest)));
+        }
 
         // Themes lay the price out as flex rows, absolutely positioned boxes of a
         // fixed height and so on, so the line carries its own style with
@@ -168,6 +174,80 @@ JS;
          * @param WC_Product $product
          */
         return apply_filters('kigocloud_anchor_price_html', $html, $price_html, (float) $anchor, (string) $date, $product);
+    }
+
+    /**
+     * Base price of the product or variation itself: its meta from KigoCloud,
+     * otherwise the price list by SKU or GTIN.
+     *
+     * @param WC_Product $product
+     * @return array|null array(price, date, null)
+     */
+    private function own_anchor($product)
+    {
+        $anchor = $product->get_meta('_kigo_anchor_price', true);
+        $date   = $product->get_meta('_kigo_anchor_price_date', true);
+        if ($anchor === '' || $anchor === null || !is_numeric($anchor)) {
+            $listed = class_exists('Woo_KigoCloud_Pricelist') ? Woo_KigoCloud_Pricelist::anchor_for($product) : null;
+            if ($listed === null) {
+                return null;
+            }
+            $anchor = $listed[0];
+            $date   = $listed[1];
+        }
+        if ((float) $anchor < 0) {
+            return null;
+        }
+
+        return array($anchor, $date, null);
+    }
+
+    /**
+     * Base prices of the visible variations of a variable product, read the
+     * same way as for a single variation (meta, then the price list by the
+     * variation's SKU, which WooCommerce takes from the parent when the
+     * variation has none, or GTIN). One meta query for all variations.
+     *
+     * @param WC_Product $product variable product
+     * @return array|null array(lowest, date when all are of the same day, highest)
+     */
+    private function variations_anchor($product)
+    {
+        $ids = array_map('intval', (array) $product->get_visible_children());
+        if (empty($ids)) {
+            return null;
+        }
+        update_meta_cache('post', $ids);
+        $prices = array();
+        $dates  = array();
+        foreach ($ids as $id) {
+            $anchor = get_post_meta($id, '_kigo_anchor_price', true);
+            $date   = get_post_meta($id, '_kigo_anchor_price_date', true);
+            if ($anchor === '' || !is_numeric($anchor)) {
+                $sku = (string) get_post_meta($id, '_sku', true);
+                if ($sku === '') {
+                    $sku = (string) $product->get_sku();
+                }
+                $listed = class_exists('Woo_KigoCloud_Pricelist')
+                    ? Woo_KigoCloud_Pricelist::anchor_for_codes($sku, (string) get_post_meta($id, '_global_unique_id', true))
+                    : null;
+                if ($listed === null) {
+                    continue;
+                }
+                $anchor = $listed[0];
+                $date   = $listed[1];
+            }
+            if ((float) $anchor < 0) {
+                continue;
+            }
+            $prices[] = (float) $anchor;
+            $dates[(string) $date] = true;
+        }
+        if (empty($prices)) {
+            return null;
+        }
+
+        return array(min($prices), count($dates) === 1 ? (string) key($dates) : '', max($prices));
     }
 
     /**

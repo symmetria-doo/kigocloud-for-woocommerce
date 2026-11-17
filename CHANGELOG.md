@@ -4,6 +4,11 @@ All notable changes to KigoCloud for WooCommerce are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.19] - 2026-11-17
+
+### Fixed
+- Bazna cijena on variable products. A variable product has no `_kigo_anchor_price` of its own and its SKU is usually not in the price list, and when all variations have the same price WooCommerce shows no variation price, so the base price appeared nowhere on the page. `anchor_price_html()` now reads the visible variations (`variations_anchor()`: meta, then the price list by the variation's SKU, the parent's SKU when the variation has none, or GTIN, one meta cache query) and prints one amount or lowest – highest, with the reference day when all variations share it; otherwise the product's own base price as before (`own_anchor()`). New `Woo_KigoCloud_Pricelist::anchor_for_codes($sku, $gtin)`, which `anchor_for()` uses.
+
 ## [2.2.18] - 2026-11-17
 
 ### Changed

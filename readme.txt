@@ -4,7 +4,7 @@ Tags: fiskalizacija, sidrena cijena, cjenik, croatia, fiscalization
 Requires at least: 5.5
 Tested up to: 7.1
 Requires PHP: 7.2
-Stable tag: 2.2.18
+Stable tag: 2.2.19
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 WC requires at least: 5.0
@@ -131,6 +131,9 @@ Kigo.Cloud privacy policy: https://www.kigocloud.com/zastita-osobnih-podataka
 4. An order with the fiscalized Kigo.Cloud invoice number.
 
 == Changelog ==
+
+= 2.2.19 =
+* Bazna cijena on variable products. When all variations had the same price, WooCommerce showed no variation price, so the base price appeared nowhere on the product page. The price of a variable product now carries the base prices of its variations: one amount when they are the same, otherwise the lowest and the highest, with the reference day when all are of the same day.
 
 = 2.2.18 =
 * The price list is published only under the file names the Pravilnik prescribes (OIB, sales point, ROBA or USLUGE, storage number and time). The extra copies cjenik-roba.csv, cjenik-roba.xml, cjenik-usluge.csv and cjenik-usluge.xml of 2.2.17 are removed. The page with [kigo_cjenik] is the place of the price list on your site: its buttons and the Price list tab link the current files under their prescribed names, and a changed price list always comes to that page.
@@ -281,6 +284,9 @@ Kigo.Cloud privacy policy: https://www.kigocloud.com/zastita-osobnih-podataka
 Older versions: https://github.com/symmetria-doo/kigocloud-for-woocommerce/blob/main/CHANGELOG.md
 
 == Upgrade Notice ==
+
+= 2.2.19 =
+Bazna cijena is also shown on variable products.
 
 = 2.2.18 =
 The price list is published only under the prescribed file names.

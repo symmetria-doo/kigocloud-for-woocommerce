@@ -762,6 +762,20 @@ class Woo_KigoCloud_Pricelist
      */
     public static function anchor_for($product)
     {
+        $gtin = is_callable(array($product, 'get_global_unique_id')) ? (string) $product->get_global_unique_id() : '';
+
+        return self::anchor_for_codes((string) $product->get_sku(), $gtin);
+    }
+
+    /**
+     * Base price from Kigo.Cloud for an SKU, then a GTIN/EAN.
+     *
+     * @param string $sku
+     * @param string $gtin
+     * @return array|null array(price, date) or null when there is none
+     */
+    public static function anchor_for_codes($sku, $gtin)
+    {
         if (self::$anchor_index === null) {
             $index = get_option(self::OPTION_ANCHOR, null);
             self::$anchor_index = is_array($index) ? $index : array();
@@ -769,15 +783,13 @@ class Woo_KigoCloud_Pricelist
         if (empty(self::$anchor_index)) {
             return null;
         }
-        $sku = self::anchor_key($product->get_sku());
+        $sku = self::anchor_key($sku);
         if ($sku !== '' && isset(self::$anchor_index['ref'][$sku])) {
             return self::$anchor_index['ref'][$sku];
         }
-        if (is_callable(array($product, 'get_global_unique_id'))) {
-            $gtin = self::anchor_key($product->get_global_unique_id());
-            if ($gtin !== '' && isset(self::$anchor_index['barcode'][$gtin])) {
-                return self::$anchor_index['barcode'][$gtin];
-            }
+        $gtin = self::anchor_key($gtin);
+        if ($gtin !== '' && isset(self::$anchor_index['barcode'][$gtin])) {
+            return self::$anchor_index['barcode'][$gtin];
         }
 
         return null;
