@@ -124,6 +124,7 @@ JS;
             return $price_html;
         }
         list($anchor, $date, $highest) = $found;
+        $date = $this->offered_since($product, (string) $date, isset($found[3]) ? (string) $found[3] : '');
         // "Bazna cijena (10. 9. 2026.): 12,00 €", the name the Pravilnik o
         // isticanju bazne cijene proizvoda (NN 132/2026) gives it and Kigo.Cloud
         // prints on shelf labels and declarations (ItemAnchorDate::getLabelWithDate).
@@ -137,10 +138,14 @@ JS;
         }
         // Plain text amount: the theme's rules for .amount (colour, size, weight)
         // must not reach the anchor price, only the line's own style does.
-        $amount = trim(wp_strip_all_tags(wc_price((float) $anchor)));
+        // Kigo.Cloud keeps the base price as a retail price, with VAT. A shop
+        // that shows prices without VAT gets the base price without VAT and
+        // with the same suffix ("+ PDV"), so both are on the same footing.
+        $amount = trim(wp_strip_all_tags(wc_price($this->shop_amount($product, (float) $anchor))));
         if ($highest !== null && (float) $highest !== (float) $anchor) {
-            $amount .= ' – ' . trim(wp_strip_all_tags(wc_price((float) $highest)));
+            $amount .= ' – ' . trim(wp_strip_all_tags(wc_price($this->shop_amount($product, (float) $highest))));
         }
+        $amount .= $this->shop_suffix();
 
         // Themes lay the price out as flex rows, absolutely positioned boxes of a
         // fixed height and so on, so the line carries its own style with
@@ -185,21 +190,117 @@ JS;
      */
     private function own_anchor($product)
     {
-        $anchor = $product->get_meta('_kigo_anchor_price', true);
-        $date   = $product->get_meta('_kigo_anchor_price_date', true);
+        $anchor    = $product->get_meta('_kigo_anchor_price', true);
+        $date      = $product->get_meta('_kigo_anchor_price_date', true);
+        $reference = self::meta_reference_day($product->get_meta('_kigo_anchor_prices', true), (string) $date);
         if ($anchor === '' || $anchor === null || !is_numeric($anchor)) {
             $listed = class_exists('Woo_KigoCloud_Pricelist') ? Woo_KigoCloud_Pricelist::anchor_for($product) : null;
             if ($listed === null) {
                 return null;
             }
-            $anchor = $listed[0];
-            $date   = $listed[1];
+            $anchor    = $listed[0];
+            $date      = $listed[1];
+            $reference = isset($listed[2]) ? (string) $listed[2] : '';
         }
         if ((float) $anchor < 0) {
             return null;
         }
 
-        return array($anchor, $date, null);
+        return array($anchor, $date, null, $reference);
+    }
+
+    /**
+     * Reference day (2026-09-10 and so on) of the entry with this date in the
+     * _kigo_anchor_prices list that KigoCloud writes next to the price.
+     *
+     * @param mixed  $json
+     * @param string $date
+     * @return string '' when KigoCloud did not send it
+     */
+    private static function meta_reference_day($json, $date)
+    {
+        $list = is_string($json) ? json_decode($json, true) : null;
+        if (!is_array($list)) {
+            return '';
+        }
+        foreach ($list as $entry) {
+            if (is_array($entry) && isset($entry['date'], $entry['reference_date']) && (string) $entry['date'] === $date) {
+                return (string) $entry['reference_date'];
+            }
+        }
+
+        return '';
+    }
+
+    /**
+     * Day the product has been on offer since, for the label. KigoCloud gives
+     * the reference day, or for an item it got later the day the item came
+     * into KigoCloud. A product already in this shop before that day was on
+     * offer earlier: then its day is the day it was created in the shop, or
+     * the reference day when it was in the shop on that day (Pravilnik o
+     * isticanju bazne cijene proizvoda, NN 132/2026, cl. 3 st. 1). Without the
+     * reference day (an older KigoCloud) such a date is left out.
+     *
+     * @param WC_Product $product
+     * @param string     $date      Y-m-d from KigoCloud
+     * @param string     $reference reference day Y-m-d, '' when unknown
+     * @return string
+     */
+    private function offered_since($product, $date, $reference)
+    {
+        if ($date === '' || ($reference !== '' && $date <= $reference)) {
+            return $date;
+        }
+        $shop_product = $product->get_parent_id() ? wc_get_product($product->get_parent_id()) : $product;
+        $created      = $shop_product ? $shop_product->get_date_created() : null;
+        if (!$created) {
+            return $date;
+        }
+        $since = $created->date('Y-m-d');
+        if ($since >= $date) {
+            return $date;
+        }
+        if ($reference === '') {
+            return '';
+        }
+
+        return $since <= $reference ? $reference : $since;
+    }
+
+    /**
+     * The base price as this shop shows prices: KigoCloud sends it with VAT,
+     * a shop that shows prices without VAT gets it without VAT at the
+     * product's tax rate of the shop's base location.
+     *
+     * @param WC_Product $product
+     * @param float      $gross
+     * @return float
+     */
+    private function shop_amount($product, $gross)
+    {
+        if (!wc_tax_enabled() || 'excl' !== get_option('woocommerce_tax_display_shop')) {
+            return $gross;
+        }
+        $rates = WC_Tax::get_base_tax_rates($product->get_tax_class('unfiltered'));
+        $taxes = WC_Tax::calc_tax($gross, $rates, true);
+
+        return (float) wc_round_tax_total($gross - array_sum($taxes));
+    }
+
+    /**
+     * The shop's price suffix ("+ PDV", "s PDV-om"), plain text, so the base
+     * price says the same as the price above it. Placeholders are left out.
+     *
+     * @return string
+     */
+    private function shop_suffix()
+    {
+        $suffix = trim((string) get_option('woocommerce_price_display_suffix', ''));
+        if ($suffix === '' || !wc_tax_enabled() || strpos($suffix, '{') !== false) {
+            return '';
+        }
+
+        return ' ' . trim(wp_strip_all_tags($suffix));
     }
 
     /**
@@ -220,9 +321,11 @@ JS;
         update_meta_cache('post', $ids);
         $prices = array();
         $dates  = array();
+        $refs   = array();
         foreach ($ids as $id) {
             $anchor = get_post_meta($id, '_kigo_anchor_price', true);
             $date   = get_post_meta($id, '_kigo_anchor_price_date', true);
+            $ref    = self::meta_reference_day(get_post_meta($id, '_kigo_anchor_prices', true), (string) $date);
             if ($anchor === '' || !is_numeric($anchor)) {
                 $sku = (string) get_post_meta($id, '_sku', true);
                 if ($sku === '') {
@@ -236,18 +339,20 @@ JS;
                 }
                 $anchor = $listed[0];
                 $date   = $listed[1];
+                $ref    = isset($listed[2]) ? (string) $listed[2] : '';
             }
             if ((float) $anchor < 0) {
                 continue;
             }
             $prices[] = (float) $anchor;
             $dates[(string) $date] = true;
+            $refs[(string) $ref]   = true;
         }
         if (empty($prices)) {
             return null;
         }
 
-        return array(min($prices), count($dates) === 1 ? (string) key($dates) : '', max($prices));
+        return array(min($prices), count($dates) === 1 ? (string) key($dates) : '', max($prices), count($refs) === 1 ? (string) key($refs) : '');
     }
 
     /**

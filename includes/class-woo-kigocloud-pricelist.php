@@ -726,7 +726,8 @@ class Woo_KigoCloud_Pricelist
             return null;
         }
 
-        return array((float) $last->price, isset($last->date) ? (string) $last->date : '');
+        return array((float) $last->price, isset($last->date) ? (string) $last->date : '',
+            isset($last->reference_date) ? (string) $last->reference_date : '');
     }
 
     /**

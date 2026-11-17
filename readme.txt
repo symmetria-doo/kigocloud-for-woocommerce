@@ -4,7 +4,7 @@ Tags: fiskalizacija, sidrena cijena, cjenik, croatia, fiscalization
 Requires at least: 5.5
 Tested up to: 7.1
 Requires PHP: 7.2
-Stable tag: 2.2.19
+Stable tag: 2.2.20
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 WC requires at least: 5.0
@@ -131,6 +131,10 @@ Kigo.Cloud privacy policy: https://www.kigocloud.com/zastita-osobnih-podataka
 4. An order with the fiscalized Kigo.Cloud invoice number.
 
 == Changelog ==
+
+= 2.2.20 =
+* Bazna cijena is shown the way the shop shows its prices: a shop that shows prices without VAT gets the base price without VAT and with the same suffix (for example "+ PDV"), so the two are no longer 25 % apart for the same price.
+* The date next to Bazna cijena: for a product that was in the shop before it came into Kigo.Cloud, the date is the day it was created in the shop, or the reference day (10. 9. 2026.) when it was already in the shop then, instead of the day it was entered into Kigo.Cloud.
 
 = 2.2.19 =
 * Bazna cijena on variable products. When all variations had the same price, WooCommerce showed no variation price, so the base price appeared nowhere on the product page. The price of a variable product now carries the base prices of its variations: one amount when they are the same, otherwise the lowest and the highest, with the reference day when all are of the same day.
@@ -284,6 +288,9 @@ Kigo.Cloud privacy policy: https://www.kigocloud.com/zastita-osobnih-podataka
 Older versions: https://github.com/symmetria-doo/kigocloud-for-woocommerce/blob/main/CHANGELOG.md
 
 == Upgrade Notice ==
+
+= 2.2.20 =
+Bazna cijena with or without VAT like the shop price, and the right date for products that were in the shop before Kigo.Cloud.
 
 = 2.2.19 =
 Bazna cijena is also shown on variable products.

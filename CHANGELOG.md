@@ -4,6 +4,12 @@ All notable changes to KigoCloud for WooCommerce are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.20] - 2026-11-17
+
+### Fixed
+- Base price amount on shops that show prices without VAT: Kigo.Cloud sends the base price with VAT (retail price), so a shop showing "30,00 € + PDV" showed "Bazna cijena: 37,50 €" for the same price. `shop_amount()` takes VAT out at the product tax class rate of the shop base location (`WC_Tax::get_base_tax_rates`, `calc_tax` inclusive) when `woocommerce_tax_display_shop` is `excl`, and `shop_suffix()` adds the shop price suffix (plain text, without placeholders).
+- Base price date for products that were in the shop before Kigo.Cloud had them: Kigo.Cloud dates an item it got after the reference day with the day it got it (for example 7. 11. 2026. for a product the shop had sold for years). Kigo.Cloud now sends `reference_date` with every entry of `anchor_prices` (and in `_kigo_anchor_prices`); `offered_since()` uses the day the product (the parent for a variation) was created in the shop when that is earlier, and the reference day when the product was in the shop on that day. Without `reference_date` (older Kigo.Cloud) such a date is left out instead of shown wrong. `own_anchor()`, `variations_anchor()` and `Woo_KigoCloud_Pricelist::newest_anchor()` carry the reference day as a further element.
+
 ## [2.2.19] - 2026-11-17
 
 ### Fixed
