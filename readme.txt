@@ -4,7 +4,7 @@ Tags: fiskalizacija, sidrena cijena, cjenik, croatia, fiscalization
 Requires at least: 5.5
 Tested up to: 7.1
 Requires PHP: 7.2
-Stable tag: 2.2.21
+Stable tag: 2.2.22
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 WC requires at least: 5.0
@@ -131,6 +131,9 @@ Kigo.Cloud privacy policy: https://www.kigocloud.com/zastita-osobnih-podataka
 4. An order with the fiscalized Kigo.Cloud invoice number.
 
 == Changelog ==
+
+= 2.2.22 =
+* Classic checkout: the R1 invoice fields (company name, address, city, postcode, OIB) and their required marks show only after the customer ticks "Yes", and hide again when it is unticked.
 
 = 2.2.21 =
 * A product without tax keeps its full base price in a shop that shows prices without VAT, as WooCommerce shows its price.
@@ -291,6 +294,9 @@ Kigo.Cloud privacy policy: https://www.kigocloud.com/zastita-osobnih-podataka
 Older versions: https://github.com/symmetria-doo/kigocloud-for-woocommerce/blob/main/CHANGELOG.md
 
 == Upgrade Notice ==
+
+= 2.2.22 =
+R1 invoice fields on the classic checkout show only when the customer asks for an R1 invoice.
 
 = 2.2.21 =
 Base price of products without tax shown in full.

@@ -315,7 +315,11 @@ class Woo_KigoCloud_R1
             'label' => __('Yes', 'kigocloud-for-woocommerce'),
         ), $checkout->get_value('kigocloud_vat_invoices_checkbox'));
 
-        echo '<div id="kigocloud_vat_invoices_fields">';
+        // The company fields (and their "required" asterisks) only apply with
+        // the box ticked, the same as classic_validate_full(): hidden until
+        // then, so the asterisks never show for a customer who wants no R1.
+        $checked = (bool) $checkout->get_value('kigocloud_vat_invoices_checkbox');
+        echo '<div id="kigocloud_vat_invoices_fields"' . ($checked ? '' : ' style="display:none"') . '>';
         woocommerce_form_field('kigocloud_vat_invoices_company', array(
             'type'        => 'text',
             'class'       => array('form-row-wide'),
@@ -354,6 +358,28 @@ class Woo_KigoCloud_R1
             'placeholder' => _x('12345678901', 'placeholder', 'kigocloud-for-woocommerce'),
         ), $checkout->get_value('kigocloud_vat_invoices_vat_number'));
         echo '</div></div>';
+
+        $script = <<<'JS'
+(function () {
+    function toggle() {
+        var box = document.getElementById('kigocloud_vat_invoices_checkbox');
+        var fields = document.getElementById('kigocloud_vat_invoices_fields');
+        if (box && fields) {
+            fields.style.display = box.checked ? '' : 'none';
+        }
+    }
+    document.addEventListener('change', function (e) {
+        if (e.target && e.target.id === 'kigocloud_vat_invoices_checkbox') {
+            toggle();
+        }
+    });
+    document.addEventListener('DOMContentLoaded', toggle);
+    window.addEventListener('pageshow', toggle);
+})();
+JS;
+        wp_register_script('kigocloud-r1-toggle', false, array(), Woo_KigoCloud::PLUGIN_VERSION, true);
+        wp_enqueue_script('kigocloud-r1-toggle');
+        wp_add_inline_script('kigocloud-r1-toggle', $script);
     }
 
     /**

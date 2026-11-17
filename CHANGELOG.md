@@ -4,6 +4,11 @@ All notable changes to KigoCloud for WooCommerce are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.22] - 2026-11-17
+
+### Fixed
+- Classic checkout (`classic_render_full()`): `#kigocloud_vat_invoices_fields` is rendered hidden unless the R1 checkbox is ticked and a small footer script shows or hides it when the checkbox changes, so the R1 fields and their required asterisks appear only for a customer who wants an R1 invoice. Validation on submit already applied only with the checkbox and is unchanged.
+
 ## [2.2.21] - 2026-11-17
 
 ### Fixed
