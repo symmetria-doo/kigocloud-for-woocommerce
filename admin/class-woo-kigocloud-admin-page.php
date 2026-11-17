@@ -790,16 +790,15 @@ class Woo_KigoCloud_Admin_Page
                                 <?php foreach (Woo_KigoCloud_Pricelist::current_kinds() as $kind): ?>
                                     <p><strong><?php echo esc_html($kind === 'usluge' ? __('Price list of services', 'kigocloud-for-woocommerce') : __('Price list of goods', 'kigocloud-for-woocommerce')); ?></strong></p>
                                     <?php foreach (array('csv', 'xml') as $format): ?>
-                                        <?php if (Woo_KigoCloud_Pricelist::stable_url($format, $kind) !== ''): ?>
-                                            <p><code><?php echo esc_html(Woo_KigoCloud_Pricelist::stable_url($format, $kind)); ?></code>
-                                                <span class="description">(<?php echo esc_html(basename(Woo_KigoCloud_Pricelist::path($format, $kind))); ?>)</span></p>
+                                        <?php if (Woo_KigoCloud_Pricelist::url($format, $kind) !== ''): ?>
+                                            <p><a href="<?php echo esc_url(Woo_KigoCloud_Pricelist::url($format, $kind)); ?>" target="_blank" rel="noopener"><code><?php echo esc_html(basename(Woo_KigoCloud_Pricelist::path($format, $kind))); ?></code></a></p>
                                         <?php endif; ?>
                                     <?php endforeach; ?>
                                 <?php endforeach; ?>
                             <?php else: ?>
                                 <p><span class="kc-status-bad"><?php esc_html_e('not downloaded yet', 'kigocloud-for-woocommerce'); ?></span></p>
                             <?php endif; ?>
-                            <p class="description"><?php esc_html_e('Give these addresses to inspectors and price crawlers: they always hold the current price list, a changed price list comes to the same address, as the Pravilnik wants. In brackets the prescribed name of the current file.', 'kigocloud-for-woocommerce'); ?></p>
+                            <p class="description"><?php esc_html_e('The current files, each under the name the Pravilnik prescribes. The page with [kigo_cjenik] is the place of the price list on your site: give its address to inspectors and price crawlers, a changed price list always comes to that page.', 'kigocloud-for-woocommerce'); ?></p>
                             <p class="description"><?php esc_html_e('A new file only when Kigo.Cloud publishes a changed price list, under the name the Pravilnik prescribes. A replaced file stays available for 30 days (the Pravilnik asks for 15) and is then deleted by the plugin.', 'kigocloud-for-woocommerce'); ?></p>
                         </td>
                     </tr>

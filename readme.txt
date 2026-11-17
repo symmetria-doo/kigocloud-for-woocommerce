@@ -4,7 +4,7 @@ Tags: fiskalizacija, sidrena cijena, cjenik, croatia, fiscalization
 Requires at least: 5.5
 Tested up to: 7.1
 Requires PHP: 7.2
-Stable tag: 2.2.17
+Stable tag: 2.2.18
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 WC requires at least: 5.0
@@ -92,7 +92,7 @@ Yes. Kigo.Cloud keeps the anchor price of every item, calculated from its price 
 
 = Which price list address do I give to the inspection or to price crawlers? =
 
-The stable addresses on your own domain: `/wp-content/uploads/kigo-cjenik/cjenik-roba.csv` and `cjenik-roba.xml` for goods, `cjenik-usluge.csv` and `cjenik-usluge.xml` for services (only when you sell services). They always hold the current price list, and a changed price list comes to the same address, as the Pravilnik o načinu objave cjenika proizvoda requires. Downloaded from the `[kigo_cjenik]` page, the file keeps its prescribed name (OIB, sales point, ROBA or USLUGE, storage number, time). The Price list tab shows these addresses.
+The address of the page where you put the `[kigo_cjenik]` shortcode. That page is the place of the price list on your site, as the Pravilnik o načinu objave cjenika proizvoda requires: it always shows the current price list of goods and, when you sell services, of services, each in CSV and XML under its prescribed name (OIB, sales point, ROBA or USLUGE, storage number, time), and the replaced ones for 30 days. A changed price list always comes to that page. The Price list tab lists the current files.
 
 = Does the plugin put a link to Kigo.Cloud on my site? =
 
@@ -131,6 +131,9 @@ Kigo.Cloud privacy policy: https://www.kigocloud.com/zastita-osobnih-podataka
 4. An order with the fiscalized Kigo.Cloud invoice number.
 
 == Changelog ==
+
+= 2.2.18 =
+* The price list is published only under the file names the Pravilnik prescribes (OIB, sales point, ROBA or USLUGE, storage number and time). The extra copies cjenik-roba.csv, cjenik-roba.xml, cjenik-usluge.csv and cjenik-usluge.xml of 2.2.17 are removed. The page with [kigo_cjenik] is the place of the price list on your site: its buttons and the Price list tab link the current files under their prescribed names, and a changed price list always comes to that page.
 
 = 2.2.17 =
 * Price list as the Pravilnik o načinu objave cjenika proizvoda (NN 132/2026, in force 17 November 2026) wants it: a price list of goods and, when you sell services, one of services, each in CSV and XML under the new prescribed file names. The plugin checks Kigo.Cloud every hour and downloads a changed price list as soon as Kigo.Cloud publishes it, so it is on your site before 11:00 on the day of the change. A replaced price list stays available for 30 days from its replacement.
@@ -278,6 +281,9 @@ Kigo.Cloud privacy policy: https://www.kigocloud.com/zastita-osobnih-podataka
 Older versions: https://github.com/symmetria-doo/kigocloud-for-woocommerce/blob/main/CHANGELOG.md
 
 == Upgrade Notice ==
+
+= 2.2.18 =
+The price list is published only under the prescribed file names.
 
 = 2.2.17 =
 Price list of goods and of services, checked every hour, and "Bazna cijena" under the product price, as the rules in force from 17 November 2026 require.

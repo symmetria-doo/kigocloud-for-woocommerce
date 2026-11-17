@@ -1346,5 +1346,5 @@ msgstr "Cjenik robe"
 msgid "Price list of services"
 msgstr "Cjenik usluga"
 
-msgid "Give these addresses to inspectors and price crawlers: they always hold the current price list, a changed price list comes to the same address, as the Pravilnik wants. In brackets the prescribed name of the current file."
-msgstr "Ove adrese dajte inspekciji i alatima za prikupljanje cijena: na njima je uvijek važeći cjenik, a izmijenjeni cjenik dolazi na istu adresu, kako traži Pravilnik. U zagradi je propisani naziv važeće datoteke."
+msgid "The current files, each under the name the Pravilnik prescribes. The page with [kigo_cjenik] is the place of the price list on your site: give its address to inspectors and price crawlers, a changed price list always comes to that page."
+msgstr "Važeće datoteke, svaka pod nazivom koji propisuje Pravilnik. Stranica s [kigo_cjenik] je mjesto cjenika na vašoj stranici: njezinu adresu dajte inspekciji i alatima za prikupljanje cijena, izmijenjeni cjenik uvijek dolazi na tu stranicu."

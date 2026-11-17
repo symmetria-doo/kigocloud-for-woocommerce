@@ -23,10 +23,10 @@
  * - the file name with OIB, sales point, ROBA/USLUGE, storage number and
  *   GGGGMMDD_HHMM (cl. 6 st. 3): KigoCloud sends that name with the file
  *   (Content-Disposition) and the file is stored under it.
- * - a changed price list at the same URL (cl. 6 st. 2): a copy of the current
- *   file of each kind and format is kept as cjenik-roba.csv, cjenik-roba.xml,
- *   cjenik-usluge.csv and cjenik-usluge.xml, overwritten when a changed price
- *   list comes; these are the addresses for inspectors and price crawlers.
+ * - a changed price list at the same place of the site (cl. 6 st. 2): the page
+ *   with [kigo_cjenik] is that place; it always links the current files, each
+ *   under its prescribed name, and the archive. No file is published under any
+ *   other name (the cjenik-roba.csv copies of 2.2.17 are removed).
  * - "dostupnost arhivskog cjenika 15 dana od njegove zamjene" (cl. 3 st. 6):
  *   a replaced file stays in the folder for 30 days from its replacement and
  *   the shortcode links to it.
@@ -288,13 +288,9 @@ class Woo_KigoCloud_Pricelist
     }
 
     /**
-     * Stable name of the current file of a kind and format (cjenik-roba.csv,
-     * cjenik-roba.xml, cjenik-usluge.csv, cjenik-usluge.xml). The Pravilnik
-     * (cl. 6 st. 2) wants a changed price list at the same URL as the one it
-     * replaces, while its file name carries the storage number and the time,
-     * so every publication has a new name. The plugin keeps a copy of the
-     * current file under this name, overwritten when a changed price list
-     * comes; the named files stay for the archive.
+     * Helper name of a copy that 2.2.17 kept next to the named files
+     * (cjenik-roba.csv, cjenik-roba.xml, cjenik-usluge.csv, cjenik-usluge.xml);
+     * only used to remove those copies.
      *
      * @param string $format csv|xml
      * @param string $kind   roba|usluge
@@ -321,48 +317,16 @@ class Woo_KigoCloud_Pricelist
     }
 
     /**
-     * Stable public address of the current file of a kind and format, '' when
-     * the copy is not there (yet).
-     *
-     * @param string $format csv|xml
-     * @param string $kind   roba|usluge
-     * @return string
+     * Removes the copies under helper names (cjenik-roba.csv and so on) that
+     * 2.2.17 kept: the Pravilnik (cl. 6 st. 3) wants every published file under
+     * its prescribed name, so only the named files stay.
      */
-    public static function stable_url($format, $kind = 'roba')
-    {
-        $file = trailingslashit(self::dir()) . self::stable_name($format, $kind);
-
-        return (self::url($format, $kind) !== '' && is_file($file)) ? self::file_url(self::stable_name($format, $kind)) : '';
-    }
-
-    /**
-     * Brings the stable copies in line with the current files: a copy that
-     * differs from its current file is written aside and renamed into place
-     * (a visitor never gets half a file), a copy of a kind that is not current
-     * any more (services the server no longer lists) is removed.
-     */
-    private static function sync_stable()
+    private static function remove_stable()
     {
         $dir = trailingslashit(self::dir());
-        $files = self::current()['files'];
-        foreach (self::$kinds as $kind) {
-            foreach (array('csv', 'xml') as $format) {
-                $stable = $dir . self::stable_name($format, $kind);
-                $source = empty($files[$kind][$format]) ? '' : $dir . $files[$kind][$format];
-                if ($source === '' || !is_file($source)) {
-                    if (is_file($stable)) {
-                        wp_delete_file($stable);
-                    }
-                    continue;
-                }
-                if (is_file($stable) && filesize($stable) === filesize($source) && md5_file($stable) === md5_file($source)) {
-                    continue;
-                }
-                $fs = self::filesystem();
-                $body = file_get_contents($source);
-                if ($body === false || !$fs->put_contents($stable . '.tmp', $body, FS_CHMOD_FILE) || !$fs->move($stable . '.tmp', $stable, true)) {
-                    self::store_status('error', __('The price list could not be saved in the uploads folder.', 'kigocloud-for-woocommerce'));
-                }
+        foreach (self::stable_names() as $name) {
+            if (is_file($dir . $name)) {
+                wp_delete_file($dir . $name);
             }
         }
     }
@@ -555,7 +519,7 @@ class Woo_KigoCloud_Pricelist
             $current['checked'] = time();
         }
         update_option(self::OPTION_CURRENT, $current, false);
-        self::sync_stable();
+        self::remove_stable();
         self::purge();
 
         if ($error !== '') {
@@ -831,8 +795,7 @@ class Woo_KigoCloud_Pricelist
     private static function purge()
     {
         $current = self::current();
-        // The stable copies are kept in line by sync_stable(), never purged here.
-        $keep = array_merge(self::current_names(), self::stable_names());
+        $keep = self::current_names();
         $limit = time() - self::KEEP_DAYS * DAY_IN_SECONDS;
         $present = array();
         foreach ((array) glob(trailingslashit(self::dir()) . '*') as $file) {
@@ -1187,11 +1150,10 @@ class Woo_KigoCloud_Pricelist
                 $text = $legacy
                     ? ($format === 'csv' ? __('Download CSV', 'kigocloud-for-woocommerce') : __('Download XML', 'kigocloud-for-woocommerce'))
                     : self::kind_label($kind) . ' (' . strtoupper($format) . ')';
-                // The stable address (the same URL for every publication, cl. 6
-                // st. 2); download keeps the prescribed name for the saved file.
-                $stable = self::stable_url($format, $kind);
-                $out .= '<a class="kc-btn' . $ghost . '" href="' . esc_url($stable !== '' ? $stable : self::url($format, $kind)) . '"'
-                    . ' download="' . esc_attr(basename(self::path($format, $kind))) . '">' . esc_html($text) . '</a>';
+                // The current file under its prescribed name (cl. 6 st. 3); this
+                // page is the same place for a changed price list (cl. 6 st. 2).
+                $out .= '<a class="kc-btn' . $ghost . '" href="' . esc_url(self::url($format, $kind)) . '"'
+                    . ' title="' . esc_attr(basename(self::path($format, $kind))) . '">' . esc_html($text) . '</a>';
                 $ghost = ' kc-btn-ghost';
             }
             $out .= '</div>';

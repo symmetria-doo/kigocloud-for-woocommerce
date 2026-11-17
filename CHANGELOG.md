@@ -4,6 +4,11 @@ All notable changes to KigoCloud for WooCommerce are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.18] - 2026-11-17
+
+### Changed
+- Published files only under their prescribed names (Pravilnik o načinu objave cjenika proizvoda, cl. 6 st. 3). The copies `cjenik-roba.csv`, `cjenik-roba.xml`, `cjenik-usluge.csv`, `cjenik-usluge.xml` that 2.2.17 kept next to the named files are no longer made; `remove_stable()` deletes them on every check (it replaces `sync_stable()`), `purge()` keeps only the current files, and `stable_url()` is gone. The same place for a changed price list (cl. 6 st. 2) is the page with `[kigo_cjenik]`: its current-card buttons link `url()` (the named file) and the Price list tab lists the current files as links under their names.
+
 ## [2.2.17] - 2026-11-16
 
 ### Changed

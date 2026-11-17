@@ -398,5 +398,5 @@ msgstr "Preisliste der Waren"
 msgid "Price list of services"
 msgstr "Preisliste der Dienstleistungen"
 
-msgid "Give these addresses to inspectors and price crawlers: they always hold the current price list, a changed price list comes to the same address, as the Pravilnik wants. In brackets the prescribed name of the current file."
-msgstr "Geben Sie diese Adressen der Aufsicht und den Preis-Crawlern: dort liegt immer die gültige Preisliste, eine geänderte Preisliste kommt an dieselbe Adresse, wie der Pravilnik es verlangt. In Klammern der vorgeschriebene Name der gültigen Datei."
+msgid "The current files, each under the name the Pravilnik prescribes. The page with [kigo_cjenik] is the place of the price list on your site: give its address to inspectors and price crawlers, a changed price list always comes to that page."
+msgstr "Die gültigen Dateien, jede unter dem Namen, den der Pravilnik vorschreibt. Die Seite mit [kigo_cjenik] ist der Ort der Preisliste auf Ihrer Website: geben Sie ihre Adresse der Aufsicht und den Preis-Crawlern, eine geänderte Preisliste kommt immer auf diese Seite."
