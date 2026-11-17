@@ -36,7 +36,7 @@ Croatian law requires every sale paid by card, cash or a similar method to be fi
 
 = About Kigo.Cloud =
 
-Kigo.Cloud is an online program for issuing and fiscalizing invoices, eRačun (Fiscalization 2.0), stock and price lists, developed in Zagreb since 2013. Connecting a web shop and fiscalizing its orders is available from the Standard plan; two-way sync of items, stock and prices and the anchor price in the shop from the Business plan. Registration is free and needs no card. Plans and prices: [www.kigocloud.com](https://www.kigocloud.com/cijene/).
+Kigo.Cloud is an online program for issuing and fiscalizing invoices, eRačun (Fiscalization 2.0), stock and price lists, developed in Zagreb since 2013. Connecting a web shop and fiscalizing its orders, with the anchor price under the product price in WooCommerce, is available from the Standard plan; two-way sync of items, stock and prices from the Business plan. Registration is free and needs no card. Plans and prices: [www.kigocloud.com](https://www.kigocloud.com/cijene/).
 
 = Live demo =
 
@@ -92,7 +92,7 @@ KigoCloud copies its settings on activation and does not send orders while the K
 
 = Does it show the anchor price (sidrena / bazna cijena) and publish the price list? =
 
-Yes. Kigo.Cloud keeps the anchor price of every item, calculated from its price history or entered by hand, and publishes the price lists of goods and of services in CSV and XML, a changed one on the day of the change. The plugin serves that price list from your own domain (Standard plan) and shows the anchor price under the product price in the shop (Business plan). More: [Sidrene cijene u Kigo.Cloudu](https://www.kigocloud.com/sidrene-cijene/).
+Yes. Kigo.Cloud keeps the anchor price of every item, calculated from its price history or entered by hand, and publishes the price lists of goods and of services in CSV and XML, a changed one on the day of the change. From the Standard plan the plugin serves that price list from your own domain and shows the anchor price under the product price in the shop. More: [Sidrene cijene u Kigo.Cloudu](https://www.kigocloud.com/sidrene-cijene/).
 
 = Which price list address do I give to the inspection or to price crawlers? =
 
