@@ -400,3 +400,12 @@ msgstr "Preisliste der Dienstleistungen"
 
 msgid "The current files, each under the name the Pravilnik prescribes. The page with [kigo_cjenik] is the place of the price list on your site: give its address to inspectors and price crawlers, a changed price list always comes to that page."
 msgstr "Die gültigen Dateien, jede unter dem Namen, den der Pravilnik vorschreibt. Die Seite mit [kigo_cjenik] ist der Ort der Preisliste auf Ihrer Website: geben Sie ihre Adresse der Aufsicht und den Preis-Crawlern, eine geänderte Preisliste kommt immer auf diese Seite."
+
+msgid "Deposit (povratna naknada)"
+msgstr "Pfand (povratna naknada)"
+
+msgid "Deposit on the packaging per piece, for example 0,10 for a bottle or 0,60 for a pack of six. The price includes it. Kigo.Cloud shows it on the invoice as the deposit, without VAT. Leave empty for a product without a deposit."
+msgstr "Pfand auf die Verpackung pro Stück, zum Beispiel 0,10 für eine Flasche oder 0,60 für ein Sechserpack. Der Preis enthält ihn. Kigo.Cloud weist ihn auf der Rechnung als Pfand aus, ohne MwSt. Leer lassen für ein Produkt ohne Pfand."
+
+msgid "Deposit per piece of this variation. Leave empty to use the deposit of the product."
+msgstr "Pfand pro Stück dieser Variante. Leer lassen, um den Pfand des Produkts zu verwenden."

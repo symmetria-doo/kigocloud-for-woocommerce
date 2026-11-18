@@ -209,6 +209,11 @@ class Woo_KigoCloud {
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-woo-kigocloud-gift-voucher.php';
 
+		/**
+		 * Deposit on beverage packaging (povratna naknada) on the product.
+		 */
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-woo-kigocloud-deposit.php';
+
 
 		$this->loader = new Woo_KigoCloud_Loader();
 
@@ -267,6 +272,14 @@ class Woo_KigoCloud {
         $this->loader->add_filter('woocommerce_get_shop_coupon_data', $plugin_gift_voucher, 'virtual_coupon', 10, 3);
         $this->loader->add_action('woocommerce_checkout_create_order_coupon_item', $plugin_gift_voucher, 'mark_order_coupon', 10, 3);
         $this->loader->add_filter('woocommerce_cart_totals_coupon_label', $plugin_gift_voucher, 'coupon_label', 10, 2);
+
+        // Deposit (povratna naknada) field on the product and the variation
+        $plugin_deposit = new Woo_KigoCloud_Deposit();
+        // General tab, own group: the pricing group is hidden for a variable product, whose variations take its deposit
+        $this->loader->add_action('woocommerce_product_options_general_product_data', $plugin_deposit, 'product_field');
+        $this->loader->add_action('woocommerce_admin_process_product_object', $plugin_deposit, 'save_product');
+        $this->loader->add_action('woocommerce_variation_options_pricing', $plugin_deposit, 'variation_field', 10, 3);
+        $this->loader->add_action('woocommerce_admin_process_variation_object', $plugin_deposit, 'save_variation', 10, 2);
 
         $r1_mode = Woo_KigoCloud_R1::mode();
         if ($r1_mode > 0) {

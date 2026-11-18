@@ -1348,3 +1348,12 @@ msgstr "Cjenik usluga"
 
 msgid "The current files, each under the name the Pravilnik prescribes. The page with [kigo_cjenik] is the place of the price list on your site: give its address to inspectors and price crawlers, a changed price list always comes to that page."
 msgstr "Važeće datoteke, svaka pod nazivom koji propisuje Pravilnik. Stranica s [kigo_cjenik] je mjesto cjenika na vašoj stranici: njezinu adresu dajte inspekciji i alatima za prikupljanje cijena, izmijenjeni cjenik uvijek dolazi na tu stranicu."
+
+msgid "Deposit (povratna naknada)"
+msgstr "Povratna naknada"
+
+msgid "Deposit on the packaging per piece, for example 0,10 for a bottle or 0,60 for a pack of six. The price includes it. Kigo.Cloud shows it on the invoice as the deposit, without VAT. Leave empty for a product without a deposit."
+msgstr "Povratna naknada za ambalažu po komadu, npr. 0,10 za bocu ili 0,60 za paket od šest boca. Uključena je u cijenu. Kigo.Cloud je na računu iskazuje kao povratnu naknadu, bez PDV-a. Ostavite prazno za proizvod bez povratne naknade."
+
+msgid "Deposit per piece of this variation. Leave empty to use the deposit of the product."
+msgstr "Povratna naknada po komadu ove varijante. Ostavite prazno za povratnu naknadu proizvoda."

@@ -8,6 +8,8 @@
  * - Price list on the shop's own domain: Standard and above, while Kigo.Cloud
  *   publishes it (Sidrene cijene > Cjenik za objavu). The plugin takes the
  *   price list address from the licence, nothing is copied by hand.
+ * - Deposit (povratna naknada) field on the product: Standard and above, while
+ *   it is switched on in Kigo.Cloud (Opcije); off until Kigo.Cloud says so.
  *
  * Read when the settings are saved and once a day. Before the first read, or
  * against a Kigo.Cloud without licence/info, nothing is switched off.
@@ -162,6 +164,22 @@ class Woo_KigoCloud_Licence
         }
 
         return !empty($data['anchor_prices']['available']) && !empty($data['anchor_prices']['enabled']);
+    }
+
+    /**
+     * The deposit (povratna naknada) is switched on in Kigo.Cloud (Opcije, Standard and above). Unlike the
+     * anchor prices it is off while unknown, so a shop sees the product field only when Kigo.Cloud has said so.
+     *
+     * @return bool
+     */
+    public static function allows_deposit()
+    {
+        $data = self::data();
+        if ($data === null || !isset($data['deposit'])) {
+            return false;
+        }
+
+        return !empty($data['deposit']['available']) && !empty($data['deposit']['enabled']);
     }
 
     /**

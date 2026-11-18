@@ -4,6 +4,11 @@ All notable changes to KigoCloud for WooCommerce are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.3.0] - 2026-11-18
+
+### Added
+- Deposit (povratna naknada) per piece on the product and the variation (`Woo_KigoCloud_Deposit`, meta `_kigocloud_deposit`): shown and sent only while `licence/info` returns `deposit.available` and `deposit.enabled` (`Woo_KigoCloud_Licence::allows_deposit()`, off while unknown, so older Kigo.Cloud and shops without the deposit see nothing). The order line sends `pet` (deposit per piece, part of the price) to `invoice/create`; a variation without its own amount takes that of the parent. 0,10 and 0.10 are both read as ten cents whatever the decimal separator of the shop (`parse_amount()`). A coupon that takes the paid price under the deposit sends the paid price as the deposit; a deposit above the price before the coupon is sent as it is, so Kigo.Cloud refuses it and the error is in the plugin log instead of an invoice with the whole price as the deposit.
+
 ## [2.2.23] - 2026-11-17
 
 ### Fixed

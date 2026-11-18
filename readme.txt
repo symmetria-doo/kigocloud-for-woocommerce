@@ -4,7 +4,7 @@ Tags: fiskalizacija, sidrena cijena, cjenik, croatia, fiscalization
 Requires at least: 5.5
 Tested up to: 7.1
 Requires PHP: 7.2
-Stable tag: 2.2.23
+Stable tag: 2.3.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 WC requires at least: 5.0
@@ -30,6 +30,7 @@ Croatian law requires every sale paid by card, cash or a similar method to be fi
 * **Base price (bazna cijena, sidrena cijena)** under the product price, as "Bazna cijena (10. 9. 2026.): 12,00 €", as the Pravilnik o isticanju bazne cijene proizvoda in force from 17 November 2026 requires, when Kigo.Cloud sends it.
 * **Price list (cjenik) of goods and of services in CSV and XML on your own domain.** The plugin checks Kigo.Cloud every hour, downloads a changed price list as soon as Kigo.Cloud publishes it and serves the CSV and XML from your uploads folder under the prescribed file names; the `[kigo_cjenik]` shortcode shows the current files and those replaced in the last 30 days.
 * **Price list without a web shop.** A WordPress site without WooCommerce (a company presentation, a craftsman's or a service provider's site) installs the plugin only for the price list: without WooCommerce it shows just the Connection and Price list tabs and publishes the CSV and XML price lists from Kigo.Cloud with the `[kigo_cjenik]` shortcode.
+* **Deposit on beverage packaging (povratna naknada).** While the deposit is switched on in Kigo.Cloud, enter it on the product, and on each variation of a variable product (a variation without its own amount takes that of the product), for example 0.10 € for a bottle or a can and 0.60 € for a six-pack. The product price includes the deposit, the same as in Kigo.Cloud. The plugin sends it with each order line, and Kigo.Cloud shows it separately on the invoice: VAT only on the rest of the price, the deposit reported as povratna naknada in fiscalization and on the eRačun. Products without a deposit work as before.
 * **Custom field mapping** for shops that already collect R1 data with another plugin.
 * **Logs tab** with the last 50 calls, and a test button that sends a test offer (never a real invoice).
 * HPOS (custom order tables) compatible.
@@ -102,6 +103,10 @@ The address of the page where you put the `[kigo_cjenik]` shortcode. That page i
 
 Only if you ask for it. On the Price list tab there is a box "Link to Kigo.Cloud", unticked by default. When you tick it, a small line "Price list made with Kigo.Cloud" with a link to www.kigocloud.com appears under the `[kigo_cjenik]` price list. Untick it and the line is gone. Nothing else on your public pages links to Kigo.Cloud, and the plugin works the same whether the box is ticked or not.
 
+= How do I charge the deposit (povratna naknada) on bottles and cans? =
+
+Switch on the deposit in Kigo.Cloud (Opće postavke, tab Ostalo: Želim koristiti povratnu naknadu, Standard plan or higher). The product and each variation then get the field Deposit (povratna naknada); enter the amount per piece, for example 0.10 € per bottle. Keep the deposit in the product price, as in Kigo.Cloud: the customer pays the price shown in the shop, and Kigo.Cloud takes the deposit out of it on the invoice, charges VAT only on the rest and reports the deposit in fiscalization. If you charged the deposit so far with a hidden product or a cart fee, remove it, otherwise the customer pays it twice. More: [Povratna naknada u WooCommerceu](https://www.kigocloud.com/povratna-naknada-woocommerce/).
+
 = Where do I get help? =
 
 Write to the support forum here or to the e-mail address on [www.kigocloud.com](https://www.kigocloud.com/).
@@ -135,6 +140,9 @@ Kigo.Cloud privacy policy: https://www.kigocloud.com/zastita-osobnih-podataka
 4. An order with the fiscalized Kigo.Cloud invoice number.
 
 == Changelog ==
+
+= 2.3.0 =
+* Deposit on beverage packaging (povratna naknada): while it is switched on in Kigo.Cloud (Opcije), a product and a variation get the field "Povratna naknada" with the amount per piece (0,10 EUR for a bottle, 0,60 EUR for a pack of six). The price of the product includes it, and the order sends it with the line, so the Kigo.Cloud invoice shows it as the deposit, without VAT, and fiscalizes it as the deposit. A variation without its own amount takes that of the product. Shops without the deposit in Kigo.Cloud see no field and send orders as before.
 
 = 2.2.23 =
 * Base price of a product without tax in a shop that shows prices without VAT: no "+ PDV" after it, as WooCommerce does for the product price.

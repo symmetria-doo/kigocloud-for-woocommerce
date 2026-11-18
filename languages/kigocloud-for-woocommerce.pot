@@ -1307,3 +1307,12 @@ msgstr ""
 
 msgid "The current files, each under the name the Pravilnik prescribes. The page with [kigo_cjenik] is the place of the price list on your site: give its address to inspectors and price crawlers, a changed price list always comes to that page."
 msgstr ""
+
+msgid "Deposit (povratna naknada)"
+msgstr ""
+
+msgid "Deposit on the packaging per piece, for example 0,10 for a bottle or 0,60 for a pack of six. The price includes it. Kigo.Cloud shows it on the invoice as the deposit, without VAT. Leave empty for a product without a deposit."
+msgstr ""
+
+msgid "Deposit per piece of this variation. Leave empty to use the deposit of the product."
+msgstr ""

@@ -471,6 +471,7 @@ if (!class_exists('Woo_KigoCloud_Request')) {
             $voucherPaid = Woo_KigoCloud_Gift_Voucher::from_order($order);
 
             $items = array();
+            $depositOn = Woo_KigoCloud_Licence::allows_deposit(); // povratna naknada switched on in Kigo.Cloud
             foreach (array_unique($order->get_items()) as $itemKey => $itemValue) { // this includes any coupons or discounts
                 $itemName = $itemValue->get_name();
                 $itemData = $itemValue->get_data();
@@ -498,6 +499,16 @@ if (!class_exists('Woo_KigoCloud_Request')) {
                 $item->item_name    = $itemName; // set name and tax rate for those items that not exist in kigocloud or not found by reference/sku
                 if ($sendVatPercent) {
                     $item->vat_percent = $taxRate;
+                }
+                // deposit (povratna naknada) per piece from the product field, part of the price; only for a
+                // product that has it, so other orders go as before. A coupon may take the paid price under the
+                // deposit: then the deposit is what the buyer paid for the piece. A deposit above the price of
+                // the piece before the coupon is a wrong field and goes as it is, so Kigo.Cloud refuses it with
+                // a message on the order instead of an invoice with the whole price as the deposit.
+                $deposit = $depositOn ? Woo_KigoCloud_Deposit::for_product($product) : 0.0;
+                if ($deposit > 0) {
+                    $listPrice = round(((float)$itemValue->get_subtotal() + (float)$itemValue->get_subtotal_tax()) / $quantity, 4);
+                    $item->pet = round($deposit <= $listPrice ? min($deposit, max(0.0, $currentPrice)) : $deposit, 4);
                 }
                 // $item->discount_percent = 0.00; TODO add option for this
 
