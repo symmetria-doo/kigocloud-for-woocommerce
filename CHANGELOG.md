@@ -4,6 +4,11 @@ All notable changes to KigoCloud for WooCommerce are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.3.1] - 2026-11-19
+
+### Changed
+- The deposit leaves the cart line for its own fee row without VAT (`Woo_KigoCloud_Deposit::cart_take_out()` on `woocommerce_before_calculate_totals` priority 999, price, regular and sale price less the deposit once per product object, so the cart does not show it as a discount; `cart_fee()` on `woocommerce_cart_calculate_fees`, not taxable). WooCommerce now charges VAT on the price without the deposit, as Kigo.Cloud does on the invoice; the catalogue price and the total paid stay the same, a percentage coupon does not apply to the deposit. The checkout keeps the deposit per piece on the order line (`_kigocloud_deposit`, classic and block checkout) and marks the fee (`_kigocloud_deposit_fee`); the request sends the line price with the deposit back in it and pet, and does not send the deposit fee as an item. Orders without the line meta (admin orders, orders before 2.3.1) are sent as in 2.3.0.
+
 ## [2.3.0] - 2026-11-18
 
 ### Added

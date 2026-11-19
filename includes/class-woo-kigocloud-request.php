@@ -505,8 +505,16 @@ if (!class_exists('Woo_KigoCloud_Request')) {
                 // deposit: then the deposit is what the buyer paid for the piece. A deposit above the price of
                 // the piece before the coupon is a wrong field and goes as it is, so Kigo.Cloud refuses it with
                 // a message on the order instead of an invoice with the whole price as the deposit.
-                $deposit = $depositOn ? Woo_KigoCloud_Deposit::for_product($product) : 0.0;
-                if ($deposit > 0) {
+                // Since 2.3.1 the cart takes the deposit out of the line into its own row and the order line keeps
+                // the deposit per piece: the line goes to Kigo.Cloud with the deposit back in its price, as sold
+                // (the deposit row is not sent as an item, see the fees below).
+                $lineDeposit = (float) $itemValue->get_meta(Woo_KigoCloud_Deposit::LINE_META, true);
+                $deposit = ($lineDeposit <= 0 && $depositOn) ? Woo_KigoCloud_Deposit::for_product($product) : 0.0;
+                if ($lineDeposit > 0) {
+                    $item->price = round($currentPrice + $lineDeposit, 4);
+                    $item->pet   = round($lineDeposit, 4);
+                } elseif ($deposit > 0) {
+                    // an order without the deposit row (made in the admin, or before 2.3.1): the price includes it
                     $listPrice = round(((float)$itemValue->get_subtotal() + (float)$itemValue->get_subtotal_tax()) / $quantity, 4);
                     $item->pet = round($deposit <= $listPrice ? min($deposit, max(0.0, $currentPrice)) : $deposit, 4);
                 }
@@ -517,6 +525,9 @@ if (!class_exists('Woo_KigoCloud_Request')) {
 
             // Get all fees in the order
             foreach ($order->get_fees() as $fee) {
+                if ($fee->get_meta(Woo_KigoCloud_Deposit::FEE_META, true)) {
+                    continue; // the deposit row: already in the lines as pet
+                }
                 $fee_name = $fee->get_name(); // Fee name
                 $fee_total = $fee->get_total(); // Fee amount
                 $fee_tax = $fee->get_total_tax(); // Fee tax

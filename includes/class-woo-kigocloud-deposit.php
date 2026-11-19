@@ -21,6 +21,124 @@ if (!class_exists('Woo_KigoCloud_Deposit')) {
         /** Product / variation meta: deposit per piece, in the shop currency */
         const META = '_kigocloud_deposit';
 
+        /** Order line meta: deposit per piece taken out of the line price into the deposit fee (since 2.3.1) */
+        const LINE_META = '_kigocloud_deposit';
+
+        /** Order fee meta: the fee is the deposit of the order lines, not an item for Kigo.Cloud */
+        const FEE_META = '_kigocloud_deposit_fee';
+
+        /**
+         * Cart product objects whose price is already without the deposit in this request, with the deposit.
+         * SplObjectStorage keeps the object, so a removed line cannot hand its object id to a new one.
+         *
+         * @var SplObjectStorage|null
+         */
+        private static $takenOut = null;
+
+        /**
+         * Name of the deposit row in the cart, the checkout and the order.
+         *
+         * @return string
+         */
+        public static function fee_name()
+        {
+            return __('Deposit (povratna naknada)', 'kigocloud-for-woocommerce');
+        }
+
+        /**
+         * Hooked on woocommerce_before_calculate_totals (late): the catalogue price includes the deposit, as in
+         * Kigo.Cloud; in the cart the deposit leaves the price of the line and goes to its own row without VAT,
+         * so WooCommerce charges VAT on the rest only, as Kigo.Cloud does. The total paid is the same.
+         *
+         * @param WC_Cart $cart
+         */
+        public function cart_take_out($cart)
+        {
+            if (!Woo_KigoCloud_Licence::allows_deposit()) {
+                return;
+            }
+            if (self::$takenOut === null) {
+                self::$takenOut = new SplObjectStorage();
+            }
+            foreach ($cart->cart_contents as $key => $cartItem) {
+                if (empty($cartItem['data']) || !is_object($cartItem['data'])) {
+                    continue;
+                }
+                $product = $cartItem['data'];
+                if (self::$takenOut->contains($product)) {
+                    // totals are calculated more than once in a request: the price is already without the deposit
+                    $cart->cart_contents[$key]['kigocloud_deposit'] = self::$takenOut[$product];
+                    continue;
+                }
+                $deposit = self::for_product($product);
+                $price = (float) $product->get_price();
+                if ($deposit <= 0 || $deposit > $price) {
+                    // no deposit, or a deposit above the price (a wrong field): the line stays as it is
+                    unset($cart->cart_contents[$key]['kigocloud_deposit']);
+                    continue;
+                }
+                $product->set_price(round($price - $deposit, 4));
+                // the regular and the sale price too, or the cart shows the deposit as a discount (3,00 -> 2,90)
+                $regular = $product->get_regular_price('edit');
+                if ($regular !== '' && (float) $regular >= $deposit) {
+                    $product->set_regular_price(round((float) $regular - $deposit, 4));
+                }
+                $sale = $product->get_sale_price('edit');
+                if ($sale !== '' && (float) $sale >= $deposit) {
+                    $product->set_sale_price(round((float) $sale - $deposit, 4));
+                }
+                self::$takenOut[$product] = $deposit;
+                $cart->cart_contents[$key]['kigocloud_deposit'] = $deposit;
+            }
+        }
+
+        /**
+         * Hooked on woocommerce_cart_calculate_fees: one row with the deposit of all lines, without VAT.
+         *
+         * @param WC_Cart $cart
+         */
+        public function cart_fee($cart)
+        {
+            $sum = 0.0;
+            foreach ($cart->cart_contents as $cartItem) {
+                if (!empty($cartItem['kigocloud_deposit'])) {
+                    $sum += (float) $cartItem['kigocloud_deposit'] * (float) $cartItem['quantity'];
+                }
+            }
+            if ($sum > 0) {
+                $cart->add_fee(self::fee_name(), round($sum, 2), false);
+            }
+        }
+
+        /**
+         * Hooked on woocommerce_checkout_create_order_line_item (classic and block checkout): the deposit per
+         * piece taken out of this line goes on the order line, so the order sends it to Kigo.Cloud as it was sold.
+         *
+         * @param WC_Order_Item_Product $item
+         * @param string                $cartItemKey
+         * @param array                 $values
+         */
+        public function order_line_meta($item, $cartItemKey, $values)
+        {
+            if (!empty($values['kigocloud_deposit'])) {
+                $item->add_meta_data(self::LINE_META, wc_format_decimal($values['kigocloud_deposit'], 4), true);
+            }
+        }
+
+        /**
+         * Hooked on woocommerce_checkout_create_order_fee_item: marks the deposit row of the order.
+         *
+         * @param WC_Order_Item_Fee $item
+         * @param string            $feeKey
+         * @param object            $fee
+         */
+        public function order_fee_meta($item, $feeKey, $fee)
+        {
+            if (isset($fee->id) && $fee->id === sanitize_title(self::fee_name())) {
+                $item->add_meta_data(self::FEE_META, 1, true);
+            }
+        }
+
         /**
          * Field under the price on the General tab of a simple product.
          */

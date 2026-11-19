@@ -45,7 +45,7 @@ class Woo_KigoCloud {
      *
      * @since 1.0.0
      */
-    const PLUGIN_VERSION = '2.3.0';
+    const PLUGIN_VERSION = '2.3.1';
 
     /**
      * Is WooCommerce active? Without it the plugin only publishes the price
@@ -280,6 +280,11 @@ class Woo_KigoCloud {
         $this->loader->add_action('woocommerce_admin_process_product_object', $plugin_deposit, 'save_product');
         $this->loader->add_action('woocommerce_variation_options_pricing', $plugin_deposit, 'variation_field', 10, 3);
         $this->loader->add_action('woocommerce_admin_process_variation_object', $plugin_deposit, 'save_variation', 10, 2);
+        // In the cart the deposit leaves the line price for its own row without VAT (VAT as on the Kigo.Cloud invoice)
+        $this->loader->add_action('woocommerce_before_calculate_totals', $plugin_deposit, 'cart_take_out', 999);
+        $this->loader->add_action('woocommerce_cart_calculate_fees', $plugin_deposit, 'cart_fee');
+        $this->loader->add_action('woocommerce_checkout_create_order_line_item', $plugin_deposit, 'order_line_meta', 10, 3);
+        $this->loader->add_action('woocommerce_checkout_create_order_fee_item', $plugin_deposit, 'order_fee_meta', 10, 3);
 
         $r1_mode = Woo_KigoCloud_R1::mode();
         if ($r1_mode > 0) {
