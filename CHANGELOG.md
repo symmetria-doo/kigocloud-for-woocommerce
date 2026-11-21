@@ -4,6 +4,14 @@ All notable changes to KigoCloud for WooCommerce are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.3.3] - 2026-11-21
+
+### Changed
+- `uninstall.php` removes only the plugin settings: options and transients named `kigocloud_*` (and site transients). Post meta, HPOS order meta and order item meta are kept: `_kigocloud_deposit` on products and variations, `_kigocloud_id_pos`, `_kigocloud_pos_number`, `_kigocloud_doc_type`, `_kigocloud_cancelled` and `kigocloud_vat_invoices_*` on orders. Without `_kigocloud_id_pos` an order that reaches the invoice status again after the plugin is installed again got a second fiscal invoice, and cancelling or refunding it no longer cancelled the first one.
+
+### Fixed
+- Deleting one of two installed copies of the plugin (the old version in a folder of another name after a zip was installed by hand) removed the settings, deposits and invoice links of the copy that stays active. `uninstall.php` now removes nothing while another copy (Text Domain `kigocloud-for-woocommerce` or main file `kigocloud-for-woocommerce.php` in another folder) is installed; the copy being deleted is found by its own folder, because WordPress keeps `WP_UNINSTALL_PLUGIN` from the first plugin when several are deleted in one request. Copies of 2.3.2 and earlier still run their own uninstall when they are deleted.
+
 ## [2.3.2] - 2026-11-20
 
 ### Changed

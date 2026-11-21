@@ -4,7 +4,7 @@ Tags: fiskalizacija, sidrena cijena, cjenik, croatia, fiscalization
 Requires at least: 5.5
 Tested up to: 7.1
 Requires PHP: 7.2
-Stable tag: 2.3.2
+Stable tag: 2.3.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 WC requires at least: 5.0
@@ -140,6 +140,10 @@ Kigo.Cloud privacy policy: https://www.kigocloud.com/zastita-osobnih-podataka
 4. An order with the fiscalized Kigo.Cloud invoice number.
 
 == Changelog ==
+
+= 2.3.3 =
+* Deleting the plugin no longer removes data from products and orders: the deposit (povratna naknada) on products and variations, the link of each order to its Kigo.Cloud invoice and the R1 data stay. Only the plugin settings are removed, so a shop that installs the plugin again does not issue a second invoice for an old order and can still cancel it.
+* Deleting one of two installed copies of the plugin (for example the old version left in a folder of another name after a zip was installed by hand) removes nothing, so the copy that stays keeps its settings.
 
 = 2.3.2 =
 * Base price of a new or changed product shows at once: saving a product or a variation in WooCommerce reads its base price from Kigo.Cloud by its SKU. All base prices are read every hour instead of once a day.
