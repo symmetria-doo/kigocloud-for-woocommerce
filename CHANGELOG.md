@@ -4,6 +4,20 @@ All notable changes to KigoCloud for WooCommerce are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.3.2] - 2026-11-20
+
+### Changed
+- Base prices are read every hour (`kigocloud_anchor_refresh` hourly, the daily 08:15 event of 2.3.1 and earlier is replaced) instead of once a day.
+
+### Added
+- Saving a product (`woocommerce_process_product_meta`) reads its base price from Kigo.Cloud by its SKU (`item/getByReference`) before the edit screen opens again; saved variations are read once at the end of the request, more than five SKUs read the whole list. An SKU Kigo.Cloud does not know loses its base price; a failed call keeps what was read before (`Woo_KigoCloud_Pricelist::read_skus()`).
+- `on_shutdown()`: a page view reads the base prices and checks the published price list when they are more than an hour old, so a site where WP-Cron does not run (DISABLE_WP_CRON, page cache) still gets them; one request at a time (`kigocloud_anchor_lock`), after the answer where PHP-FPM allows it. Found on a shop whose last read was three days old.
+- Product and variation edit screen: a Base price line under the prices with the amount, the date, the Kigo.Cloud item code and the time of the read, or what is missing (no SKU, no Kigo.Cloud item with that code or no base price on it).
+- Dashboard notice when the base prices were last read more than three hours ago, or could not be read.
+
+### Fixed
+- The time of the last read on the settings page is in the site time zone (`wp_date()`), not UTC.
+
 ## [2.3.1] - 2026-11-19
 
 ### Changed

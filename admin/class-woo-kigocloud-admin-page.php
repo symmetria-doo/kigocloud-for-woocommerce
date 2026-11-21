@@ -704,15 +704,16 @@ class Woo_KigoCloud_Admin_Page
             <th scope="row"><?php esc_html_e('Base prices (anchor prices)', 'kigocloud-for-woocommerce'); ?></th>
             <td>
                 <?php if ($reason === ''): ?>
-                    <p><span class="kc-status-ok"><?php
+                    <?php $stale = isset($source['time']) && (time() - (int) $source['time']) > Woo_KigoCloud_Pricelist::STALE_AFTER; ?>
+                    <p><span class="<?php echo $stale ? 'kc-status-bad' : 'kc-status-ok'; ?>"><?php
                         echo esc_html(sprintf(
                             /* translators: 1: number of items, 2: date and time */
                             __('%1$d items, read from Kigo.Cloud (Sidrene cijene, newest reference day) on %2$s.', 'kigocloud-for-woocommerce'),
                             isset($source['count']) ? (int) $source['count'] : 0,
-                            date_i18n(get_option('date_format') . ' ' . get_option('time_format'), isset($source['time']) ? (int) $source['time'] : time())
+                            wp_date(get_option('date_format') . ' ' . get_option('time_format'), isset($source['time']) ? (int) $source['time'] : time())
                         ));
                     ?></span></p>
-                    <p class="description"><?php esc_html_e('Read again every morning and when these settings are saved.', 'kigocloud-for-woocommerce'); ?></p>
+                    <p class="description"><?php esc_html_e('Read again every hour, for its SKU when a product is saved, and when these settings are saved. The shop shows the base price of the Kigo.Cloud item whose code (šifra) is the same as the product SKU; the product edit screen shows it under the price.', 'kigocloud-for-woocommerce'); ?></p>
                 <?php elseif (isset($reasons[$reason])): ?>
                     <p><span class="kc-status-bad"><?php echo esc_html($reasons[$reason]); ?></span></p>
                 <?php else: ?>

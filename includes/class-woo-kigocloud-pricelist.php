@@ -540,15 +540,26 @@ class Woo_KigoCloud_Pricelist
      * v1 API (GET item/list), which carries anchor_prices for every item: one
      * entry per switched-on reference day that applies to the item and has a
      * price, oldest day first. The newest one is the anchor price the shop
-     * shows. Anchor prices are in every Kigo.Cloud package. Read once a day after
-     * 8:00 and when the settings are saved; nothing is typed in by hand.
+     * shows. Anchor prices are in every Kigo.Cloud package. Read every hour, on
+     * a page view when WP-Cron did not run for an hour, when the settings are
+     * saved, and for its SKU when a product or variation is saved; nothing is
+     * typed in by hand.
      */
 
     /** Last read: array('time', 'count', 'reason', 'message'). Not autoloaded. */
     const OPTION_ANCHOR_SOURCE = 'kigocloud_anchor_source';
 
-    /** Daily refresh of the anchor prices, after Kigo.Cloud publishes at 8:00. */
+    /** Hourly refresh of the anchor prices (daily at 08:15 up to 2.3.1). */
     const ANCHOR_CRON = 'kigocloud_anchor_refresh';
+
+    /** Anchor prices read longer ago than this are read again on a page view. */
+    const ANCHOR_EVERY = 3600;
+
+    /** More saved SKUs than this in one request read the whole list instead, one call per page. */
+    const ANCHOR_SKU_CALLS = 5;
+
+    /** @var string[] SKUs of the variations saved in this request, read at its end */
+    private static $saved_skus = array();
 
     /**
      * Hooks of the anchor prices. Called from init().
@@ -557,6 +568,16 @@ class Woo_KigoCloud_Pricelist
     {
         add_action(self::ANCHOR_CRON, array(__CLASS__, 'cron_refresh'));
         add_action('init', array(__CLASS__, 'schedule_anchor'));
+        // WP-Cron runs only when the site gets a visit and is often switched off
+        // or blocked by a page cache: then a page view reads what is overdue.
+        add_action('shutdown', array(__CLASS__, 'on_shutdown'), 1000);
+        // A saved product reads its own base price at once, and its edit screen
+        // says which base price the shop shows and where it comes from.
+        add_action('woocommerce_process_product_meta', array(__CLASS__, 'on_product_saved'), 99);
+        add_action('woocommerce_save_product_variation', array(__CLASS__, 'on_variation_saved'), 99);
+        add_action('woocommerce_product_options_pricing', array(__CLASS__, 'product_anchor_field'));
+        add_action('woocommerce_variation_options_pricing', array(__CLASS__, 'variation_anchor_field'), 20, 3);
+        add_action('admin_notices', array(__CLASS__, 'anchor_notice'));
         // Every Save reads them again, also when nothing changed here (a login
         // switched in Kigo.Cloud, a reference day changed there).
         add_action('admin_init', array(__CLASS__, 'on_settings_form'));
@@ -579,20 +600,20 @@ class Woo_KigoCloud_Pricelist
     }
 
     /**
-     * Hooked on `init`: the daily refresh at 08:15 while the anchor price is shown.
+     * Hooked on `init`: the hourly refresh while the anchor price is shown. The
+     * daily event of 2.3.1 and earlier is replaced.
      */
     public static function schedule_anchor()
     {
-        $next = wp_next_scheduled(self::ANCHOR_CRON);
         if (!self::anchor_wanted()) {
-            if ($next) {
-                wp_unschedule_event($next, self::ANCHOR_CRON);
-            }
+            wp_clear_scheduled_hook(self::ANCHOR_CRON);
             return;
         }
-        if (!$next) {
-            wp_schedule_event(strtotime('tomorrow 08:15'), 'daily', self::ANCHOR_CRON);
+        if (wp_next_scheduled(self::ANCHOR_CRON) && wp_get_schedule(self::ANCHOR_CRON) === 'hourly') {
+            return;
         }
+        wp_clear_scheduled_hook(self::ANCHOR_CRON);
+        wp_schedule_event(time() + 5 * MINUTE_IN_SECONDS, 'hourly', self::ANCHOR_CRON);
     }
 
     /**
@@ -608,8 +629,8 @@ class Woo_KigoCloud_Pricelist
     }
 
     /**
-     * The daily refresh. A login Kigo.Cloud refused at the last check is not
-     * tried again every morning (each try is a refused login in Kigo.Cloud's
+     * The hourly refresh. A login Kigo.Cloud refused at the last check is not
+     * tried again every hour (each try is a refused login in Kigo.Cloud's
      * log): the next Save or "Test connection" checks it again.
      */
     public static function cron_refresh()
@@ -707,6 +728,309 @@ class Woo_KigoCloud_Pricelist
         self::store_anchor_source(array('reason' => $count > 0 ? '' : 'empty', 'count' => $count));
 
         return $count;
+    }
+
+    /**
+     * Hooked on `shutdown`: reads the base prices of the variations saved in
+     * this request, otherwise reads what WP-Cron left overdue (the base prices
+     * and the published price list, each after an hour). A page view answers
+     * the visitor first where PHP-FPM allows it. Skipped in WP-Cron's own
+     * request, which runs the events itself.
+     */
+    public static function on_shutdown()
+    {
+        if (!empty(self::$saved_skus)) {
+            $skus = array_keys(self::$saved_skus);
+            self::$saved_skus = array();
+            self::read_skus($skus);
+            return;
+        }
+        if (function_exists('wp_doing_cron') && wp_doing_cron()) {
+            return;
+        }
+        $anchor = self::anchor_overdue();
+        $pricelist = self::base_url() !== '' && !self::is_current();
+        if (!$anchor && !$pricelist) {
+            return;
+        }
+        if (!is_admin() && function_exists('fastcgi_finish_request')) {
+            fastcgi_finish_request();
+        }
+        // One request does the work; the others render what is stored.
+        if ($anchor && !get_transient('kigocloud_anchor_lock')) {
+            set_transient('kigocloud_anchor_lock', 1, 300);
+            self::cron_refresh();
+            delete_transient('kigocloud_anchor_lock');
+        }
+        if ($pricelist) {
+            self::maybe_refresh();
+        }
+    }
+
+    /**
+     * @return bool the base prices are shown and were last read (or tried) more
+     *              than an hour ago, with a login Kigo.Cloud did not refuse
+     */
+    private static function anchor_overdue()
+    {
+        if (!self::anchor_wanted()) {
+            return false;
+        }
+        $check = Woo_KigoCloud_Request::login_check();
+        if (isset($check['ok']) && !$check['ok']) {
+            return false;
+        }
+        $source = self::anchor_source();
+
+        return !isset($source['time']) || (time() - (int) $source['time']) > self::ANCHOR_EVERY;
+    }
+
+    /**
+     * Hooked on `woocommerce_process_product_meta`: the saved product reads its
+     * base price from Kigo.Cloud by its SKU before the edit screen opens again.
+     *
+     * @param int $product_id
+     */
+    public static function on_product_saved($product_id)
+    {
+        $product = function_exists('wc_get_product') ? wc_get_product($product_id) : null;
+        if ($product && !$product->is_type('variable') && self::anchor_wanted()) {
+            $sku = trim((string) $product->get_sku());
+            if ($sku !== '') {
+                self::read_skus(array($sku));
+            }
+        }
+    }
+
+    /**
+     * Hooked on `woocommerce_save_product_variation`: collects the SKU (the
+     * parent's when the variation has none); all are read once at the end of
+     * the request.
+     *
+     * @param int $variation_id
+     */
+    public static function on_variation_saved($variation_id)
+    {
+        if (!self::anchor_wanted()) {
+            return;
+        }
+        $sku = trim((string) get_post_meta($variation_id, '_sku', true));
+        if ($sku === '') {
+            $sku = trim((string) get_post_meta(wp_get_post_parent_id($variation_id), '_sku', true));
+        }
+        if ($sku !== '') {
+            self::$saved_skus[$sku] = true;
+        }
+    }
+
+    /**
+     * Reads the base price of these SKUs from Kigo.Cloud (item/getByReference),
+     * or the whole list when there are more than a few. An SKU Kigo.Cloud does
+     * not know loses its base price; a failed call keeps what was read before.
+     *
+     * @param string[] $skus
+     */
+    private static function read_skus(array $skus)
+    {
+        $check = Woo_KigoCloud_Request::login_check();
+        if (isset($check['ok']) && !$check['ok']) {
+            return;
+        }
+        if (count($skus) > self::ANCHOR_SKU_CALLS) {
+            self::refresh_anchor_prices();
+            return;
+        }
+        $index = get_option(self::OPTION_ANCHOR, array());
+        if (!is_array($index)) {
+            $index = array();
+        }
+        foreach (array('ref', 'barcode', 'checked') as $key) {
+            if (!isset($index[$key]) || !is_array($index[$key])) {
+                $index[$key] = array();
+            }
+        }
+        foreach ($skus as $sku) {
+            $key = self::anchor_key($sku);
+            $answer = Woo_KigoCloud_Request::call('GET', 'item/getByReference?reference=' . rawurlencode($sku));
+            if (is_wp_error($answer)) {
+                if ($answer->get_error_code() !== 'kigocloud_404') {
+                    continue;
+                }
+                unset($index['ref'][$key]);
+            } else {
+                // item/getByReference answers with the item itself, item/list wraps rows in data.
+                $entry = self::newest_anchor((isset($answer->data) && is_object($answer->data)) ? $answer->data : $answer);
+                if ($entry === null) {
+                    unset($index['ref'][$key]);
+                } else {
+                    $index['ref'][$key] = $entry;
+                }
+            }
+            $index['checked'][$key] = time();
+        }
+        update_option(self::OPTION_ANCHOR, $index, false);
+        self::$anchor_index = null;
+    }
+
+    /**
+     * Hooked on `woocommerce_product_options_pricing`: under the prices of a
+     * simple product, which base price the shop shows and where it comes from.
+     */
+    public static function product_anchor_field()
+    {
+        global $product_object;
+        if ($product_object instanceof WC_Product && !$product_object->is_type('variable')) {
+            echo self::anchor_field_html($product_object, (string) $product_object->get_sku()); // phpcs:ignore WordPress.Security.EscapeOutput -- escaped in anchor_field_html()
+        }
+    }
+
+    /**
+     * Hooked on `woocommerce_variation_options_pricing`.
+     *
+     * @param int     $loop
+     * @param array   $variation_data
+     * @param WP_Post $variation
+     */
+    public static function variation_anchor_field($loop, $variation_data, $variation)
+    {
+        $product = function_exists('wc_get_product') ? wc_get_product($variation->ID) : null;
+        if (!$product) {
+            return;
+        }
+        $sku = (string) $product->get_sku();
+        if (trim($sku) === '') {
+            $sku = (string) get_post_meta($variation->post_parent, '_sku', true);
+        }
+        echo self::anchor_field_html($product, $sku); // phpcs:ignore WordPress.Security.EscapeOutput -- escaped in anchor_field_html()
+    }
+
+    /**
+     * One line on the product edit screen: the base price and where it comes
+     * from, or what to do so the shop shows one.
+     *
+     * @param WC_Product $product
+     * @param string     $sku SKU the base price is looked up by
+     * @return string HTML
+     */
+    private static function anchor_field_html($product, $sku)
+    {
+        if ('1' !== (string) get_option('kigocloud_show_anchor_price', '0')) {
+            return '';
+        }
+        $sku = trim($sku);
+        $meta = $product->get_meta('_kigo_anchor_price', true);
+        $ok = true;
+        if ($meta !== '' && $meta !== null && is_numeric($meta)) {
+            $text = sprintf(
+                /* translators: 1: amount, 2: date */
+                __('%1$s (%2$s), sent by Kigo.Cloud with the product sync.', 'kigocloud-for-woocommerce'),
+                self::admin_amount($meta),
+                self::admin_date((string) $product->get_meta('_kigo_anchor_price_date', true))
+            );
+        } elseif ($sku === '') {
+            $ok = false;
+            $text = __('None. Enter the SKU: it must be the same as the item code (šifra) in Kigo.Cloud, the base price is taken from that item.', 'kigocloud-for-woocommerce');
+        } else {
+            $found = self::anchor_for_codes($sku, is_callable(array($product, 'get_global_unique_id')) ? (string) $product->get_global_unique_id() : '');
+            $read = self::sku_read_time($sku);
+            if ($found !== null) {
+                $text = sprintf(
+                    /* translators: 1: amount, 2: date, 3: item code, 4: date and time */
+                    __('%1$s (%2$s), from the item %3$s in Kigo.Cloud, read %4$s.', 'kigocloud-for-woocommerce'),
+                    self::admin_amount($found[0]),
+                    self::admin_date((string) $found[1]),
+                    $sku,
+                    $read
+                );
+            } else {
+                $ok = false;
+                $text = sprintf(
+                    /* translators: 1: item code, 2: date and time */
+                    __('None. Kigo.Cloud has no item with the code %1$s, or the item has no base price (read %2$s). The SKU must be the same as the item code (šifra) in Kigo.Cloud; saving the product reads it again.', 'kigocloud-for-woocommerce'),
+                    $sku,
+                    $read
+                );
+            }
+        }
+
+        return '<p class="form-field kigocloud-anchor-field"><label>' . esc_html__('Base price', 'kigocloud-for-woocommerce') . '</label>'
+            . '<span style="display:inline-block;max-width:32em;' . ($ok ? '' : 'color:#b32d2e;') . '">'
+            . esc_html($text) . '</span></p>';
+    }
+
+    /**
+     * @param string $sku
+     * @return string when the base price of this SKU was last read, for the admin
+     */
+    private static function sku_read_time($sku)
+    {
+        $index = get_option(self::OPTION_ANCHOR, array());
+        $key = self::anchor_key($sku);
+        $time = (is_array($index) && isset($index['checked'][$key])) ? (int) $index['checked'][$key] : 0;
+        $source = self::anchor_source();
+        if (isset($source['time']) && (int) $source['time'] > $time && (!isset($source['reason']) || $source['reason'] === '')) {
+            $time = (int) $source['time'];
+        }
+        if ($time === 0) {
+            return __('never', 'kigocloud-for-woocommerce');
+        }
+
+        return wp_date('j. n. Y. H:i', $time);
+    }
+
+    /**
+     * @param mixed $amount
+     * @return string the amount as Kigo.Cloud keeps it, with VAT
+     */
+    private static function admin_amount($amount)
+    {
+        $text = function_exists('wc_price') ? wp_strip_all_tags(wc_price((float) $amount)) : number_format((float) $amount, 2, ',', '.');
+
+        return sprintf(
+            /* translators: %s: amount */
+            __('%s with VAT', 'kigocloud-for-woocommerce'),
+            html_entity_decode($text, ENT_QUOTES, 'UTF-8')
+        );
+    }
+
+    /**
+     * @param string $date Y-m-d
+     * @return string
+     */
+    private static function admin_date($date)
+    {
+        $time = strtotime($date);
+
+        return $time ? wp_date('j. n. Y.', $time, new DateTimeZone('UTC')) : '';
+    }
+
+    /**
+     * Hooked on `admin_notices`: warns when the base prices were not read from
+     * Kigo.Cloud for more than three hours, so a changed or new base price is
+     * not missing from the shop unnoticed.
+     */
+    public static function anchor_notice()
+    {
+        if (!current_user_can('manage_options') || !Woo_KigoCloud::is_notice_screen() || !self::anchor_wanted()) {
+            return;
+        }
+        $source = self::anchor_source();
+        $reason = isset($source['reason']) ? (string) $source['reason'] : '';
+        $good = isset($source['time']) && $reason === '';
+        // No base prices in Kigo.Cloud or not read yet: the settings page says so.
+        if (($good && (time() - (int) $source['time']) <= self::STALE_AFTER) || (!$good && $reason !== 'error')) {
+            return;
+        }
+        if ($good) {
+            $text = sprintf(
+                /* translators: %s: date and time */
+                __('The base prices were last read from Kigo.Cloud on %s, so a changed or new base price may be missing from the shop. Click Save all settings on the Kigo.Cloud page to read them now.', 'kigocloud-for-woocommerce'),
+                wp_date('j. n. Y. H:i', (int) $source['time'])
+            );
+        } else {
+            $text = __('The base prices could not be read from Kigo.Cloud. The Kigo.Cloud page says why.', 'kigocloud-for-woocommerce');
+        }
+        echo '<div class="notice notice-warning"><p><strong>KigoCloud</strong> ' . esc_html($text) . '</p></div>';
     }
 
     /**

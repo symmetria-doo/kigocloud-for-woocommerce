@@ -616,8 +616,8 @@ msgstr "Bazne cijene (sidrene cijene)"
 msgid "%1$d items, read from Kigo.Cloud (Sidrene cijene, newest reference day) on %2$s."
 msgstr "%1$d artikala, pročitano iz Kigo.Clouda (Sidrene cijene, najnoviji referentni dan) %2$s."
 
-msgid "Read again every morning and when these settings are saved."
-msgstr "Čita se ponovno svako jutro i kad se ove postavke spreme."
+msgid "Read again every hour, for its SKU when a product is saved, and when these settings are saved. The shop shows the base price of the Kigo.Cloud item whose code (šifra) is the same as the product SKU; the product edit screen shows it under the price."
+msgstr "Čita se ponovno svaki sat, za šifru proizvoda kad se proizvod spremi i kad se ove postavke spreme. Trgovina prikazuje baznu cijenu artikla u Kigo.Cloudu čija je šifra ista kao šifra proizvoda (SKU); na uređivanju proizvoda piše ispod cijene."
 
 msgid "The anchor prices could not be read from Kigo.Cloud."
 msgstr "Bazne (sidrene) cijene nije bilo moguće pročitati iz Kigo.Clouda."
@@ -1357,3 +1357,30 @@ msgstr "Povratna naknada za ambalažu po komadu, npr. 0,10 za bocu ili 0,60 za p
 
 msgid "Deposit per piece of this variation. Leave empty to use the deposit of the product."
 msgstr "Povratna naknada po komadu ove varijante. Ostavite prazno za povratnu naknadu proizvoda."
+
+msgid "%1$s (%2$s), sent by Kigo.Cloud with the product sync."
+msgstr "%1$s (%2$s), iz sinkronizacije proizvoda s Kigo.Cloudom."
+
+msgid "None. Enter the SKU: it must be the same as the item code (šifra) in Kigo.Cloud, the base price is taken from that item."
+msgstr "Nema. Upišite šifru (SKU): mora biti ista kao šifra artikla u Kigo.Cloudu, bazna cijena se uzima s tog artikla."
+
+msgid "%1$s (%2$s), from the item %3$s in Kigo.Cloud, read %4$s."
+msgstr "%1$s (%2$s), s artikla %3$s u Kigo.Cloudu, pročitano %4$s."
+
+msgid "None. Kigo.Cloud has no item with the code %1$s, or the item has no base price (read %2$s). The SKU must be the same as the item code (šifra) in Kigo.Cloud; saving the product reads it again."
+msgstr "Nema. Kigo.Cloud nema artikl sa šifrom %1$s ili artikl nema baznu cijenu (pročitano %2$s). Šifra (SKU) mora biti ista kao šifra artikla u Kigo.Cloudu; spremanje proizvoda je čita ponovno."
+
+msgid "Base price"
+msgstr "Bazna cijena"
+
+msgid "never"
+msgstr "nikad"
+
+msgid "%s with VAT"
+msgstr "%s s PDV-om"
+
+msgid "The base prices were last read from Kigo.Cloud on %s, so a changed or new base price may be missing from the shop. Click Save all settings on the Kigo.Cloud page to read them now."
+msgstr "Bazne cijene zadnji su put pročitane iz Kigo.Clouda %s, pa u trgovini možda nema promijenjene ili nove bazne cijene. Kliknite Spremi sve postavke na stranici Kigo.Cloud da se pročitaju odmah."
+
+msgid "The base prices could not be read from Kigo.Cloud. The Kigo.Cloud page says why."
+msgstr "Bazne cijene nije bilo moguće pročitati iz Kigo.Clouda. Razlog piše na stranici Kigo.Cloud."

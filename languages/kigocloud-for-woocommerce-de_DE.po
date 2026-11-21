@@ -119,8 +119,8 @@ msgstr "Basispreise (Ankerpreise)"
 msgid "%1$d items, read from Kigo.Cloud (Sidrene cijene, newest reference day) on %2$s."
 msgstr "%1$d Artikel, aus Kigo.Cloud gelesen (Sidrene cijene, neuester Referenztag) am %2$s."
 
-msgid "Read again every morning and when these settings are saved."
-msgstr "Wird jeden Morgen und beim Speichern dieser Einstellungen neu gelesen."
+msgid "Read again every hour, for its SKU when a product is saved, and when these settings are saved. The shop shows the base price of the Kigo.Cloud item whose code (šifra) is the same as the product SKU; the product edit screen shows it under the price."
+msgstr "Wird jede Stunde, für die Artikelnummer beim Speichern eines Produkts und beim Speichern dieser Einstellungen neu gelesen. Der Shop zeigt den Basispreis des Kigo.Cloud-Artikels, dessen Code (šifra) gleich der Artikelnummer (SKU) des Produkts ist; die Produktbearbeitung zeigt ihn unter dem Preis."
 
 msgid "The anchor prices could not be read from Kigo.Cloud."
 msgstr "Die Ankerpreise konnten nicht aus Kigo.Cloud gelesen werden."
@@ -409,3 +409,30 @@ msgstr "Pfand auf die Verpackung pro Stück, zum Beispiel 0,10 für eine Flasche
 
 msgid "Deposit per piece of this variation. Leave empty to use the deposit of the product."
 msgstr "Pfand pro Stück dieser Variante. Leer lassen, um den Pfand des Produkts zu verwenden."
+
+msgid "%1$s (%2$s), sent by Kigo.Cloud with the product sync."
+msgstr "%1$s (%2$s), von Kigo.Cloud mit der Produktsynchronisation gesendet."
+
+msgid "None. Enter the SKU: it must be the same as the item code (šifra) in Kigo.Cloud, the base price is taken from that item."
+msgstr "Keiner. Geben Sie die Artikelnummer (SKU) ein: Sie muss gleich dem Artikelcode (šifra) in Kigo.Cloud sein, der Basispreis wird von diesem Artikel genommen."
+
+msgid "%1$s (%2$s), from the item %3$s in Kigo.Cloud, read %4$s."
+msgstr "%1$s (%2$s), vom Artikel %3$s in Kigo.Cloud, gelesen am %4$s."
+
+msgid "None. Kigo.Cloud has no item with the code %1$s, or the item has no base price (read %2$s). The SKU must be the same as the item code (šifra) in Kigo.Cloud; saving the product reads it again."
+msgstr "Keiner. Kigo.Cloud hat keinen Artikel mit dem Code %1$s, oder der Artikel hat keinen Basispreis (gelesen am %2$s). Die Artikelnummer (SKU) muss gleich dem Artikelcode (šifra) in Kigo.Cloud sein; beim Speichern des Produkts wird er neu gelesen."
+
+msgid "Base price"
+msgstr "Basispreis"
+
+msgid "never"
+msgstr "nie"
+
+msgid "%s with VAT"
+msgstr "%s inkl. MwSt."
+
+msgid "The base prices were last read from Kigo.Cloud on %s, so a changed or new base price may be missing from the shop. Click Save all settings on the Kigo.Cloud page to read them now."
+msgstr "Die Basispreise wurden zuletzt am %s aus Kigo.Cloud gelesen, daher fehlt im Shop möglicherweise ein geänderter oder neuer Basispreis. Klicken Sie auf der Seite Kigo.Cloud auf Alle Einstellungen speichern, um sie jetzt zu lesen."
+
+msgid "The base prices could not be read from Kigo.Cloud. The Kigo.Cloud page says why."
+msgstr "Die Basispreise konnten nicht aus Kigo.Cloud gelesen werden. Die Seite Kigo.Cloud nennt den Grund."

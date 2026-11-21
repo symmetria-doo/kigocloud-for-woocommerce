@@ -4,7 +4,7 @@ Tags: fiskalizacija, sidrena cijena, cjenik, croatia, fiscalization
 Requires at least: 5.5
 Tested up to: 7.1
 Requires PHP: 7.2
-Stable tag: 2.3.1
+Stable tag: 2.3.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 WC requires at least: 5.0
@@ -123,7 +123,7 @@ What is sent, and when:
 * **Order cancelled** (`https://app.kigo.cloud/hr/api/v1/invoice/cancelOrder`): once, when an order that already has a Kigo.Cloud document is set to cancelled or refunded. Sent: the order number, the employee PIN and your Kigo.Cloud login. Kigo.Cloud cancels the invoice, or releases the gift voucher reserved for an offer.
 * **Connection test** (R1 tab button): when you click it. Sends a test offer with made-up buyer data and your Kigo.Cloud login.
 * **Licence** (`https://app.kigo.cloud/hr/api/v1/licence/info`): once a day and when the settings are saved. Sent: your Kigo.Cloud login. The answer is the package, its expiry and the price list address.
-* **Anchor prices** (`https://app.kigo.cloud/hr/api/v1/item/list`): while "Anchor price" is set to show, once a day at 8:15 and when the settings are saved. Sent: your Kigo.Cloud login. The answer is your Kigo.Cloud item list with the anchor prices; the plugin keeps the item code, barcode and anchor price. No data about your shop or customers is sent.
+* **Anchor prices** (`https://app.kigo.cloud/hr/api/v1/item/list`, and `item/getByReference` for the SKU of a saved product): while "Anchor price" is set to show, every hour, on a page view when WP-Cron did not run for an hour, when a product is saved and when the settings are saved. Sent: your Kigo.Cloud login. The answer is your Kigo.Cloud item list with the anchor prices; the plugin keeps the item code, barcode and anchor price. No data about your shop or customers is sent.
 * **Price list** (the addresses of the price list files in the Kigo.Cloud licence): every hour, when the settings are saved, and when a page with the `[kigo_cjenik]` shortcode finds a copy not checked in the last hour. Each check is a conditional request; only the CSV and XML files of a changed price list are downloaded; no data about your shop or customers is sent.
 * **Demo account**: if you use the demo login, the same order data goes into the public Kigo.Cloud demo, which anyone can open with that login.
 
@@ -140,6 +140,11 @@ Kigo.Cloud privacy policy: https://www.kigocloud.com/zastita-osobnih-podataka
 4. An order with the fiscalized Kigo.Cloud invoice number.
 
 == Changelog ==
+
+= 2.3.2 =
+* Base price of a new or changed product shows at once: saving a product or a variation in WooCommerce reads its base price from Kigo.Cloud by its SKU. All base prices are read every hour instead of once a day.
+* Works on sites where WP-Cron does not run (switched off, or blocked by a page cache): a page view reads the base prices and checks the published price list when they are more than an hour old.
+* The product edit screen shows under the price which base price the shop shows and from which Kigo.Cloud item, or why there is none (no SKU, or no Kigo.Cloud item with that code). The dashboard warns when the base prices were not read for more than three hours.
 
 = 2.3.1 =
 * Deposit (povratna naknada) in the cart: the deposit leaves the line price for its own row "Povratna naknada" without VAT in the cart, the checkout, the order and the order e-mails, so WooCommerce charges VAT on the same amount as the Kigo.Cloud invoice. The catalogue price stays as entered (with the deposit) and the total paid is the same. A percentage coupon no longer applies to the deposit. Orders made in the admin or before 2.3.1 are sent as before.
