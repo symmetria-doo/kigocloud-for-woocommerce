@@ -4,6 +4,11 @@ All notable changes to KigoCloud for WooCommerce are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.3.4] - 2026-11-24
+
+### Fixed
+- Variable products: the date of the base price on the product card and product page is compared after the same `offered_since()` each variation goes through, so variations that came into Kigo.Cloud on different days (`_kigo_anchor_price_date` 2026-09-10 and 2026-10-06) but whose product was in the shop on the reference day show that day, as each variation does. Before, the raw dates differed and the line had no date. Variations that show different days still give the line without a date.
+
 ## [2.3.3] - 2026-11-21
 
 ### Changed

@@ -124,7 +124,10 @@ JS;
             return $price_html;
         }
         list($anchor, $date, $highest) = $found;
-        $date = $this->offered_since($product, (string) $date, isset($found[3]) ? (string) $found[3] : '');
+        // The variations' dates are already the days shown (variations_anchor).
+        if (empty($found[4])) {
+            $date = $this->offered_since($product, (string) $date, isset($found[3]) ? (string) $found[3] : '');
+        }
         // "Bazna cijena (10. 9. 2026.): 12,00 €", the name the Pravilnik o
         // isticanju bazne cijene proizvoda (NN 132/2026) gives it and Kigo.Cloud
         // prints on shelf labels and declarations (ItemAnchorDate::getLabelWithDate).
@@ -322,8 +325,12 @@ JS;
      * variation's SKU, which WooCommerce takes from the parent when the
      * variation has none, or GTIN). One meta query for all variations.
      *
+     * The date is the day each variation shows (offered_since), so variations
+     * that came into Kigo.Cloud on different days but were all in the shop on
+     * the reference day give that one day, as each of them shows it.
+     *
      * @param WC_Product $product variable product
-     * @return array|null array(lowest, date when all are of the same day, highest)
+     * @return array|null array(lowest, day shown when all show the same day, highest, '', true)
      */
     private function variations_anchor($product)
     {
@@ -334,7 +341,6 @@ JS;
         update_meta_cache('post', $ids);
         $prices = array();
         $dates  = array();
-        $refs   = array();
         foreach ($ids as $id) {
             $anchor = get_post_meta($id, '_kigo_anchor_price', true);
             $date   = get_post_meta($id, '_kigo_anchor_price_date', true);
@@ -358,14 +364,14 @@ JS;
                 continue;
             }
             $prices[] = (float) $anchor;
-            $dates[(string) $date] = true;
-            $refs[(string) $ref]   = true;
+            // The parent's creation day counts for a variation (offered_since).
+            $dates[$this->offered_since($product, (string) $date, (string) $ref)] = true;
         }
         if (empty($prices)) {
             return null;
         }
 
-        return array(min($prices), count($dates) === 1 ? (string) key($dates) : '', max($prices), count($refs) === 1 ? (string) key($refs) : '');
+        return array(min($prices), count($dates) === 1 ? (string) key($dates) : '', max($prices), '', true);
     }
 
     /**
