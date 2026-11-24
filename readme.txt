@@ -4,7 +4,7 @@ Tags: fiskalizacija, sidrena cijena, cjenik, croatia, fiscalization
 Requires at least: 5.5
 Tested up to: 7.1
 Requires PHP: 7.2
-Stable tag: 2.3.4
+Stable tag: 2.3.5
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 WC requires at least: 5.0
@@ -140,6 +140,11 @@ Kigo.Cloud privacy policy: https://www.kigocloud.com/zastita-osobnih-podataka
 4. An order with the fiscalized Kigo.Cloud invoice number.
 
 == Changelog ==
+
+= 2.3.5 =
+* A variation without its own SKU no longer takes the base price of the item that has its product's SKU. WooCommerce shows the product's SKU on such a variation, so every variation of a printer (filter, ink, the printer itself) showed the base price of one item, or a printer showed the base price of an ink coded like the product. The product's SKU now counts only for its only variation; other variations need their own SKU, or the link from Kigo.Cloud.
+* The admin screens (Dashboard, Plugins, Kigo.Cloud) name the published products that show no base price and why: Kigo.Cloud has no item with their SKU or GTIN, or a variation has no SKU of its own. The list is made after each reading of the base prices.
+* A product with variations whose base prices show different dates shows each date: next to the lowest and the highest amount, or next to the one amount when they cost the same. Before, the line had no date. When such variations cost the same, the selected variation now shows its price with its own base price and date.
 
 = 2.3.4 =
 * A product with variations shows the date of its base price when every variation shows the same date. Variations that came into Kigo.Cloud on different days but were all in the shop on the reference day showed the base price without a date on the product card, although each variation showed the reference day.

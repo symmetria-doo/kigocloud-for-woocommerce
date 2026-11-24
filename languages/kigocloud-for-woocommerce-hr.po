@@ -1384,3 +1384,18 @@ msgstr "Bazne cijene zadnji su put pročitane iz Kigo.Clouda %s, pa u trgovini m
 
 msgid "The base prices could not be read from Kigo.Cloud. The Kigo.Cloud page says why."
 msgstr "Bazne cijene nije bilo moguće pročitati iz Kigo.Clouda. Razlog piše na stranici Kigo.Cloud."
+
+msgid "SKU %s"
+msgstr "šifra %s"
+
+msgid "%1$s and %2$d more"
+msgstr "%1$s i još %2$d"
+
+msgid "variation without its own SKU"
+msgstr "varijanta bez svoje šifre"
+
+msgid "Products in the shop without a base price: %1$d. Kigo.Cloud has no item with their SKU or GTIN, or a variation has no SKU of its own: %2$s."
+msgstr "Proizvoda u trgovini bez bazne cijene: %1$d. Kigo.Cloud nema artikl s njihovom šifrom (SKU) ili GTIN-om, ili varijanta nema svoju šifru: %2$s."
+
+msgid "The SKU of a product and of each variation must be the same as the item code (šifra) in Kigo.Cloud: correct the SKU here or the code in Kigo.Cloud, or link the product to its items in Kigo.Cloud (WooCommerce, Spajanje s trgovinom)."
+msgstr "Šifra (SKU) proizvoda i svake varijante mora biti ista kao šifra artikla u Kigo.Cloudu: ispravite šifru ovdje ili u Kigo.Cloudu, ili proizvod spojite s artiklima u Kigo.Cloudu (WooCommerce, Spajanje s trgovinom)."

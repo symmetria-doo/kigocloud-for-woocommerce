@@ -114,11 +114,13 @@ JS;
             return $price_html;
         }
         $found = null;
-        if ($product->is_type('variable')) {
+        $variable = $product->is_type('variable');
+        if ($variable) {
             $found = $this->variations_anchor($product);
         }
         if ($found === null) {
-            $found = $this->own_anchor($product);
+            // A variable product's SKU is no variation's item (sku_of): only its own meta.
+            $found = $this->own_anchor($product, !$variable);
         }
         if ($found === null) {
             return $price_html;
@@ -131,13 +133,24 @@ JS;
         // "Bazna cijena (10. 9. 2026.): 12,00 €", the name the Pravilnik o
         // isticanju bazne cijene proizvoda (NN 132/2026) gives it and Kigo.Cloud
         // prints on shelf labels and declarations (ItemAnchorDate::getLabelWithDate).
+        // Variations that show different days: each amount carries its own day,
+        // "Bazna cijena: 349,00 € (25. 9. 2026.) – 899,00 € (2. 10. 2026.)",
+        // or one amount with its days, so the line never lacks a date.
+        $low_days  = empty($date) && isset($found[5]) ? self::days_text($found[5]) : '';
+        $high_days = empty($date) && isset($found[6]) ? self::days_text($found[6]) : '';
+        $range     = $highest !== null && (float) $highest !== (float) $anchor;
         $label = esc_html__('Bazna cijena', 'kigocloud-for-woocommerce');
         if (!empty($date)) {
-            $timestamp = strtotime($date);
-            if ($timestamp) {
+            $day = self::days_text(array((string) $date));
+            if ($day !== '') {
                 /* translators: %s: reference day, for example 10. 9. 2026. */
-                $label = esc_html(sprintf(__('Bazna cijena (%s)', 'kigocloud-for-woocommerce'), date_i18n('j. n. Y.', $timestamp)));
+                $label = esc_html(sprintf(__('Bazna cijena (%s)', 'kigocloud-for-woocommerce'), $day));
             }
+        } elseif ($low_days !== '' && (!$range || $low_days === $high_days)) {
+            // One amount, or the lowest and the highest from the same day: the day once.
+            /* translators: %s: reference day, for example 10. 9. 2026. */
+            $label = esc_html(sprintf(__('Bazna cijena (%s)', 'kigocloud-for-woocommerce'), $low_days));
+            $low_days = $high_days = '';
         }
         // Plain text amount: the theme's rules for .amount (colour, size, weight)
         // must not reach the anchor price, only the line's own style does.
@@ -145,8 +158,14 @@ JS;
         // that shows prices without VAT gets the base price without VAT and
         // with the same suffix ("+ PDV"), so both are on the same footing.
         $amount = trim(wp_strip_all_tags(wc_price($this->shop_amount($product, (float) $anchor))));
-        if ($highest !== null && (float) $highest !== (float) $anchor) {
+        if ($range) {
+            if ($low_days !== '') {
+                $amount .= ' (' . $low_days . ')';
+            }
             $amount .= ' – ' . trim(wp_strip_all_tags(wc_price($this->shop_amount($product, (float) $highest))));
+            if ($high_days !== '') {
+                $amount .= ' (' . $high_days . ')';
+            }
         }
         $amount .= $this->shop_suffix($product);
 
@@ -189,15 +208,16 @@ JS;
      * otherwise the price list by SKU or GTIN.
      *
      * @param WC_Product $product
+     * @param bool       $by_code also the price list by SKU or GTIN
      * @return array|null array(price, date, null)
      */
-    private function own_anchor($product)
+    private function own_anchor($product, $by_code = true)
     {
         $anchor    = $product->get_meta('_kigo_anchor_price', true);
         $date      = $product->get_meta('_kigo_anchor_price_date', true);
         $reference = self::meta_reference_day($product->get_meta('_kigo_anchor_prices', true), (string) $date);
         if ($anchor === '' || $anchor === null || !is_numeric($anchor)) {
-            $listed = class_exists('Woo_KigoCloud_Pricelist') ? Woo_KigoCloud_Pricelist::anchor_for($product) : null;
+            $listed = $by_code && class_exists('Woo_KigoCloud_Pricelist') ? Woo_KigoCloud_Pricelist::anchor_for($product) : null;
             if ($listed === null) {
                 return null;
             }
@@ -322,17 +342,37 @@ JS;
     /**
      * Base prices of the visible variations of a variable product, read the
      * same way as for a single variation (meta, then the price list by the
-     * variation's SKU, which WooCommerce takes from the parent when the
-     * variation has none, or GTIN). One meta query for all variations.
+     * variation's SKU, or the product's SKU for its only variation, or GTIN).
+     * One meta query for all variations.
      *
      * The date is the day each variation shows (offered_since), so variations
      * that came into Kigo.Cloud on different days but were all in the shop on
-     * the reference day give that one day, as each of them shows it.
+     * the reference day give that one day, as each of them shows it. When they
+     * show different days, the days of the variations with the lowest and with
+     * the highest amount go with those amounts.
      *
      * @param WC_Product $product variable product
-     * @return array|null array(lowest, day shown when all show the same day, highest, '', true)
+     * @return array|null array(lowest, day shown when all show the same day, highest, '', true,
+     *                    days of the lowest amount, days of the highest amount)
      */
     private function variations_anchor($product)
+    {
+        $key = (int) $product->get_id();
+        if (!array_key_exists($key, $this->variations_found)) {
+            $this->variations_found[$key] = $this->read_variations_anchor($product);
+        }
+
+        return $this->variations_found[$key];
+    }
+
+    /** @var array product id => variations_anchor() of this request */
+    private $variations_found = array();
+
+    /**
+     * @param WC_Product $product variable product
+     * @return array|null see variations_anchor()
+     */
+    private function read_variations_anchor($product)
     {
         $ids = array_map('intval', (array) $product->get_visible_children());
         if (empty($ids)) {
@@ -341,14 +381,16 @@ JS;
         update_meta_cache('post', $ids);
         $prices = array();
         $dates  = array();
+        $shown  = array();
         foreach ($ids as $id) {
             $anchor = get_post_meta($id, '_kigo_anchor_price', true);
             $date   = get_post_meta($id, '_kigo_anchor_price_date', true);
             $ref    = self::meta_reference_day(get_post_meta($id, '_kigo_anchor_prices', true), (string) $date);
             if ($anchor === '' || !is_numeric($anchor)) {
                 $sku = (string) get_post_meta($id, '_sku', true);
-                if ($sku === '') {
-                    $sku = (string) $product->get_sku();
+                // The product's SKU only for its only variation (Woo_KigoCloud_Pricelist::sku_of).
+                if (trim($sku) === '' && count($ids) === 1) {
+                    $sku = (string) $product->get_sku('edit');
                 }
                 $listed = class_exists('Woo_KigoCloud_Pricelist')
                     ? Woo_KigoCloud_Pricelist::anchor_for_codes($sku, (string) get_post_meta($id, '_global_unique_id', true))
@@ -365,13 +407,68 @@ JS;
             }
             $prices[] = (float) $anchor;
             // The parent's creation day counts for a variation (offered_since).
-            $dates[$this->offered_since($product, (string) $date, (string) $ref)] = true;
+            $day = $this->offered_since($product, (string) $date, (string) $ref);
+            $dates[$day] = true;
+            $shown[] = array((float) $anchor, $day);
         }
         if (empty($prices)) {
             return null;
         }
+        $low  = min($prices);
+        $high = max($prices);
+        $days = function ($amount) use ($shown) {
+            $list = array();
+            foreach ($shown as $one) {
+                if ($one[1] !== '' && abs($one[0] - $amount) < 0.005) {
+                    $list[$one[1]] = true;
+                }
+            }
+            $list = array_keys($list);
+            sort($list);
 
-        return array(min($prices), count($dates) === 1 ? (string) key($dates) : '', max($prices), '', true);
+            return $list;
+        };
+
+        return array($low, count($dates) === 1 ? (string) key($dates) : '', $high, '', true, $days($low), $days($high));
+    }
+
+    /**
+     * @param string[] $dates Y-m-d
+     * @return string "10. 9. 2026., 25. 9. 2026.", '' without a valid date
+     */
+    private static function days_text(array $dates)
+    {
+        $out = array();
+        foreach ($dates as $date) {
+            $timestamp = strtotime((string) $date);
+            if ($timestamp) {
+                $out[] = date_i18n('j. n. Y.', $timestamp);
+            }
+        }
+
+        return implode(', ', $out);
+    }
+
+    /**
+     * Hooked on `woocommerce_show_variation_price`: WooCommerce leaves out the
+     * price of the selected variation when all variations cost the same, so the
+     * product's line is the only one on the page. When the variations show
+     * different days that line cannot name one day, so the selected variation
+     * shows its price with its own base price and day.
+     *
+     * @param bool                 $show
+     * @param WC_Product           $product   variable product
+     * @param WC_Product_Variation $variation
+     * @return bool
+     */
+    public function show_variation_price($show, $product, $variation)
+    {
+        if ($show || '1' !== (string) get_option('kigocloud_show_anchor_price', '0') || !($product instanceof WC_Product)) {
+            return $show;
+        }
+        $found = $this->variations_anchor($product);
+
+        return $found !== null && $found[1] === '' && count(array_unique(array_merge($found[5], $found[6]))) > 1;
     }
 
     /**

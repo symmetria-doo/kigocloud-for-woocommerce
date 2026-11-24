@@ -1316,3 +1316,18 @@ msgstr ""
 
 msgid "Deposit per piece of this variation. Leave empty to use the deposit of the product."
 msgstr ""
+
+msgid "SKU %s"
+msgstr ""
+
+msgid "%1$s and %2$d more"
+msgstr ""
+
+msgid "variation without its own SKU"
+msgstr ""
+
+msgid "Products in the shop without a base price: %1$d. Kigo.Cloud has no item with their SKU or GTIN, or a variation has no SKU of its own: %2$s."
+msgstr ""
+
+msgid "The SKU of a product and of each variation must be the same as the item code (šifra) in Kigo.Cloud: correct the SKU here or the code in Kigo.Cloud, or link the product to its items in Kigo.Cloud (WooCommerce, Spajanje s trgovinom)."
+msgstr ""

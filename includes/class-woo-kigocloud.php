@@ -45,7 +45,7 @@ class Woo_KigoCloud {
      *
      * @since 1.0.0
      */
-    const PLUGIN_VERSION = '2.3.4';
+    const PLUGIN_VERSION = '2.3.5';
 
     /**
      * Is WooCommerce active? Without it the plugin only publishes the price
@@ -375,6 +375,8 @@ class Woo_KigoCloud {
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
 		// Anchor price under the product price (_kigo_anchor_price meta from KigoCloud).
 		$this->loader->add_filter( 'woocommerce_get_price_html', $plugin_public, 'anchor_price_html', 20, 2 );
+		// The selected variation shows its own base price day when the variations show different days.
+		$this->loader->add_filter( 'woocommerce_show_variation_price', $plugin_public, 'show_variation_price', 20, 3 );
 
 	}
 

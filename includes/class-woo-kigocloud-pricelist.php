@@ -578,6 +578,7 @@ class Woo_KigoCloud_Pricelist
         add_action('woocommerce_product_options_pricing', array(__CLASS__, 'product_anchor_field'));
         add_action('woocommerce_variation_options_pricing', array(__CLASS__, 'variation_anchor_field'), 20, 3);
         add_action('admin_notices', array(__CLASS__, 'anchor_notice'));
+        add_action('admin_notices', array(__CLASS__, 'missing_notice'));
         // Every Save reads them again, also when nothing changed here (a login
         // switched in Kigo.Cloud, a reference day changed there).
         add_action('admin_init', array(__CLASS__, 'on_settings_form'));
@@ -680,6 +681,12 @@ class Woo_KigoCloud_Pricelist
     /** Items per page of item/list (its maximum). */
     const ANCHOR_PAGE = 3000;
 
+    /** Published products and variations of this shop without a base price, after the last read. */
+    const OPTION_ANCHOR_MISSING = 'kigocloud_anchor_missing';
+
+    /** Products named in the warning; the rest are counted. */
+    const MISSING_LISTED = 5;
+
     /**
      * Reads the anchor prices of all items from Kigo.Cloud (GET item/list, page
      * by page) and stores the newest one of each item. A failed call keeps the
@@ -726,8 +733,156 @@ class Woo_KigoCloud_Pricelist
         update_option(self::OPTION_ANCHOR, $index, false);
         self::$anchor_index = null;
         self::store_anchor_source(array('reason' => $count > 0 ? '' : 'empty', 'count' => $count));
+        if ($count > 0) {
+            self::store_missing();
+        } else {
+            delete_option(self::OPTION_ANCHOR_MISSING);
+        }
 
         return $count;
+    }
+
+    /**
+     * Finds the published products and variations that have a price but no
+     * base price (no meta from Kigo.Cloud, and no Kigo.Cloud item with their
+     * SKU or GTIN) and keeps them for the warning (missing_notice). A product
+     * shows no base price line then, and the shop owner would not know it
+     * without opening each product. Direct queries, so a shop with many
+     * products is read in a few calls.
+     */
+    private static function store_missing()
+    {
+        global $wpdb;
+        // Without a good read every product would look like one without a base price.
+        $source = self::anchor_source();
+        if (!isset($source['time']) || (isset($source['reason']) && $source['reason'] !== '') || !self::anchor_wanted()) {
+            delete_option(self::OPTION_ANCHOR_MISSING);
+            return;
+        }
+        $products = $wpdb->get_results("SELECT ID, post_title FROM {$wpdb->posts} WHERE post_type = 'product' AND post_status = 'publish'", OBJECT_K);
+        if (empty($products)) {
+            delete_option(self::OPTION_ANCHOR_MISSING);
+            return;
+        }
+        // Variable and grouped products have no price of their own (a variable one is judged by its variations).
+        $no_price_types = $wpdb->get_col(
+            "SELECT tr.object_id FROM {$wpdb->term_relationships} tr"
+            . " JOIN {$wpdb->term_taxonomy} tt ON tt.term_taxonomy_id = tr.term_taxonomy_id"
+            . " JOIN {$wpdb->terms} t ON t.term_id = tt.term_id"
+            . " WHERE tt.taxonomy = 'product_type' AND t.slug IN ('variable', 'grouped')"
+        );
+        $no_price_types = array_flip(array_map('intval', $no_price_types));
+        $rows = array();
+        foreach ($products as $id => $product) {
+            if (!isset($no_price_types[(int) $id])) {
+                $rows[(int) $id] = array('id' => (int) $id, 'parent' => 0, 'title' => (string) $product->post_title);
+            }
+        }
+        $variations = $wpdb->get_results("SELECT ID, post_parent FROM {$wpdb->posts} WHERE post_type = 'product_variation' AND post_status = 'publish'");
+        $siblings = array();
+        foreach ($variations as $variation) {
+            $parent = (int) $variation->post_parent;
+            if (isset($products[$parent])) {
+                $rows[(int) $variation->ID] = array('id' => (int) $variation->ID, 'parent' => $parent, 'title' => (string) $products[$parent]->post_title);
+                $siblings[$parent] = isset($siblings[$parent]) ? $siblings[$parent] + 1 : 1;
+            }
+        }
+        $meta = array();
+        $ids = array_merge(array_keys($rows), array_keys($products));
+        foreach (array_chunk(array_unique($ids), 1000) as $chunk) {
+            $found = $wpdb->get_results(
+                "SELECT post_id, meta_key, meta_value FROM {$wpdb->postmeta}"
+                . " WHERE meta_key IN ('_sku', '_price', '_global_unique_id', '_kigo_anchor_price')"
+                . ' AND post_id IN (' . implode(',', array_map('intval', $chunk)) . ')'
+            );
+            foreach ($found as $one) {
+                $meta[(int) $one->post_id][$one->meta_key] = (string) $one->meta_value;
+            }
+        }
+        $get = function ($id, $key) use ($meta) {
+            return isset($meta[$id][$key]) ? trim($meta[$id][$key]) : '';
+        };
+        $missing = array();
+        foreach ($rows as $id => $row) {
+            if ($get($id, '_price') === '') {
+                continue;
+            }
+            $anchor = $get($id, '_kigo_anchor_price');
+            if ($anchor !== '' && is_numeric($anchor)) {
+                continue;
+            }
+            $sku = $get($id, '_sku');
+            // The product's SKU only for its only variation (sku_of).
+            if ($sku === '' && $row['parent'] > 0 && $siblings[$row['parent']] === 1) {
+                $sku = $get($row['parent'], '_sku');
+            }
+            if (self::anchor_for_codes($sku, $get($id, '_global_unique_id')) !== null) {
+                continue;
+            }
+            // One entry per product: its SKUs Kigo.Cloud does not know, and whether a variation has none.
+            $product_id = $row['parent'] > 0 ? $row['parent'] : $id;
+            if (!isset($missing[$product_id])) {
+                $missing[$product_id] = array('id' => $product_id, 'title' => $row['title'], 'skus' => array(), 'no_sku' => false);
+            }
+            if ($sku === '') {
+                $missing[$product_id]['no_sku'] = true;
+            } elseif (count($missing[$product_id]['skus']) < 3 && !in_array($sku, $missing[$product_id]['skus'], true)) {
+                $missing[$product_id]['skus'][] = $sku;
+            }
+        }
+        update_option(self::OPTION_ANCHOR_MISSING, array(
+            'time' => time(),
+            'count' => count($missing),
+            'items' => array_slice(array_values($missing), 0, self::MISSING_LISTED),
+        ), false);
+    }
+
+    /**
+     * Hooked on `admin_notices`: names the published products that show no
+     * base price, and why (the SKU is not an item code in Kigo.Cloud), so the
+     * shop owner can fix the SKU or the item in Kigo.Cloud. Gone once the next
+     * read finds a base price for all of them.
+     */
+    public static function missing_notice()
+    {
+        if (!current_user_can('manage_options') || !Woo_KigoCloud::is_notice_screen() || !self::anchor_wanted()) {
+            return;
+        }
+        $missing = get_option(self::OPTION_ANCHOR_MISSING, array());
+        if (!is_array($missing) || empty($missing['count'])) {
+            return;
+        }
+        $names = array();
+        foreach ((array) $missing['items'] as $item) {
+            if (!isset($item['skus'])) {
+                continue;
+            }
+            $why = array();
+            if (!empty($item['skus'])) {
+                /* translators: %s: SKU or SKUs */
+                $why[] = sprintf(esc_html__('SKU %s', 'kigocloud-for-woocommerce'), esc_html(implode(', ', (array) $item['skus'])));
+            }
+            if (!empty($item['no_sku'])) {
+                $why[] = esc_html__('variation without its own SKU', 'kigocloud-for-woocommerce');
+            }
+            $name = esc_html((string) $item['title']) . ' (' . implode('; ', $why) . ')';
+            $link = get_edit_post_link((int) $item['id']);
+            $names[] = $link ? '<a href="' . esc_url($link) . '">' . $name . '</a>' : $name;
+        }
+        $more = (int) $missing['count'] - count($names);
+        $list = implode(', ', $names);
+        if ($more > 0) {
+            /* translators: 1: list of products, 2: number of other products */
+            $list = sprintf(esc_html__('%1$s and %2$d more', 'kigocloud-for-woocommerce'), $list, $more);
+        }
+        $text = sprintf(
+            /* translators: 1: number of products, 2: list of products */
+            esc_html__('Products in the shop without a base price: %1$d. Kigo.Cloud has no item with their SKU or GTIN, or a variation has no SKU of its own: %2$s.', 'kigocloud-for-woocommerce'),
+            (int) $missing['count'],
+            $list
+        );
+        $help = esc_html__('The SKU of a product and of each variation must be the same as the item code (šifra) in Kigo.Cloud: correct the SKU here or the code in Kigo.Cloud, or link the product to its items in Kigo.Cloud (WooCommerce, Spajanje s trgovinom).', 'kigocloud-for-woocommerce');
+        echo '<div class="notice notice-warning"><p><strong>KigoCloud</strong> ' . $text . ' ' . $help . '</p></div>'; // phpcs:ignore WordPress.Security.EscapeOutput -- escaped above
     }
 
     /**
@@ -816,7 +971,7 @@ class Woo_KigoCloud_Pricelist
         }
         $sku = trim((string) get_post_meta($variation_id, '_sku', true));
         if ($sku === '') {
-            $sku = trim((string) get_post_meta(wp_get_post_parent_id($variation_id), '_sku', true));
+            $sku = self::only_variation_sku((int) wp_get_post_parent_id($variation_id), (int) $variation_id);
         }
         if ($sku !== '') {
             self::$saved_skus[$sku] = true;
@@ -870,6 +1025,7 @@ class Woo_KigoCloud_Pricelist
         }
         update_option(self::OPTION_ANCHOR, $index, false);
         self::$anchor_index = null;
+        self::store_missing();
     }
 
     /**
@@ -897,11 +1053,7 @@ class Woo_KigoCloud_Pricelist
         if (!$product) {
             return;
         }
-        $sku = (string) $product->get_sku();
-        if (trim($sku) === '') {
-            $sku = (string) get_post_meta($variation->post_parent, '_sku', true);
-        }
-        echo self::anchor_field_html($product, $sku); // phpcs:ignore WordPress.Security.EscapeOutput -- escaped in anchor_field_html()
+        echo self::anchor_field_html($product, self::sku_of($product)); // phpcs:ignore WordPress.Security.EscapeOutput -- escaped in anchor_field_html()
     }
 
     /**
@@ -1087,9 +1239,57 @@ class Woo_KigoCloud_Pricelist
      */
     public static function anchor_for($product)
     {
-        $gtin = is_callable(array($product, 'get_global_unique_id')) ? (string) $product->get_global_unique_id() : '';
+        $gtin = is_callable(array($product, 'get_global_unique_id')) ? (string) $product->get_global_unique_id('edit') : '';
 
-        return self::anchor_for_codes((string) $product->get_sku(), $gtin);
+        return self::anchor_for_codes(self::sku_of($product), $gtin);
+    }
+
+    /**
+     * SKU a product or variation is matched by. A variation without its own
+     * SKU shows its product's SKU in WooCommerce, but that SKU is the item of
+     * one variation at most: taken only when the product has no other
+     * variation, otherwise every variation would show the base price of that
+     * one item (a printer's variations Fan filter and Ink with the printer's
+     * base price, or a printer with the base price of an ink coded like the
+     * product). Such a variation needs its own SKU, the warning on the admin
+     * screens names it.
+     *
+     * @param WC_Product $product
+     * @return string
+     */
+    public static function sku_of($product)
+    {
+        if (!$product->get_parent_id()) {
+            return (string) $product->get_sku();
+        }
+        $own = trim((string) $product->get_sku('edit'));
+        if ($own !== '') {
+            return $own;
+        }
+
+        return self::only_variation_sku((int) $product->get_parent_id(), (int) $product->get_id());
+    }
+
+    /**
+     * @param int $parent_id variable product
+     * @param int $variation_id
+     * @return string the product's SKU when this is its only published variation, otherwise ''
+     */
+    public static function only_variation_sku($parent_id, $variation_id)
+    {
+        $children = get_posts(array(
+            'post_type' => 'product_variation',
+            'post_parent' => $parent_id,
+            'post_status' => 'publish',
+            'fields' => 'ids',
+            'numberposts' => 2,
+            'suppress_filters' => true,
+        ));
+        if (count($children) !== 1 || (int) $children[0] !== $variation_id) {
+            return '';
+        }
+
+        return trim((string) get_post_meta($parent_id, '_sku', true));
     }
 
     /**

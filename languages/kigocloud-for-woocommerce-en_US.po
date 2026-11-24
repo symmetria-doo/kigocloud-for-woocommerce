@@ -372,3 +372,18 @@ msgstr "Base price"
 #, php-format
 msgid "Bazna cijena (%s)"
 msgstr "Base price (%s)"
+
+msgid "SKU %s"
+msgstr "SKU %s"
+
+msgid "%1$s and %2$d more"
+msgstr "%1$s and %2$d more"
+
+msgid "variation without its own SKU"
+msgstr "variation without its own SKU"
+
+msgid "Products in the shop without a base price: %1$d. Kigo.Cloud has no item with their SKU or GTIN, or a variation has no SKU of its own: %2$s."
+msgstr "Products in the shop without a base price: %1$d. Kigo.Cloud has no item with their SKU or GTIN, or a variation has no SKU of its own: %2$s."
+
+msgid "The SKU of a product and of each variation must be the same as the item code (šifra) in Kigo.Cloud: correct the SKU here or the code in Kigo.Cloud, or link the product to its items in Kigo.Cloud (WooCommerce, Spajanje s trgovinom)."
+msgstr "The SKU of a product and of each variation must be the same as the item code (šifra) in Kigo.Cloud: correct the SKU here or the code in Kigo.Cloud, or link the product to its items in Kigo.Cloud (WooCommerce, Spajanje s trgovinom)."

@@ -4,6 +4,16 @@ All notable changes to KigoCloud for WooCommerce are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.3.5] - 2026-11-24
+
+### Fixed
+- A variation without its own SKU was matched with the price list by its product's SKU (`WC_Product_Variation::get_sku()` falls back to the parent), so all variations of a product showed the base price of the one item coded like the product: at Gea Data the 16 variations of Roland MO-180, the 8 of ORIC DTF 60 and the 7 of Roland BT-12 (filter 40 EUR with the base price 1.299 EUR of a heat press coded 015-8), and Roland BD-12 with the base price of an ink coded like the product. `Woo_KigoCloud_Pricelist::sku_of()` takes the product's SKU only for its only published variation; `anchor_for()`, `variations_anchor()`, the base price field of a variation, the reading of a saved variation and the missing list use it. A variable product without base prices of its variations no longer falls back to its own SKU (only its own meta).
+- Variable products whose variations show different days: the line names them, `Bazna cijena: 349,00 EUR (25. 9. 2026.) - 899,00 EUR (2. 10. 2026.)` with the days of the lowest and the highest amount, or `Bazna cijena (5. 11. 2026., 13. 11. 2026.): 314,00 EUR` when they cost the same. Before, the line had no date.
+- When such variations cost the same, WooCommerce left out the price of the selected variation, so the product page never showed a variation's own day; `woocommerce_show_variation_price` now shows it then.
+
+### Added
+- Warning on the admin screens (Dashboard, Plugins, Kigo.Cloud) with the number of published products that have a price but no base price, the first five by name with their SKU or "variation without its own SKU" and a link to edit them. Made after each reading of the base prices (`refresh_anchor_prices`, `read_skus`) and kept in the option `kigocloud_anchor_missing`; not made after a failed reading.
+
 ## [2.3.4] - 2026-11-24
 
 ### Fixed
